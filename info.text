@@ -1,0 +1,44 @@
+Admin Panel Modules
+Admin Login 
+Select GuestBlog or PressRelease
+Press Release
+Media Library
+Upload/ Delete Photos & Videos
+Published & Draft Press Release List (Title, Category, Published Date)
+Edit & Delete Post
+Change Publish Date
+Author Name (Optional as of now)
+Filters (Date, Category, Author)
+Add new PressRelease
+Featured Image
+Title
+Content (Rich Text Editor)
+SEO Meta Title & Description
+URL (Slug)
+Featured Image
+Category (Can be more than 1)
+Save Draft
+Publish Post
+Publish Date (we can change it)
+Status (Public,Draft - We can change the status manually)
+
+Guest Post
+Media Library
+Upload/ Delete Photos & Videos
+Published & Draft Guest Post List (Title, Category, Published Date)
+Edit & Delete Post
+Change Publish Date
+Author Name (Optional as of now)
+Filters (Date, Category, Author)
+Add new Guest Blog
+Featured Image
+Title
+Content (Rich Text Editor)
+SEO Meta Title & Description
+URL (Slug)
+Category (Can be more than 1)
+Save Draft
+Publish Post
+Status (Public,Draft - We can change the status manually)
+Contact Form Entries (Same as UNT)
+Other Dynamic Sections based on the design

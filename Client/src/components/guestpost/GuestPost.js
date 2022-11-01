@@ -4,18 +4,17 @@ import Header from "../common/Header"
 import "./style.css"
 import "react-datepicker/dist/react-datepicker.css";
 
-const PressRelease = () => {
+export default function GuestPost() {
     return (
         <>
             <Header />
             <Container fluid>
                 <Row className="AddActionSpace">
                     <Col xl={12}>
-                        <Button variant="success">Add new PressRelease</Button>
+                        <Button variant="success">Add new Guest post</Button>
                     </Col>
                 </Row>
                 <Row className="TableSpace">
-
                     <Col xl={6}>
                         <Table striped bordered hover variant="dark">
                             <thead>
@@ -34,18 +33,14 @@ const PressRelease = () => {
                                     <td>Mark</td>
                                     <td>Otto</td>
                                     <td>1-1-2022</td>
-
                                     <td><Button variant="info" style={{ width: "100%" }}>Edit</Button></td>
                                     <td><Button variant="danger" style={{ width: "100%" }}>Delete</Button></td>
                                 </tr>
-
                             </tbody>
                         </Table>
                     </Col>
-
                 </Row>
             </Container>
         </>
     )
 }
-export default PressRelease

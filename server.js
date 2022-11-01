@@ -8,7 +8,8 @@ const path = require('path');
 const fs = require('fs');
 const { default: mongoose } = require('mongoose');
 const EModel = require("./model/model")
-const cors = require('cors')
+const cors = require('cors');
+const ECategory = require('./model/category');
 
 const PORT = process.env.PORT || 8000;
 const app = express();
@@ -63,10 +64,26 @@ app.post('/save', async (req, res) => {
         }
     }
 })
+
+app.post('/upload-category', async (req, res) => {
+    const { title } = req.body
+    if (!title || title === "null" || title.length <= 3) {
+        return res.status(400).send({ msg: "Enter valid category title ! ,length must be greater than 3 words !", success: false })
+    } else {
+        if (await ECategory.create({ title })) {
+            return res.status(200).send({ msg: "Category uploaded !", success: true })
+        } else {
+            return res.status(500).send({ msg: "Category not uploaded !", success: false })
+        }
+    }
+})
+
 app.get('/all', async (req, res) => {
     const data = await EModel.find({}).clone()
     return res.send({ success: true, data: data })
 })
+
+
 mongoose.connect("mongodb+srv://kevanultroneous:Gs2vHLkMT4J96UhK@cluster0.2uvjism.mongodb.net/editor?retryWrites=true&w=majority")
     .then((r) => console.log("database connect"))
     .catch((e) => console.log("error" + e))
