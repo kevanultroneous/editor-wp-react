@@ -1,0 +1,53 @@
+.cardstyle {
+    border-radius: 20px !important;
+    box-shadow: -12px 24px 58px -16px #323232;
+}
+
+.loginbtn {
+    background-color: #1746A2;
+    border: none;
+}
+
+.loginbtn:hover {
+    background-color: transparent;
+    border: 1px solid #1746A2;
+    color: #1746A2;
+}
+
+.loginbtn:focus {
+    background-color: transparent;
+    border: 1px solid #1746A2;
+    color: #1746A2;
+    box-shadow: none;
+}
+
+.loginbtn:active {
+    background-color: transparent;
+    border: 1px solid #1746A2;
+    color: #1746A2;
+    box-shadow: none;
+}
+
+.inputborder:focus {
+    border-color: #1746A2;
+    box-shadow: none;
+}
+
+.linkbtn {
+    color: #1746A2;
+}
+
+.linkbtn:hover {
+    color: #1746A2;
+    box-shadow: none;
+}
+
+.linkbtn:focus {
+    color: #1746A2;
+    box-shadow: none !important;
+}
+
+.linkbtn:active {
+    color: #1746A2;
+    box-shadow: none !important;
+}
