@@ -1,13 +1,35 @@
 const EPost = require('../model/post');
 
 const uploadPost = async (req, res) => {
-    const { data, draft } = req.body
-    if (!data || data === "null" || data.length < 10) {
-        return res.status(400).send({ msg: "Enter valid data ! ,data must be 10  words !", success: false })
+    const { title,
+        fimg,
+        category,
+        date,
+        author,
+        content,
+        smeta,
+        stitle,
+        sdesc,
+        url,
+        status,
+        parent } = req.body
+    if (await EPost.create({
+        title,
+        fimg,
+        category,
+        date,
+        author,
+        content,
+        smeta,
+        stitle,
+        sdesc,
+        url,
+        status,
+        parent
+    })) {
+        return res.status(200).send({ msg: status == 1 ? "Post uploaded !" : "Post drafted !", success: true, data: data })
     } else {
-        if (await EPost.create({ data, draft })) {
-            return res.status(200).send({ msg: "Post uploaded !", success: true, data: data })
-        }
+        return res.status(200).send({ msg: "Post not uploaded !", success: false })
     }
 }
 

@@ -13,6 +13,7 @@ export default function Contact() {
     const [editHtml, setEditHtml] = useState(false)
     const [allowEdit, setAllowEdit] = useState(false)
 
+
     const ckeditorstate = (event, editor) => {
         const data = editor.getData();
         setContent(data)
@@ -40,7 +41,6 @@ export default function Contact() {
         <Container fluid>
             <Row className="EditorSpace">
                 <Col xl={5} className="EditorSize">
-
                     <CKEditor
                         data={""}
                         editor={ClassicEditor}
