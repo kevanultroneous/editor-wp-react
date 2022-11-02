@@ -4,13 +4,42 @@ import Header from "../common/Header"
 import "./style.css"
 import "react-datepicker/dist/react-datepicker.css";
 
+const ModelUplaod = ({ show, handleClose, handleSave }) => {
+    return (
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header>
+                <Modal.Title>Add new category..</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <InputGroup className="mb-3">
+                    <Form.Control
+                        placeholder="Category name"
+                        aria-label="Category name"
+                        aria-describedby="basic-addon2"
+                    />
+                </InputGroup>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={handleSave}>
+                    Upload
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    )
+}
 export default function Categories() {
-    const [show, setShow] = useState(false);
-    const [category, setCategory] = useState("")
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const handleSave = () => {
 
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+
+    const handleShow = () => setShow(true);
+
+    const handleSave = () => {
+        alert('saved')
     }
 
     return (
@@ -45,28 +74,11 @@ export default function Categories() {
                     </Col>
                 </Row>
             </Container>
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header>
-                    <Modal.Title>Add new category..</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <InputGroup className="mb-3">
-                        <Form.Control
-                            placeholder="Category name"
-                            aria-label="Category name"
-                            aria-describedby="basic-addon2"
-                        />
-                    </InputGroup>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Upload
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <ModelUplaod
+                show={show}
+                handleClose={handleClose}
+                handleSave={handleSave}
+            />
         </>
     )
 }

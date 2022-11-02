@@ -5,6 +5,10 @@ const schema = new mongoose.Schema({
         type: String,
         default: 'Wrraper'
     },
+    featuredImage: {
+        type: String,
+        default: '/uploads/cover.jpg'
+    },
     author: {
         type: String,
         default: 'author'

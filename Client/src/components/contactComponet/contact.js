@@ -18,16 +18,6 @@ export default function Contact() {
         setContent(data)
     }
 
-    // const fetchingsdatas = () => {
-    //     axios.get("http://192.168.1.28:8000/all").then((r) => {
-    //         setFetched(r.data.data)
-    //     }).catch((e) => {
-    //         if (e.response) {
-    //             alert(e.response.data.msg)
-    //         }
-    //     })
-    // }
-
     const handlesubmit = (draft = false) => {
         axios.post("http://192.168.1.28:8000/save", { data: content, draft: draft }).then((r) => {
             if (r.data.success) {
