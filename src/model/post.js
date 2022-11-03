@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
+
 // status 0 draft
 // status 1 publish
 // parent 0 press release
 // parent 1 guest post
+
 const schema = new mongoose.Schema({
     title: {
         type: String,
@@ -51,6 +53,10 @@ const schema = new mongoose.Schema({
     parent: {
         type: Number,
         default: 0
+    },
+    isDelete: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 
