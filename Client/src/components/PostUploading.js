@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Header from "./common/Header";
-import { Container, Row, Col, Form, InputGroup, FloatingLabel } from "react-bootstrap"
-
+import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button } from "react-bootstrap"
 import "./postUploading.css"
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import Contact from "./contactComponet/contact";
+import CKEditor from '@ckeditor/ckeditor5-react'
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
+import { Markup } from "interweave";
+import { useNavigate } from "react-router-dom";
+
 export default function PostUploading() {
 
     const [categoryData, setCategoryData] = useState([])
@@ -17,26 +22,45 @@ export default function PostUploading() {
     const [seometatags, setSeoMetaTags] = useState("")
     const [url, setUrl] = useState("")
     const [publish, setPublish] = useState(0)
+    const [content, setContent] = useState('')
+
+    const navigate = useNavigate()
+    // status 0 draft
+    // status 1 publish
+    // parent 0 press release
+    // parent 1 guest post
 
     useEffect(() => {
         fetchCategory()
     }, [])
 
-    const postUpload = () => {
 
+    const dataready = {
+        title: mainTitle,
+        category: category,
+        author: author,
+        content: content,
+        smeta: seometatags,
+        stitle: seotitle,
+        sdesc: seodescription,
+        url: url,
+        status: publish,
+        parent: 1,
     }
-    // title,
-    //     fimg,
-    //     category,
-    //     date,
-    //     author,
-    //     content,
-    //     smeta,
-    //     stitle,
-    //     sdesc,
-    //     url,
-    //     status,
-    //     parent
+
+    const postUpload = () => {
+        axios.post('http://192.168.1.28:8000/upload-post', dataready)
+            .then((r) => {
+                if (r.data.success) {
+                    toast.success(r.data.msg)
+                    navigate('/home')
+                } else {
+                    toast.error(r.data.msg)
+                }
+            })
+            .catch((e) => toast.error(e.response.data.msg))
+    }
+
     const fetchCategory = () => {
         axios.get('http://192.168.1.28:8000/categories').then((r) => {
             if (r.data.success) {
@@ -53,8 +77,14 @@ export default function PostUploading() {
         }
     }
 
+    const ckeditorstate = (event, editor) => {
+        const data = editor.getData();
+        setContent(data)
+    }
+
+
     return (
-        <>
+        <div>
             <Toaster
                 position="top-right"
                 reverseOrder={false}
@@ -95,7 +125,7 @@ export default function PostUploading() {
                                     <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}>
                                         {
                                             categoryData.map((v, i) =>
-                                                <option value={v._id} >{v.title}</option>
+                                                <option value={v._id} key={i}>{v.title}</option>
                                             )
                                         }
                                     </select>
@@ -147,7 +177,7 @@ export default function PostUploading() {
                             <div className="mt-4">
                                 <Form.Label><strong>Publish / Draft</strong></Form.Label>
                                 <Form.Check
-                                    onClick={(e) => setPublish(e.target.checked ? 1 : 0)}
+                                    onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
                                     checked={publish}
                                     type="switch"
                                     id="custom-switch"
@@ -158,25 +188,62 @@ export default function PostUploading() {
                     </Col>
                     <Col xl={9}>
                         <div className="EditorWrraper">
-                            <Contact />
+                            <div>
+                                <h3>Add Content
+                                    <Button
+                                        onClick={() => postUpload()}
+                                        className="ms-4"
+                                        variant={publish === 1 ? "success" : "secondary"}
+                                    >
+                                        Save as {publish === 1 ? "Publish" : "Draft"}
+                                    </Button></h3>
+                            </div>
+                            <Row className="EditorSpace">
+                                <Col xl={6} className="EditorSize">
+                                    <Tabs
+                                        id="controlled-tab-example"
+                                        className="mb-3"
+                                    >
+                                        <Tab eventKey="Content" title="Content">
+                                            <CKEditor
+                                                editor={ClassicEditor}
+                                                onChange={ckeditorstate}
+                                                config={
+                                                    {
+                                                        ckfinder: {
+                                                            // The URL that the images are uploaded to.
+                                                            uploadUrl: '/upload',
+                                                            // Enable the XMLHttpRequest.withCredentials property.
+                                                            withCredentials: true,
+                                                            // Headers sent along with the XMLHttpRequest to the upload server.
+                                                            headers: {
+                                                                'X-CSRF-TOKEN': 'CSFR-Token',
+                                                                Authorization: 'Bearer <JSON Web Token>'
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            />
+                                        </Tab>
+                                        <Tab eventKey="Html" title="Html">
+                                            <textarea
+                                                onChange={(e) => setContent(e.target.value)}
+                                                value={content}
+                                                style={{ height: "100vh", width: "100%", border: "none", outline: "none" }}
+                                                placeholder="write your html......"
+                                            >
+                                            </textarea>
+                                        </Tab>
+                                        <Tab eventKey="Preview" title="Preview">
+                                            <Markup content={content} />
+                                        </Tab>
+                                    </Tabs>
+                                </Col>
+                            </Row>
                         </div>
                     </Col>
                 </Row>
             </Container>
-            {/* <h3>
-                Add new PressRelease
-                -Featured Image
-                -Title
-                -Content (Rich Text Editor)
-                -SEO Meta Title & Description
-                -URL (Slug)
-                -Featured Image
-                -Category (Can be more than 1)
-                -Save Draft
-                -Publish Post
-                -Publish Date (we can change it)
-                -Status (Public,Draft - We can change the status manually)
-            </h3> */}
-        </>
+        </div>
     )
 }

@@ -24,7 +24,11 @@ Add new PressRelease
 -Status (Public,Draft - We can change the status manually)
 
 
-
+// "@ckeditor/ckeditor5-build-classic": "^18.0.0",
+    // "@ckeditor/ckeditor5-build-decoupled-document": "^20.0.0",
+    // "@ckeditor/ckeditor5-essentials": "^20.0.0",
+    // "@ckeditor/ckeditor5-html-support": "^35.2.1",
+    // "@ckeditor/ckeditor5-react": "^2.1.0",
 
 
 

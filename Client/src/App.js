@@ -9,6 +9,7 @@ import Categories from './components/categories/Categories';
 import EditPost from './components/EditPost';
 import PostUploading from './components/PostUploading';
 import "./app.css"
+import ViewPost from './components/Viewpost';
 
 export default function App() {
   return (
@@ -20,6 +21,8 @@ export default function App() {
       <Route path='/categories' element={<Categories />} />
       <Route path='/edit-post' element={<EditPost />} />
       <Route path='/upload-post' element={<PostUploading />} />
+      <Route path='/view-press-release/:postid' element={<ViewPost />} />
+      <Route path='/view-guest-post/:gpostid' element={<ViewPost />} />
       <Route path='*' element={<h1>404</h1>} />
     </Routes>
   );
