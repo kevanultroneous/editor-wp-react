@@ -1,5 +1,5 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
+import SourceEditing from '@ckeditor/ckeditor5-source-editing/src/sourceediting';
 class MyUploadAdapter {
     constructor(loader) {
         // The file loader instance to use during the upload.
@@ -128,13 +128,11 @@ function MyCustomUploadAdapterPlugin(editor) {
         return new MyUploadAdapter(loader);
     };
 }
-
-ClassicEditor
-    .create(document.querySelector('#editor'), {
-        extraPlugins: [MyCustomUploadAdapterPlugin],
-
-        // ...
-    })
-    .catch(error => {
-        console.log(error);
-    });
+// ClassicEditor
+//     .create(document.querySelector('#editor'), {
+//         extraPlugins: [MyCustomUploadAdapterPlugin, SourceEditing],
+//         // ...
+//     }).then((r) => console.log('all done'))
+//     .catch(error => {
+//         console.log(error);
+//     });

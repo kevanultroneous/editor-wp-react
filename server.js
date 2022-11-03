@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
-const { uploadPost } = require('./src/controller/postController');
+const { uploadPost, getAllpost, deletePost } = require('./src/controller/postController');
 const { uploadCategory, getAllCategory, deleteCategory, updateCategory } = require('./src/controller/categoryController');
 
 const PORT = process.env.PORT || 8000;
@@ -18,7 +18,7 @@ app.use(express.static('uploads'))
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
-// post
+// content image upload
 app.post('/upload', MuiltiPartyMiddleware, async (req, res) => {
     var TempFile = req.files.upload;
     var TempPathfile = TempFile.path;
@@ -40,13 +40,17 @@ app.post('/upload', MuiltiPartyMiddleware, async (req, res) => {
     // console.log(req.files);
 })
 
+// post
 app.post('/upload-post', uploadPost)
+app.post('/delete-post', deletePost)
+app.get('/get-all-post/:num', getAllpost)
 
 // category
 app.post('/upload-category', uploadCategory)
 app.get('/categories', getAllCategory)
 app.post('/delete-category', deleteCategory)
 app.post('/update-category', updateCategory)
+
 // database connection
 mongoose.connect("mongodb+srv://kevanultroneous:Gs2vHLkMT4J96UhK@cluster0.2uvjism.mongodb.net/editor?retryWrites=true&w=majority")
     .then((r) => console.log("database connect"))

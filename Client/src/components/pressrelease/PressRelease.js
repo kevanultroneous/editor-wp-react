@@ -1,16 +1,75 @@
 import { Button, Col, Container, Row, Table } from "react-bootstrap"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import Header from "../common/Header"
 import "./style.css"
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios"
+import toast, { Toaster } from "react-hot-toast";
+import DeleteModel from "../common/DeleteModel";
 
 const PressRelease = () => {
     const navigate = useNavigate()
+    const [postData, setPostData] = useState([])
+    const [deleteShow, setDeleteShow] = useState(false)
+    const [currentPost, setCurrentPost] = useState("")
+    const [currentPostId, setCurrentPostId] = useState("")
+
+    const handleDeleteShow = () => setDeleteShow(true)
+    const handleDeleteHide = () => setDeleteShow(false)
+
+    const handleDelete = (id, title) => {
+        handleDeleteShow()
+        setCurrentPostId(id)
+        setCurrentPost(title)
+    }
+
+    const timestampToDate = (ts) => {
+        return new Date(ts).getDate() + "-" + new Date(ts).getMonth() + "-" + new Date(ts).getFullYear()
+    }
+
+    useEffect(() => {
+        fetchPosts()
+    }, [])
+
+    const fetchPosts = () => {
+        axios.get('http://192.168.1.28:8000/get-all-post/0')
+            .then((r) => {
+                if (r.data.success) {
+                    setPostData(r.data.data)
+                }
+            })
+            .catch((e) => toast.error(e.response.data.msg))
+    }
+
+    const deletePosts = () => {
+        axios.post('http://192.168.1.28:8000/delete-post', { postid: currentPostId })
+            .then((r) => {
+                if (r.data.success) {
+                    handleDeleteHide()
+                    setCurrentPost("")
+                    setCurrentPostId("")
+                    fetchPosts()
+                }
+            })
+            .catch((e) => toast.error(e.response.data.msg))
+    }
 
     return (
         <>
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+            />
             <Header />
+            <DeleteModel
+                title={"Delete Press Release"}
+                mentionText={`Are you sure to delete this ${currentPost} Press Release ?`}
+                show={deleteShow}
+                onHide={handleDeleteHide}
+                handleYes={deletePosts}
+                handleNo={handleDeleteHide}
+            />
             <Container fluid>
                 <Row className="AddActionSpace">
                     <Col xl={12}>
@@ -25,22 +84,34 @@ const PressRelease = () => {
                                 <tr>
                                     <th>#</th>
                                     <th>Title</th>
-                                    <th>Category</th>
                                     <th>Author</th>
                                     <th>Published Date</th>
-                                    <th colSpan={2}>Action</th>
+                                    <th colSpan={3}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>Author</td>
-                                    <td>1-1-2022</td>
-                                    <td><Button variant="info" style={{ width: "100%" }}>Edit</Button></td>
-                                    <td><Button variant="danger" style={{ width: "100%" }}>Delete</Button></td>
-                                </tr>
+                                {
+                                    postData != null ?
+                                        postData.map((v, i) =>
+                                            <tr key={i}>
+                                                <td>{i + 1}</td>
+                                                <td>{v.title}</td>
+                                                <td>{v.author}</td>
+                                                <td>{timestampToDate(v.date)}</td>
+                                                <td>
+                                                    <Link to={`/view-press-release/${v._id}`}>
+                                                        <Button variant="primary" style={{ width: "100%" }}>View</Button>
+                                                    </Link>
+                                                </td>
+                                                <td><Button variant="info" style={{ width: "100%" }}>Edit</Button></td>
+                                                <td><Button
+                                                    onClick={() => handleDelete(v._id, v.title)}
+                                                    variant="danger"
+                                                    style={{ width: "100%" }}>Delete</Button></td>
+                                            </tr>)
+                                        :
+                                        <h1>No data</h1>
+                                }
                             </tbody>
                         </Table>
                     </Col>

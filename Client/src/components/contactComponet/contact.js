@@ -42,7 +42,7 @@ export default function Contact() {
             <Row className="EditorSpace">
                 <Col xl={5} className="EditorSize">
                     <CKEditor
-                        data={""}
+                        data={content}
                         editor={ClassicEditor}
                         onChange={ckeditorstate}
                         config={
