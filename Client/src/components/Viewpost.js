@@ -8,6 +8,7 @@ import Header from "./common/Header"
 export default function ViewPost() {
     const { postid, gpostid } = useParams()
     const [postData, setPostData] = useState([])
+
     useEffect(() => {
         fetchParamPost()
     }, [])
