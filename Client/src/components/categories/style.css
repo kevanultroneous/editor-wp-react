@@ -1,0 +1,22 @@
+.SubCategoryWrraper {
+    display: flex;
+    flex-wrap: wrap;
+    height: 300px;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.SubCatTag {
+    padding: 0.5rem 1rem 0.5rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-bottom: 0.2rem;
+    margin-right: 1rem;
+    font-weight: 600;
+    height: 40px;
+    background-image: linear-gradient(20deg, #E97777, #FF8FB1);
+}
+
+.clearBtn {
+    cursor: pointer;
+}

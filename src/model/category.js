@@ -6,6 +6,13 @@ const schema = new mongoose.Schema({
         default: 'category',
         unique: true
     },
+    subcategory: {
+        type: Array,
+    },
+    selected: {
+        type: Boolean,
+        default: true
+    },
     isDelete: {
         type: Boolean,
         default: false

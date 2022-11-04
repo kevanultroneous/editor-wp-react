@@ -5,8 +5,11 @@ import "./style.css"
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";
+import { IoCloseCircle } from "react-icons/io5"
+import { MdOutlineUpdate } from "react-icons/md"
 
-const ModelUplaod = ({ show, handleClose, handleSave, catname, changeCatname }) => {
+export const ModelUplaod = ({ show, handleClose, handleSave, catname, subcatname, changeCatname, changesubcatname, keyuphandler, selectedSubcategories }) => {
+
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header>
@@ -22,6 +25,19 @@ const ModelUplaod = ({ show, handleClose, handleSave, catname, changeCatname }) 
                         aria-describedby="basic-addon2"
                     />
                 </InputGroup>
+                <InputGroup className="mb-3">
+                    <Form.Control
+                        value={subcatname}
+                        onChange={changesubcatname}
+                        onKeyUp={keyuphandler}
+                        placeholder="write Subcategory and press the enter"
+                        aria-label="Category name"
+                        aria-describedby="basic-addon2"
+                    />
+                </InputGroup>
+                <div className="mt-4">
+                    {selectedSubcategories}
+                </div>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
@@ -34,14 +50,14 @@ const ModelUplaod = ({ show, handleClose, handleSave, catname, changeCatname }) 
         </Modal>
     )
 }
-const ModelUpdate = ({ show, handleClose, handleUpdate, catname, changeCatname, currentTitle }) => {
+const ModelUpdate = ({ show, handleClose, handleUpdate, catname, changeCatname, currentTitle, subcatname, changesubcatname, keyuphandler, selectedSubcategories }) => {
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header>
                 <Modal.Title>Update category {currentTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <b>Update Category title</b>
+                <b>Update Category</b>
                 <InputGroup className="mb-3 mt-2">
                     <Form.Control
                         value={catname}
@@ -51,6 +67,19 @@ const ModelUpdate = ({ show, handleClose, handleUpdate, catname, changeCatname, 
                         aria-describedby="basic-addon2"
                     />
                 </InputGroup>
+                <InputGroup className="mb-3">
+                    <Form.Control
+                        value={subcatname}
+                        onChange={changesubcatname}
+                        onKeyUp={keyuphandler}
+                        placeholder="write Subcategory and press the enter"
+                        aria-label="Category name"
+                        aria-describedby="basic-addon2"
+                    />
+                </InputGroup>
+                <div className="mt-4">
+                    {selectedSubcategories}
+                </div>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
@@ -63,6 +92,7 @@ const ModelUpdate = ({ show, handleClose, handleUpdate, catname, changeCatname, 
         </Modal>
     )
 }
+
 export default function Categories() {
 
     useEffect(() => {
@@ -74,9 +104,16 @@ export default function Categories() {
     const [showUpd, setShowUpd] = useState(false);
 
     const [catname, setCatname] = useState("")
+    const [subcatname, setSubCatname] = useState("")
+    const [subCategories, setSubCategories] = useState([])
+
     const [currentCatId, setCurrentCatId] = useState("")
     const [currentCatname, setCurrentCatname] = useState("")
     const [newcatname, setNewCatname] = useState("")
+    const [newsubcats, setNewSubCats] = useState([])
+
+    const [mainCheck, setMainCheck] = useState(false)
+    const [multiUpdate, setMultiUpdate] = useState([])
 
 
     const [categoryData, setCategoryData] = useState([])
@@ -89,7 +126,8 @@ export default function Categories() {
 
     const handleSave = () => {
         axios.post('http://192.168.1.28:8000/upload-category', {
-            title: catname
+            title: catname,
+            subcategory: subCategories
         }).then((r) => {
             if (r.data.success) {
                 toast.success(r.data.msg)
@@ -123,7 +161,7 @@ export default function Categories() {
     }
 
     const handleUpdate = () => {
-        axios.post('http://192.168.1.28:8000/update-category', { catid: currentCatId, newtitle: newcatname }).then((r) => {
+        axios.post('http://192.168.1.28:8000/update-category', { catid: currentCatId, newtitle: newcatname, subcategory: newsubcats }).then((r) => {
             if (r.data.success) {
                 toast.success(r.data.msg)
                 fetchCategory()
@@ -133,6 +171,39 @@ export default function Categories() {
             }
         }).catch((e) => toast.error(e.response.data.msg))
     }
+
+    // future use
+    // const multiUnchecked = (v) => {
+    //     setMultiUpdate(multiUpdate.filter(k => k._id !== v))
+    //     setMultiUpdate(multiUpdate.concat({ _id: v, checked: false }))
+    // }
+    // const handleMultiUpdate = () => {
+    //     axios.post('http://192.168.1.28:8000/update-category', { multiid: multiUpdate }).then((r) => {
+    //         if (r.data.success) {
+    //             toast.success(r.data.msg)
+    //             setMultiUpdate([])
+    //             fetchCategory()
+    //         }
+    //     }).catch((e) => toast.error(e.response.data.msg))
+    // }
+
+    const removeSelectedSubCategory = (id, upd) => {
+        if (upd) {
+            setNewSubCats(newsubcats.filter(v => v.id !== id))
+        } else {
+            setSubCategories(subCategories.filter(v => v.id !== id))
+        }
+    }
+
+    useEffect(() => {
+        if (mainCheck) {
+            categoryData.map((v) =>
+                setMultiUpdate(multiUpdate.concat({ _id: v._id, checked: true }))
+            )
+        } else {
+            setMultiUpdate([])
+        }
+    }, [mainCheck])
 
     return (
         <>
@@ -147,28 +218,66 @@ export default function Categories() {
                         <Button variant="success" onClick={handleShow}>Add Category</Button>
                     </Col>
                 </Row>
+                {/* future use */}
+                {/* <Row className="AddActionSpace">
+                    {multiUpdate.length > 0 &&
+                        <Col xl={12}>
+                            <Button variant="warning" onClick={handleMultiUpdate}>Update Selection{" "}
+                                <MdOutlineUpdate />
+                            </Button>
+                        </Col>
+                    }
+                </Row> */}
                 <Row className="TableSpace">
                     <Col xl={6}>
                         <Table striped bordered hover variant="dark">
                             <thead>
                                 <tr>
-                                    <th>sr.no</th>
+                                    {/* future use selected  */}
+                                    {/* <th className="text-center">
+                                        <Form.Check
+                                            onChange={(e) =>
+                                                setMainCheck(e.target.checked)
+                                            }
+                                            value={mainCheck}
+                                            type="switch"
+                                            id="disabled-custom-switch"
+                                        />
+                                    </th> */}
+                                    <th className="text-center">Sr.no</th>
                                     <th>Category</th>
+                                    <th className="text-center">Sub Category</th>
                                     <th>Edit</th>
                                     <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
+                                    categoryData != null &&
                                     categoryData.map((v, i) =>
                                         <tr key={i}>
-                                            <td>{i + 1}</td>
+                                            {/* future use */}
+                                            {/* <td className="text-center">
+                                                <Form.Check
+                                                    onChange={(e) =>
+                                                        e.target.checked ?
+                                                            setMultiUpdate(multiUpdate.concat({ _id: v._id, checked: true }))
+                                                            : multiUnchecked(v._id)
+                                                    }
+                                                    defaultChecked={v.selected ? v.selected : false}
+                                                    type="switch"
+                                                    id="disabled-custom-switch"
+                                                />
+                                            </td> */}
+                                            <td className="text-center">{i + 1}</td>
                                             <td>{v.title}</td>
+                                            <td className="text-center">{v.subcategory.length > 0 ? "Yes" : "No"}</td>
                                             <td><Button variant="info" style={{ width: "100%" }} onClick={() => {
                                                 handleShowUpd()
                                                 setCurrentCatId(v._id)
                                                 setCurrentCatname(v.title)
                                                 setNewCatname(v.title)
+                                                setNewSubCats(v.subcategory)
                                             }}>Edit</Button></td>
                                             <td><Button variant="danger" style={{ width: "100%" }} onClick={() => {
                                                 setSmShow(true)
@@ -195,11 +304,12 @@ export default function Categories() {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <h6>Are you sure to delete <b>{currentCatname}</b> category ?</h6>
-
-                    <Row>
+                    <h6>Are you sure to delete <b>{currentCatname}</b> category ?
+                    </h6>
+                    <small><b>{currentCatname}</b> category related all sub category will be also deleting !</small>
+                    <Row className="mt-3">
                         <Col xl={12}>
-                            <Button variant="info" className="mr-3" onClick={() => {
+                            <Button variant="info" className="me-3" onClick={() => {
                                 setSmShow(false)
                                 setCurrentCatId("")
                                 setCurrentCatname("")
@@ -217,6 +327,36 @@ export default function Categories() {
                 currentTitle={currentCatname}
                 handleClose={handleCloseUpd}
                 handleUpdate={handleUpdate}
+                subcatname={subcatname}
+                changesubcatname={(e) => setSubCatname(e.target.value)}
+                keyuphandler={(e) => {
+                    const num = Math.floor(Math.random() * 9000 + 1000)
+                    const num2 = Math.floor(Math.random() * 900 + 100 * 50 + 20.10)
+                    if (e.keyCode === 13) {
+                        setNewSubCats(newsubcats.concat({ id: num + num2, name: subcatname }))
+                        setSubCatname("")
+                    }
+                }}
+                selectedSubcategories={
+                    <>
+                        {newsubcats.length > 0 &&
+                            <>
+                                <div className="d-block mb-4">
+                                    <label className="clearBtn" onClick={() => setNewSubCats([])}><b>Clear All</b></label>
+                                </div>
+                                <div className="SubCategoryWrraper">
+                                    {
+                                        newsubcats.map((v, i) =>
+                                            <div className="SubCatTag" onClick={() => removeSelectedSubCategory(v.id, true)}>{v.name}&nbsp;
+                                                <IoCloseCircle />
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                            </>
+                        }
+                    </>
+                }
             />
             <ModelUplaod
                 catname={catname}
@@ -224,6 +364,36 @@ export default function Categories() {
                 show={show}
                 handleClose={handleClose}
                 handleSave={handleSave}
+                subcatname={subcatname}
+                changesubcatname={(e) => setSubCatname(e.target.value)}
+                keyuphandler={(e) => {
+                    const num = Math.floor(Math.random() * 9000 + 1000)
+                    const num2 = Math.floor(Math.random() * 900 + 100 * 50 + 20.10)
+                    if (e.keyCode === 13) {
+                        setSubCategories(subCategories.concat({ id: num + num2, name: subcatname }))
+                        setSubCatname("")
+                    }
+                }}
+                selectedSubcategories={
+                    <>
+                        {subCategories.length > 0 &&
+                            <>
+                                <div className="d-block mb-4">
+                                    <label className="clearBtn" onClick={() => setSubCategories([])}><b>Clear All</b></label>
+                                </div>
+                                <div className="SubCategoryWrraper">
+                                    {
+                                        subCategories.map((v, i) =>
+                                            <div className="SubCatTag" onClick={() => removeSelectedSubCategory(v.id)}>{v.name}&nbsp;
+                                                <IoCloseCircle />
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                            </>
+                        }
+                    </>
+                }
             />
         </>
     )

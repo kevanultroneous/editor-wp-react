@@ -10,6 +10,8 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
 import { useNavigate } from "react-router-dom";
+import { ModelUplaod } from "./categories/Categories";
+import { IoMdCloseCircleOutline } from "react-icons/io"
 
 export default function PostUploading() {
 
@@ -23,6 +25,25 @@ export default function PostUploading() {
     const [url, setUrl] = useState("")
     const [publish, setPublish] = useState(0)
     const [content, setContent] = useState('')
+
+    // category upload
+    const [show, setShow] = useState(false);
+    const [catname, setCatname] = useState("")
+    const handleClose = () => setShow(false);
+    const handleSave = () => {
+        axios.post('http://192.168.1.28:8000/upload-category', {
+            title: catname
+        }).then((r) => {
+            if (r.data.success) {
+                toast.success(r.data.msg)
+                handleClose()
+                fetchCategory()
+                setCatname("")
+            } else {
+                toast.error(r.data.msg)
+            }
+        }).catch((e) => toast.error(e.response.data.msg))
+    }
 
     const navigate = useNavigate()
     // status 0 draft
@@ -89,6 +110,13 @@ export default function PostUploading() {
                 position="top-right"
                 reverseOrder={false}
             />
+            <ModelUplaod
+                catname={catname}
+                changeCatname={(e) => setCatname(e.target.value)}
+                show={show}
+                handleClose={handleClose}
+                handleSave={handleSave}
+            />
             <Header />
             <Container fluid>
                 <Row className="MainSectionRow">
@@ -122,13 +150,28 @@ export default function PostUploading() {
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
                                 <div>
-                                    <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}>
+                                    <Button
+                                        onClick={() => setShow(true)}
+                                        variant="secondary"
+                                        size="sm"
+                                        className="mb-3">
+                                        Add new Category
+                                    </Button>
+                                </div>
+                                <div>
+                                    {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
+                                    <div className="TagsWrraper">
                                         {
                                             categoryData.map((v, i) =>
-                                                <option value={v._id} key={i}>{v.title}</option>
+                                                <div
+                                                    onClick={() => handleCategorySelection(v._id)}
+                                                    className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
+                                                    &nbsp;&nbsp;<IoMdCloseCircleOutline />
+                                                </div>
                                             )
                                         }
-                                    </select>
+                                    </div>
+                                    {/* </select> */}
                                 </div>
                             </div>
                             <div className="mt-4">
@@ -206,6 +249,7 @@ export default function PostUploading() {
                                     >
                                         <Tab eventKey="Content" title="Content">
                                             <CKEditor
+                                                key={"content-editor"}
                                                 editor={ClassicEditor}
                                                 onChange={ckeditorstate}
                                                 config={

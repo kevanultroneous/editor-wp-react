@@ -1,5 +1,4 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import SourceEditing from '@ckeditor/ckeditor5-source-editing/src/sourceediting';
 class MyUploadAdapter {
     constructor(loader) {
         // The file loader instance to use during the upload.
