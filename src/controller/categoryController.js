@@ -93,9 +93,29 @@ const updateCategory = async (req, res) => {
     }
 }
 
+const searchCategory = async (req, res, next) => {
+    const { search } = req.body;
+    const results = await ECategory.find({
+        title: {
+            $regex: search,
+            $options: "i",
+        },
+    }).limit(5).sort({ createdAt: -1 }).lean()
+    if (results) {
+        if (results.length === 0) {
+            return res.status(200).send({ success: true, data: null, msg: "data not found !", suggestion: true })
+        } else {
+            return res.status(200).send({ success: true, data: results, msg: "data availabel !", suggestion: false })
+        }
+    } else {
+        return res.status(500).send({ success: false, data: null, msg: "Internal server error !", suggestion: false })
+    }
+}
+
 module.exports = {
     uploadCategory,
     getAllCategory,
     deleteCategory,
-    updateCategory
+    updateCategory,
+    searchCategory
 }

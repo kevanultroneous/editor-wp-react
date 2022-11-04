@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "./common/Header";
-import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button } from "react-bootstrap"
+import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge } from "react-bootstrap"
 import "./postUploading.css"
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,6 +12,7 @@ import { Markup } from "interweave";
 import { useNavigate } from "react-router-dom";
 import { ModelUplaod } from "./categories/Categories";
 import { IoMdCloseCircleOutline } from "react-icons/io"
+import { AiFillCaretRight } from "react-icons/ai"
 
 export default function PostUploading() {
 
@@ -26,11 +27,18 @@ export default function PostUploading() {
     const [publish, setPublish] = useState(0)
     const [content, setContent] = useState('')
 
+    //search category
+    const [searchCateg, setSearchCateg] = useState([])
+    const [searchText, setSerachText] = useState("")
+    const [suggestion, setSuggestion] = useState(false)
+    const [loader, setLoader] = useState(false)
+    const [subhover, setSubHover] = useState(false)
+
     // category upload
     const [show, setShow] = useState(false);
     const [catname, setCatname] = useState("")
     const handleClose = () => setShow(false);
-    const handleSave = () => {
+    const handleSave = (catname = catname) => {
         axios.post('http://192.168.1.28:8000/upload-category', {
             title: catname
         }).then((r) => {
@@ -53,6 +61,7 @@ export default function PostUploading() {
 
     useEffect(() => {
         fetchCategory()
+        searchCategories(searchText)
     }, [])
 
 
@@ -88,6 +97,20 @@ export default function PostUploading() {
                 setCategoryData(r.data.data)
             }
         }).catch((e) => toast.error(e.response.data.msg))
+    }
+
+    const searchCategories = (search) => {
+        setLoader(true)
+        setTimeout(() => {
+            axios.post('http://192.168.1.28:8000/search-category', { search }).then((r) => {
+                setLoader(false)
+                setSearchCateg(r.data?.data)
+                setSuggestion(r.data?.suggestion)
+            }).catch((e) => {
+                setLoader(false)
+                toast.error(e.response.data.msg)
+            })
+        }, 1000)
     }
 
     const handleCategorySelection = (value) => {
@@ -149,7 +172,8 @@ export default function PostUploading() {
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
-                                <div>
+                                {/* future use */}
+                                {/* <div>
                                     <Button
                                         onClick={() => setShow(true)}
                                         variant="secondary"
@@ -157,10 +181,10 @@ export default function PostUploading() {
                                         className="mb-3">
                                         Add new Category
                                     </Button>
-                                </div>
-                                <div>
-                                    {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
-                                    <div className="TagsWrraper">
+                                </div> */}
+                                {/* <div> */}
+                                {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
+                                {/* <div className="TagsWrraper">
                                         {
                                             categoryData.map((v, i) =>
                                                 <div
@@ -170,8 +194,72 @@ export default function PostUploading() {
                                                 </div>
                                             )
                                         }
-                                    </div>
-                                    {/* </select> */}
+                                    </div> */}
+                                {/* </select> */}
+                                {/* </div> */}
+
+                                <div className="SearchWrraper">
+                                    <Form.Control
+                                        value={searchText}
+                                        onChange={(e) => {
+                                            searchCategories(e.target.value)
+                                            setSerachText(e.target.value)
+                                        }}
+                                        type="text"
+                                        placeholder="Search category...."
+                                    />
+                                    {
+                                        loader ?
+                                            <div className="mt-3 text-center">
+                                                <Spinner animation="border" variant="success" />
+                                            </div>
+                                            :
+                                            <>
+
+                                                <div className="ListOfCategories">
+                                                    {
+                                                        searchCateg?.map((v, i) =>
+                                                            <div className="SearchList" onMouseOver={() => setSubHover(true)}
+                                                                onMouseLeave={() => setSubHover(false)}>
+                                                                <label className="SearchText" >{v.title}</label>
+                                                                {v.subcategory.length > 0 ?
+                                                                    <>
+                                                                        <div style={{ float: "right" }} className="me-3">
+                                                                            <AiFillCaretRight />
+                                                                            {
+                                                                                subhover &&
+                                                                                <div className="Subcategory">
+                                                                                    {
+                                                                                        v.subcategory.map((v, i) =>
+                                                                                            <div className="SearchList">
+                                                                                                <label className="SearchText">
+                                                                                                    {v.name}
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        )
+                                                                                    }
+                                                                                </div>
+                                                                            }
+                                                                        </div>
+                                                                    </>
+                                                                    : ""}
+                                                            </div>
+                                                        )
+                                                    }
+                                                </div>
+                                                {
+                                                    suggestion &&
+                                                    <div className="SuggestText">
+                                                        <b>Suggest for add category "{searchText}"&nbsp;&nbsp;
+                                                            <Badge bg="success" className="BadgeClk" onClick={() => {
+                                                                handleSave(searchText)
+                                                                searchCategories(searchText)
+                                                            }}>Add Now</Badge>
+                                                        </b>
+                                                    </div>
+                                                }
+                                            </>
+                                    }
                                 </div>
                             </div>
                             <div className="mt-4">
