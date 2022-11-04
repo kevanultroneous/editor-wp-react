@@ -23,7 +23,7 @@ export default function PostUploading() {
     const [seotitle, setSeoTitle] = useState("")
     const [seodescription, setSeoDescription] = useState("")
     const [seometatags, setSeoMetaTags] = useState("")
-    const [url, setUrl] = useState("")
+    const [url, setUrl] = useState(mainTitle)
     const [publish, setPublish] = useState(0)
     const [content, setContent] = useState('')
 
@@ -126,6 +126,9 @@ export default function PostUploading() {
         setContent(data)
     }
 
+    const editUrl = (v) => {
+        setUrl(v.split(' ').join('-'))
+    }
 
     return (
         <div>
@@ -143,7 +146,7 @@ export default function PostUploading() {
             <Header />
             <Container fluid>
                 <Row className="MainSectionRow">
-                    <Col xl={3} className="p-0">
+                    <Col xl={4} className="p-0">
                         <div className="Sidebar">
                             <div>
                                 <h3>Add New Post</h3>
@@ -152,7 +155,10 @@ export default function PostUploading() {
                                 <Form.Label><strong>Title</strong></Form.Label>
                                 <Form.Control
                                     value={mainTitle}
-                                    onChange={(e) => setMainTitle(e.target.value)}
+                                    onChange={(e) => {
+                                        setMainTitle(e.target.value)
+                                        editUrl(e.target.value)
+                                    }}
                                     type="text"
                                     placeholder="Enter title here"
                                 />
@@ -173,7 +179,7 @@ export default function PostUploading() {
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
                                 {/* future use */}
-                                {/* <div>
+                                <div>
                                     <Button
                                         onClick={() => setShow(true)}
                                         variant="secondary"
@@ -181,24 +187,24 @@ export default function PostUploading() {
                                         className="mb-3">
                                         Add new Category
                                     </Button>
-                                </div> */}
+                                </div>
                                 {/* <div> */}
                                 {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
-                                {/* <div className="TagsWrraper">
-                                        {
-                                            categoryData.map((v, i) =>
-                                                <div
-                                                    onClick={() => handleCategorySelection(v._id)}
-                                                    className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
-                                                    &nbsp;&nbsp;<IoMdCloseCircleOutline />
-                                                </div>
-                                            )
-                                        }
-                                    </div> */}
+                                <div className="TagsWrraper">
+                                    {
+                                        categoryData.map((v, i) =>
+                                            <div
+                                                onClick={() => handleCategorySelection(v._id)}
+                                                className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
+                                                &nbsp;&nbsp;<IoMdCloseCircleOutline />
+                                            </div>
+                                        )
+                                    }
+                                </div>
                                 {/* </select> */}
                                 {/* </div> */}
 
-                                <div className="SearchWrraper">
+                                {/* <div className="SearchWrraper">
                                     <Form.Control
                                         value={searchText}
                                         onChange={(e) => {
@@ -260,7 +266,7 @@ export default function PostUploading() {
                                                 }
                                             </>
                                     }
-                                </div>
+                                </div> */}
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>SEO Title</strong></Form.Label>
@@ -284,7 +290,7 @@ export default function PostUploading() {
                                     />
                                 </FloatingLabel>
                             </div>
-                            <div className="mt-4">
+                            {/* <div className="mt-4">
                                 <Form.Label><strong>SEO Meta tags</strong></Form.Label>
                                 <FloatingLabel controlId="floatingTextarea2" label="Meta tags">
                                     <Form.Control
@@ -295,7 +301,7 @@ export default function PostUploading() {
                                         style={{ height: '100px' }}
                                     />
                                 </FloatingLabel>
-                            </div>
+                            </div> */}
                             <div className="mt-4">
                                 <Form.Label><strong>URL</strong></Form.Label>
                                 <InputGroup className="mb-3">
@@ -317,7 +323,7 @@ export default function PostUploading() {
                             </div>
                         </div>
                     </Col>
-                    <Col xl={9}>
+                    <Col xl={8}>
                         <div className="EditorWrraper">
                             <div>
                                 <h3>Add Content

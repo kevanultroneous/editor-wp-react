@@ -31,7 +31,7 @@ app.post('/upload', MuiltiPartyMiddleware, async (req, res) => {
 
             res.status(200).json({
                 uploaded: true,
-                url: `${TempFile.originalFilename}`
+                url: `http://192.168.1.28:8000/${TempFile.originalFilename}`
             });
 
             if (err) return console.log(err);
