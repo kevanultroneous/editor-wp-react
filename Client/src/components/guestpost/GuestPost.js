@@ -45,7 +45,7 @@ const GuestPost = () => {
             <Container fluid>
                 <Row className="AddActionSpace">
                     <Col xl={12}>
-                        <Button variant="success" onClick={() => navigate('/upload-post')}>Add new PressRelease</Button>
+                        <Button variant="success" onClick={() => navigate('/upload-post')}>Add new Guest Post</Button>
                     </Col>
                 </Row>
                 <Row className="TableSpace">

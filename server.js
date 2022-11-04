@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
-const { uploadPost, getAllpost, deletePost } = require('./src/controller/postController');
+const { uploadPost, getAllpost, deletePost, getSinglePost } = require('./src/controller/postController');
 const { uploadCategory, getAllCategory, deleteCategory, updateCategory } = require('./src/controller/categoryController');
 
 const PORT = process.env.PORT || 8000;
@@ -44,7 +44,7 @@ app.post('/upload', MuiltiPartyMiddleware, async (req, res) => {
 app.post('/upload-post', uploadPost)
 app.post('/delete-post', deletePost)
 app.get('/get-all-post/:num', getAllpost)
-
+app.get('/get-post/:postid', getSinglePost)
 // category
 app.post('/upload-category', uploadCategory)
 app.get('/categories', getAllCategory)

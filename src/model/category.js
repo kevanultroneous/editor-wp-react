@@ -6,6 +6,10 @@ const schema = new mongoose.Schema({
         default: 'category',
         unique: true
     },
+    isDelete: {
+        type: Boolean,
+        default: false
+    }
 }, { timestamps: true })
 
 const ECategory = mongoose.model("categories", schema)
