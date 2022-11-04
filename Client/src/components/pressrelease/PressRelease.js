@@ -103,7 +103,7 @@ const PressRelease = () => {
                                                         <Button variant="primary" style={{ width: "100%" }}>View</Button>
                                                     </Link>
                                                 </td>
-                                                <td><Button variant="info" style={{ width: "100%" }}>Edit</Button></td>
+                                                <td><Button variant="info" style={{ width: "100%" }} onClick={() => navigate(`/edit-post/${v._id}`)}>Edit</Button></td>
                                                 <td><Button
                                                     onClick={() => handleDelete(v._id, v.title)}
                                                     variant="danger"

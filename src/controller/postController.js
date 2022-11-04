@@ -63,11 +63,15 @@ const deletePost = async (req, res) => {
 
 const getSinglePost = async (req, res) => {
     const postid = req.params['postid']
-    const singlepost = await EPost.findOne({ _id: postid }).lean()
-    if (!singlepost) {
-        return res.status(200).send({ success: true, data: null })
-    } else {
-        return res.status(200).send({ success: true, data: singlepost })
+    try {
+        const singlepost = await EPost.findOne({ _id: postid }).lean()
+        if (!singlepost) {
+            return res.status(200).send({ success: true, data: null })
+        } else {
+            return res.status(200).send({ success: true, data: singlepost })
+        }
+    } catch (e) {
+        return res.status(500).send({ success: false, data: null })
     }
 }
 

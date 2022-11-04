@@ -3,12 +3,12 @@ import { Markup } from "interweave"
 import React, { useEffect, useState } from "react"
 import { Container } from "react-bootstrap"
 import toast, { Toaster } from "react-hot-toast"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import Header from "./common/Header"
 export default function ViewPost() {
     const { postid, gpostid } = useParams()
     const [postData, setPostData] = useState([])
-
+    const navigate = useNavigate()
     useEffect(() => {
         fetchParamPost()
     }, [])
@@ -17,9 +17,15 @@ export default function ViewPost() {
         axios.get(`http://192.168.1.28:8000/get-post/${postid}`)
             .then((r) => {
                 if (r.data.success) {
+                    if (r.data?.data === null) {
+                        navigate("/home")
+                    }
                     setPostData(r.data.data)
                 }
-            }).catch((e) => toast.error(e.response.data.msg))
+            }).catch((e) => {
+                navigate("/home")
+                toast.error(e.response.data.msg)
+            })
     }
 
     return (

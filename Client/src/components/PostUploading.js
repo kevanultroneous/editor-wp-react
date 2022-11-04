@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "./common/Header";
-import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button } from "react-bootstrap"
+import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge } from "react-bootstrap"
 import "./postUploading.css"
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,6 +12,7 @@ import { Markup } from "interweave";
 import { useNavigate } from "react-router-dom";
 import { ModelUplaod } from "./categories/Categories";
 import { IoMdCloseCircleOutline } from "react-icons/io"
+import { AiFillCaretRight } from "react-icons/ai"
 
 export default function PostUploading() {
 
@@ -22,15 +23,22 @@ export default function PostUploading() {
     const [seotitle, setSeoTitle] = useState("")
     const [seodescription, setSeoDescription] = useState("")
     const [seometatags, setSeoMetaTags] = useState("")
-    const [url, setUrl] = useState("")
+    const [url, setUrl] = useState(mainTitle)
     const [publish, setPublish] = useState(0)
     const [content, setContent] = useState('')
+
+    //search category
+    const [searchCateg, setSearchCateg] = useState([])
+    const [searchText, setSerachText] = useState("")
+    const [suggestion, setSuggestion] = useState(false)
+    const [loader, setLoader] = useState(false)
+    const [subhover, setSubHover] = useState(false)
 
     // category upload
     const [show, setShow] = useState(false);
     const [catname, setCatname] = useState("")
     const handleClose = () => setShow(false);
-    const handleSave = () => {
+    const handleSave = (catname = catname) => {
         axios.post('http://192.168.1.28:8000/upload-category', {
             title: catname
         }).then((r) => {
@@ -53,6 +61,7 @@ export default function PostUploading() {
 
     useEffect(() => {
         fetchCategory()
+        searchCategories(searchText)
     }, [])
 
 
@@ -90,6 +99,20 @@ export default function PostUploading() {
         }).catch((e) => toast.error(e.response.data.msg))
     }
 
+    const searchCategories = (search) => {
+        setLoader(true)
+        setTimeout(() => {
+            axios.post('http://192.168.1.28:8000/search-category', { search }).then((r) => {
+                setLoader(false)
+                setSearchCateg(r.data?.data)
+                setSuggestion(r.data?.suggestion)
+            }).catch((e) => {
+                setLoader(false)
+                toast.error(e.response.data.msg)
+            })
+        }, 1000)
+    }
+
     const handleCategorySelection = (value) => {
         if (category.includes(value)) {
             setCategory(category.filter(i => i !== value))
@@ -103,6 +126,9 @@ export default function PostUploading() {
         setContent(data)
     }
 
+    const editUrl = (v) => {
+        setUrl(v.split(' ').join('-'))
+    }
 
     return (
         <div>
@@ -120,7 +146,7 @@ export default function PostUploading() {
             <Header />
             <Container fluid>
                 <Row className="MainSectionRow">
-                    <Col xl={3} className="p-0">
+                    <Col xl={4} className="p-0">
                         <div className="Sidebar">
                             <div>
                                 <h3>Add New Post</h3>
@@ -129,7 +155,10 @@ export default function PostUploading() {
                                 <Form.Label><strong>Title</strong></Form.Label>
                                 <Form.Control
                                     value={mainTitle}
-                                    onChange={(e) => setMainTitle(e.target.value)}
+                                    onChange={(e) => {
+                                        setMainTitle(e.target.value)
+                                        editUrl(e.target.value)
+                                    }}
                                     type="text"
                                     placeholder="Enter title here"
                                 />
@@ -149,6 +178,7 @@ export default function PostUploading() {
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
+                                {/* future use */}
                                 <div>
                                     <Button
                                         onClick={() => setShow(true)}
@@ -158,21 +188,85 @@ export default function PostUploading() {
                                         Add new Category
                                     </Button>
                                 </div>
-                                <div>
-                                    {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
-                                    <div className="TagsWrraper">
-                                        {
-                                            categoryData.map((v, i) =>
-                                                <div
-                                                    onClick={() => handleCategorySelection(v._id)}
-                                                    className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
-                                                    &nbsp;&nbsp;<IoMdCloseCircleOutline />
-                                                </div>
-                                            )
-                                        }
-                                    </div>
-                                    {/* </select> */}
+                                {/* <div> */}
+                                {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
+                                <div className="TagsWrraper">
+                                    {
+                                        categoryData.map((v, i) =>
+                                            <div
+                                                onClick={() => handleCategorySelection(v._id)}
+                                                className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
+                                                &nbsp;&nbsp;<IoMdCloseCircleOutline />
+                                            </div>
+                                        )
+                                    }
                                 </div>
+                                {/* </select> */}
+                                {/* </div> */}
+
+                                {/* <div className="SearchWrraper">
+                                    <Form.Control
+                                        value={searchText}
+                                        onChange={(e) => {
+                                            searchCategories(e.target.value)
+                                            setSerachText(e.target.value)
+                                        }}
+                                        type="text"
+                                        placeholder="Search category...."
+                                    />
+                                    {
+                                        loader ?
+                                            <div className="mt-3 text-center">
+                                                <Spinner animation="border" variant="success" />
+                                            </div>
+                                            :
+                                            <>
+
+                                                <div className="ListOfCategories">
+                                                    {
+                                                        searchCateg?.map((v, i) =>
+                                                            <div className="SearchList" onMouseOver={() => setSubHover(true)}
+                                                                onMouseLeave={() => setSubHover(false)}>
+                                                                <label className="SearchText" >{v.title}</label>
+                                                                {v.subcategory.length > 0 ?
+                                                                    <>
+                                                                        <div style={{ float: "right" }} className="me-3">
+                                                                            <AiFillCaretRight />
+                                                                            {
+                                                                                subhover &&
+                                                                                <div className="Subcategory">
+                                                                                    {
+                                                                                        v.subcategory.map((v, i) =>
+                                                                                            <div className="SearchList">
+                                                                                                <label className="SearchText">
+                                                                                                    {v.name}
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        )
+                                                                                    }
+                                                                                </div>
+                                                                            }
+                                                                        </div>
+                                                                    </>
+                                                                    : ""}
+                                                            </div>
+                                                        )
+                                                    }
+                                                </div>
+                                                {
+                                                    suggestion &&
+                                                    <div className="SuggestText">
+                                                        <b>Suggest for add category "{searchText}"&nbsp;&nbsp;
+                                                            <Badge bg="success" className="BadgeClk" onClick={() => {
+                                                                handleSave(searchText)
+                                                                searchCategories(searchText)
+                                                            }}>Add Now</Badge>
+                                                        </b>
+                                                    </div>
+                                                }
+                                            </>
+                                    }
+                                </div> */}
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>SEO Title</strong></Form.Label>
@@ -196,7 +290,7 @@ export default function PostUploading() {
                                     />
                                 </FloatingLabel>
                             </div>
-                            <div className="mt-4">
+                            {/* <div className="mt-4">
                                 <Form.Label><strong>SEO Meta tags</strong></Form.Label>
                                 <FloatingLabel controlId="floatingTextarea2" label="Meta tags">
                                     <Form.Control
@@ -207,7 +301,7 @@ export default function PostUploading() {
                                         style={{ height: '100px' }}
                                     />
                                 </FloatingLabel>
-                            </div>
+                            </div> */}
                             <div className="mt-4">
                                 <Form.Label><strong>URL</strong></Form.Label>
                                 <InputGroup className="mb-3">
@@ -229,7 +323,7 @@ export default function PostUploading() {
                             </div>
                         </div>
                     </Col>
-                    <Col xl={9}>
+                    <Col xl={8}>
                         <div className="EditorWrraper">
                             <div>
                                 <h3>Add Content
