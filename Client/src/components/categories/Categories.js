@@ -7,6 +7,7 @@ import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";
 import { IoCloseCircle } from "react-icons/io5"
 import { MdOutlineUpdate } from "react-icons/md"
+import { defaultUrl } from "../../utils/default";
 
 export const ModelUplaod = ({ show, handleClose, handleSave, catname, subcatname, changeCatname, changesubcatname, keyuphandler, selectedSubcategories }) => {
 
@@ -118,14 +119,17 @@ export default function Categories() {
 
     const [categoryData, setCategoryData] = useState([])
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setSubCategories([])
+        setShow(false);
+    }
     const handleCloseUpd = () => setShowUpd(false);
 
     const handleShow = () => setShow(true);
     const handleShowUpd = () => setShowUpd(true);
 
     const handleSave = () => {
-        axios.post('http://192.168.1.28:8000/upload-category', {
+        axios.post(`${defaultUrl}api/category/upload-category`, {
             title: catname,
             subcategory: subCategories
         }).then((r) => {
@@ -141,7 +145,7 @@ export default function Categories() {
     }
 
     const fetchCategory = () => {
-        axios.get('http://192.168.1.28:8000/categories').then((r) => {
+        axios.get(`${defaultUrl}api/category/categories`).then((r) => {
             if (r.data.success) {
                 setCategoryData(r.data.data)
             }
@@ -149,7 +153,7 @@ export default function Categories() {
     }
 
     const deleteCategory = (catid) => {
-        axios.post('http://192.168.1.28:8000/delete-category', { catid: catid }).then((r) => {
+        axios.post(`${defaultUrl}api/category/delete-category`, { catid: catid }).then((r) => {
             if (r.data.success) {
                 toast.success(r.data.msg)
                 setSmShow(false)
@@ -161,7 +165,7 @@ export default function Categories() {
     }
 
     const handleUpdate = () => {
-        axios.post('http://192.168.1.28:8000/update-category', { catid: currentCatId, newtitle: newcatname, subcategory: newsubcats }).then((r) => {
+        axios.post(`${defaultUrl}api/category/update-category`, { catid: currentCatId, newtitle: newcatname, subcategory: newsubcats }).then((r) => {
             if (r.data.success) {
                 toast.success(r.data.msg)
                 fetchCategory()
@@ -178,7 +182,7 @@ export default function Categories() {
     //     setMultiUpdate(multiUpdate.concat({ _id: v, checked: false }))
     // }
     // const handleMultiUpdate = () => {
-    //     axios.post('http://192.168.1.28:8000/update-category', { multiid: multiUpdate }).then((r) => {
+    //     axios.post(`${defaultUrl}update-category`, { multiid: multiUpdate }).then((r) => {
     //         if (r.data.success) {
     //             toast.success(r.data.msg)
     //             setMultiUpdate([])

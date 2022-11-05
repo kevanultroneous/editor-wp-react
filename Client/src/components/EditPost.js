@@ -13,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ModelUplaod } from "./categories/Categories";
 import { IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
+import { defaultUrl } from "../utils/default";
 
 export default function EditPost() {
 
@@ -24,7 +25,7 @@ export default function EditPost() {
     }, [])
 
     const fetchParamPost = () => {
-        axios.get(`http://192.168.1.28:8000/get-post/${postid}`)
+        axios.get(`${defaultUrl}get-post/${postid}`)
             .then((r) => {
                 if (r.data.success) {
                     setPostData(r.data.data)
@@ -63,7 +64,7 @@ export default function EditPost() {
     const [catname, setCatname] = useState("")
     const handleClose = () => setShow(false);
     const handleSave = (catname = catname) => {
-        axios.post('http://192.168.1.28:8000/upload-category', {
+        axios.post(`${defaultUrl}api/category/upload-category`, {
             title: catname
         }).then((r) => {
             if (r.data.success) {
@@ -103,7 +104,7 @@ export default function EditPost() {
     }
 
     const postUpload = () => {
-        axios.post('http://192.168.1.28:8000/upload-post', dataready)
+        axios.post(`${defaultUrl}api/post/upload-post`, dataready)
             .then((r) => {
                 if (r.data.success) {
                     toast.success(r.data.msg)
@@ -116,7 +117,7 @@ export default function EditPost() {
     }
 
     const fetchCategory = () => {
-        axios.get('http://192.168.1.28:8000/categories').then((r) => {
+        axios.get(`${defaultUrl}api/category/categories`).then((r) => {
             if (r.data.success) {
                 setCategoryData(r.data.data)
             }
@@ -126,7 +127,7 @@ export default function EditPost() {
     const searchCategories = (search) => {
         setLoader(true)
         setTimeout(() => {
-            axios.post('http://192.168.1.28:8000/search-category', { search }).then((r) => {
+            axios.post(`${defaultUrl}api/category/search-category`, { search }).then((r) => {
                 setLoader(false)
                 setSearchCateg(r.data?.data)
                 setSuggestion(r.data?.suggestion)

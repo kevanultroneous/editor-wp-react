@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";
+import { defaultUrl } from "../../utils/default";
 
 const GuestPost = () => {
     const navigate = useNavigate()
@@ -18,7 +19,7 @@ const GuestPost = () => {
 
     const fetchPosts = () => {
         setLoading(true)
-        axios.get('http://192.168.1.28:8000/get-all-post/1')
+        axios.get(`${defaultUrl}api/post/get-all-post/1`)
             .then((r) => {
                 setLoading(false)
                 if (r.data.success) {

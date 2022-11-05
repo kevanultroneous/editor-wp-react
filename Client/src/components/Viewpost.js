@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { Container } from "react-bootstrap"
 import toast, { Toaster } from "react-hot-toast"
 import { useNavigate, useParams } from "react-router-dom"
+import { defaultUrl } from "../utils/default"
 import Header from "./common/Header"
 export default function ViewPost() {
     const { postid, gpostid } = useParams()
@@ -14,7 +15,7 @@ export default function ViewPost() {
     }, [])
 
     const fetchParamPost = () => {
-        axios.get(`http://192.168.1.28:8000/get-post/${postid}`)
+        axios.get(`${defaultUrl}api/post/get-post/${postid}`)
             .then((r) => {
                 if (r.data.success) {
                     if (r.data?.data === null) {

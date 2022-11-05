@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { ModelUplaod } from "./categories/Categories";
 import { IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
+import { defaultUrl } from "../utils/default";
 
 export default function PostUploading() {
 
@@ -39,7 +40,7 @@ export default function PostUploading() {
     const [catname, setCatname] = useState("")
     const handleClose = () => setShow(false);
     const handleSave = (catname = catname) => {
-        axios.post('http://192.168.1.28:8000/upload-category', {
+        axios.post(`${defaultUrl}api/category/upload-category`, {
             title: catname
         }).then((r) => {
             if (r.data.success) {
@@ -79,7 +80,7 @@ export default function PostUploading() {
     }
 
     const postUpload = () => {
-        axios.post('http://192.168.1.28:8000/upload-post', dataready)
+        axios.post(`${defaultUrl}api/post/upload-post`, dataready)
             .then((r) => {
                 if (r.data.success) {
                     toast.success(r.data.msg)
@@ -92,7 +93,7 @@ export default function PostUploading() {
     }
 
     const fetchCategory = () => {
-        axios.get('http://192.168.1.28:8000/categories').then((r) => {
+        axios.get(`${defaultUrl}api/category/categories`).then((r) => {
             if (r.data.success) {
                 setCategoryData(r.data.data)
             }
@@ -102,7 +103,7 @@ export default function PostUploading() {
     const searchCategories = (search) => {
         setLoader(true)
         setTimeout(() => {
-            axios.post('http://192.168.1.28:8000/search-category', { search }).then((r) => {
+            axios.post(`${defaultUrl}api/category/search-category`, { search }).then((r) => {
                 setLoader(false)
                 setSearchCateg(r.data?.data)
                 setSuggestion(r.data?.suggestion)
@@ -178,33 +179,8 @@ export default function PostUploading() {
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
-                                {/* future use */}
-                                <div>
-                                    <Button
-                                        onClick={() => setShow(true)}
-                                        variant="secondary"
-                                        size="sm"
-                                        className="mb-3">
-                                        Add new Category
-                                    </Button>
-                                </div>
-                                {/* <div> */}
-                                {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
-                                <div className="TagsWrraper">
-                                    {
-                                        categoryData.map((v, i) =>
-                                            <div
-                                                onClick={() => handleCategorySelection(v._id)}
-                                                className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
-                                                &nbsp;&nbsp;<IoMdCloseCircleOutline />
-                                            </div>
-                                        )
-                                    }
-                                </div>
-                                {/* </select> */}
-                                {/* </div> */}
 
-                                {/* <div className="SearchWrraper">
+                                <div className="SearchWrraper">
                                     <Form.Control
                                         value={searchText}
                                         onChange={(e) => {
@@ -225,7 +201,9 @@ export default function PostUploading() {
                                                 <div className="ListOfCategories">
                                                     {
                                                         searchCateg?.map((v, i) =>
-                                                            <div className="SearchList" onMouseOver={() => setSubHover(true)}
+                                                            <div className="SearchList" onMouseOver={() =>
+                                                                v.subcategory.length > 0 ? setSubHover(true) : null
+                                                            }
                                                                 onMouseLeave={() => setSubHover(false)}>
                                                                 <label className="SearchText" >{v.title}</label>
                                                                 {v.subcategory.length > 0 ?
@@ -257,16 +235,13 @@ export default function PostUploading() {
                                                     suggestion &&
                                                     <div className="SuggestText">
                                                         <b>Suggest for add category "{searchText}"&nbsp;&nbsp;
-                                                            <Badge bg="success" className="BadgeClk" onClick={() => {
-                                                                handleSave(searchText)
-                                                                searchCategories(searchText)
-                                                            }}>Add Now</Badge>
+                                                            <Badge bg="success" className="BadgeClk" onClick={() => setShow(true)}>Add Now</Badge>
                                                         </b>
                                                     </div>
                                                 }
                                             </>
                                     }
-                                </div> */}
+                                </div>
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>SEO Title</strong></Form.Label>

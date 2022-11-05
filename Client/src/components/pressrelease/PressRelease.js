@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";
 import DeleteModel from "../common/DeleteModel";
+import { defaultUrl } from "../../utils/default";
 
 const PressRelease = () => {
     const navigate = useNavigate()
@@ -33,7 +34,7 @@ const PressRelease = () => {
     }, [])
 
     const fetchPosts = () => {
-        axios.get('http://192.168.1.28:8000/get-all-post/0')
+        axios.get(`${defaultUrl}api/post/get-all-post/0`)
             .then((r) => {
                 if (r.data.success) {
                     setPostData(r.data.data)
@@ -43,7 +44,7 @@ const PressRelease = () => {
     }
 
     const deletePosts = () => {
-        axios.post('http://192.168.1.28:8000/delete-post', { postid: currentPostId })
+        axios.post(`${defaultUrl}api/post/delete-post`, { postid: currentPostId })
             .then((r) => {
                 if (r.data.success) {
                     handleDeleteHide()
