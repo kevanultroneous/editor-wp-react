@@ -4,20 +4,7 @@ const { sendResponse } = require('../utils/commonFunctions');
 var ObjectId = require('mongoose').Types.ObjectId;
 
 const uploadPost = catchAsyncError(async (req, res) => {
-    const defaultBody = {
-        title,
-        fimg,
-        category,
-        date,
-        author,
-        content,
-        smeta,
-        stitle,
-        sdesc,
-        url,
-        status,
-        parent
-    }
+
     const { title,
         fimg,
         category,
@@ -31,7 +18,20 @@ const uploadPost = catchAsyncError(async (req, res) => {
         status,
         parent } = req.body
 
-    if (await EPost.create(defaultBody)) {
+    if (await EPost.create({
+        title,
+        fimg,
+        category,
+        date,
+        author,
+        content,
+        smeta,
+        stitle,
+        sdesc,
+        url,
+        status,
+        parent
+    })) {
         sendResponse(res, 200, {
             msg: status == 1 ? "Post uploaded !" : "Post drafted !",
             success: true

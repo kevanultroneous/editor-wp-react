@@ -74,7 +74,7 @@ const PressRelease = () => {
             <Container fluid>
                 <Row className="AddActionSpace">
                     <Col xl={12}>
-                        <Button variant="success" onClick={() => navigate('/upload-post')}>Add new PressRelease</Button>
+                        <Button variant="success" onClick={() => navigate('/upload-post/press-release')}>Add new PressRelease</Button>
                     </Col>
                 </Row>
                 <Row className="TableSpace">

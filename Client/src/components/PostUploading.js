@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "./common/Header";
-import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge } from "react-bootstrap"
+import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge, Image } from "react-bootstrap"
 import "./postUploading.css"
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -9,13 +9,21 @@ import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ModelUplaod } from "./categories/Categories";
 import { IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
 import { defaultUrl } from "../utils/default";
+import { FcAddImage, FcGallery } from "react-icons/fc"
+import MediaGallery from "../components/common/MediaGallery"
 
 export default function PostUploading() {
+
+    const { type } = useParams()
+
+    //gallery 
+    const [galleryShow, setGalleryShow] = useState(false)
+
 
     const [categoryData, setCategoryData] = useState([])
     const [mainTitle, setMainTitle] = useState("")
@@ -61,6 +69,9 @@ export default function PostUploading() {
     // parent 1 guest post
 
     useEffect(() => {
+        if (!(type === 'press-release' || type === "guest-post")) {
+            navigate('/')
+        }
         fetchCategory()
         searchCategories(searchText)
     }, [])
@@ -76,7 +87,7 @@ export default function PostUploading() {
         sdesc: seodescription,
         url: url,
         status: publish,
-        parent: 1,
+        parent: type === 'press-release' ? 0 : 1,
     }
 
     const postUpload = () => {
@@ -145,6 +156,50 @@ export default function PostUploading() {
                 handleSave={handleSave}
             />
             <Header />
+            <MediaGallery
+                heading={"Media Gallery"}
+                show={galleryShow}
+                body={
+                    <Tabs
+                        className="mb-3"
+                    >
+                        <Tab eventKey="g-upd" title="Upload Image">
+                            <Row className="RowMg">
+                                <div>
+                                    <Form.Group controlId="formFileSm" className="mb-1">
+                                        <Form.Label>Select Your Image Files</Form.Label>
+                                        <Form.Control
+                                            type="file"
+                                            size="sm"
+                                            multiple
+                                            maxLength={5} accept="image/jpg, image/jpeg, image/png, image/svg"
+                                            onChange={(e) => console.log(e.target.files)}
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div className="text-center">
+                                    <FcAddImage size={200} />
+                                </div>
+                            </Row>
+                        </Tab>
+                        <Tab eventKey="g-all" title="Gallery">
+                            <Row className="RowMg">
+                                {
+                                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((v, i) =>
+                                        <Col xl={3}>
+                                            <div className="MediaGallery">
+                                                <Image src="https://media.istockphoto.com/id/1329568867/photo/smartphone-mockup-closeup-of-woman-using-mobile-phone-with-empty-screen-at-home.jpg?b=1&s=170667a&w=0&k=20&c=GTGeVBujOna8YFI2kqdqLaqb6ipnpJDNsLuczd-aBGM=" fluid />
+                                                <small className="mt-4 text-center"><b>Image</b></small>
+                                            </div>
+                                        </Col>
+                                    )
+                                }
+                            </Row>
+                        </Tab>
+                    </Tabs>
+                }
+                handleClose={() => setGalleryShow(false)}
+            />
             <Container fluid>
                 <Row className="MainSectionRow">
                     <Col xl={4} className="p-0">
@@ -310,6 +365,12 @@ export default function PostUploading() {
                                         Save as {publish === 1 ? "Publish" : "Draft"}
                                     </Button></h3>
                             </div>
+                            <div>
+                                <Button
+                                    onClick={() => setGalleryShow(true)}
+                                    variant="dark"
+                                    className="text-white mt-5 mb-5"><FcGallery /> Media Gallery</Button>
+                            </div>
                             <Row className="EditorSpace">
                                 <Col xl={6} className="EditorSize">
                                     <Tabs
@@ -333,6 +394,13 @@ export default function PostUploading() {
                                                                 'X-CSRF-TOKEN': 'CSFR-Token',
                                                                 Authorization: 'Bearer <JSON Web Token>'
                                                             }
+                                                        },
+                                                        mediaEmbed: {
+                                                            providers: [
+                                                                {
+
+                                                                }
+                                                            ]
                                                         }
                                                     }
                                                 }

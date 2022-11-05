@@ -99,3 +99,20 @@
     z-index: 2;
     width: 10rem;
 }
+
+.MediaGallery {
+    padding: 1rem;
+    margin-bottom: 0rem;
+    cursor: pointer;
+}
+
+.MediaGallery:hover {
+    background-color: #5F9DF7;
+    transition: all 0.5s ease;
+}
+
+.RowMg {
+    height: 40rem;
+    overflow: hidden;
+    overflow-y: scroll;
+}

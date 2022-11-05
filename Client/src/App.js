@@ -20,7 +20,7 @@ export default function App() {
       <Route path='/guest-post' element={<GuestPost />} />
       <Route path='/categories' element={<Categories />} />
       <Route path='/edit-post/:postid' element={<EditPost />} />
-      <Route path='/upload-post' element={<PostUploading />} />
+      <Route path='/upload-post/:type' element={<PostUploading />} />
       <Route path='/view-press-release/:postid' element={<ViewPost />} />
       <Route path='/view-guest-post/:gpostid' element={<ViewPost />} />
       <Route path='*' element={<h1>404</h1>} />

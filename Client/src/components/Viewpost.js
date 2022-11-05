@@ -15,7 +15,7 @@ export default function ViewPost() {
     }, [])
 
     const fetchParamPost = () => {
-        axios.get(`${defaultUrl}api/post/get-post/${postid}`)
+        axios.get(`${defaultUrl}api/post/get-post/${postid || gpostid}`)
             .then((r) => {
                 if (r.data.success) {
                     if (r.data?.data === null) {
@@ -38,7 +38,14 @@ export default function ViewPost() {
             <Header />
             <div className="mt-5">
                 <Container>
-                    <Markup content={postData.content} />
+                    <h1>{gpostid}</h1>
+                    <h2>{JSON.stringify(postData.content)}</h2>
+                    <div>
+                        <Markup content={postData?.content} />
+                    </div>
+                </Container>
+                <Container>
+
                 </Container>
             </div>
         </div>
