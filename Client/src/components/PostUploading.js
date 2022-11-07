@@ -28,6 +28,7 @@ export default function PostUploading() {
     const [selectedGalleryImageData, setSelectedGalleryImageData] = useState([])
     const [files, setFiles] = useState([])
 
+
     const [categoryData, setCategoryData] = useState([])
     const [mainTitle, setMainTitle] = useState("")
     const [author, setAuthor] = useState("")
@@ -38,6 +39,11 @@ export default function PostUploading() {
     const [url, setUrl] = useState(mainTitle)
     const [publish, setPublish] = useState(0)
     const [content, setContent] = useState('')
+    const [htmlEditor, setHtmlEditor] = useState('')
+
+    useEffect(() => {
+        setHtmlEditor(content)
+    }, [content])
 
     //search category
     const [searchCateg, setSearchCateg] = useState([])
@@ -478,9 +484,10 @@ export default function PostUploading() {
                                             />
                                         </Tab>
                                         <Tab eventKey="Html" title="Html">
+                                            <Button onClick={() => setContent(htmlEditor)}>Save</Button>
                                             <textarea
-                                                onChange={(e) => setContent(e.target.value)}
-                                                value={content}
+                                                onChange={(e) => setHtmlEditor(e.target.value)}
+                                                value={htmlEditor}
                                                 style={{ height: "100vh", width: "100%", border: "none", outline: "none" }}
                                                 placeholder="write your html......"
                                             >
