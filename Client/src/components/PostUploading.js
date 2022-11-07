@@ -11,7 +11,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
 import { useNavigate, useParams } from "react-router-dom";
 import { ModelUplaod } from "./categories/Categories";
-import { IoMdCloseCircleOutline } from "react-icons/io"
+import { IoMdAddCircle, IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
 import { defaultUrl } from "../utils/default";
 import { FcAddImage, FcGallery } from "react-icons/fc"
@@ -23,7 +23,10 @@ export default function PostUploading() {
 
     //gallery 
     const [galleryShow, setGalleryShow] = useState(false)
-
+    const [selectedImage, setSelectedImage] = useState([])
+    const [galleryDatas, setGalleryDatas] = useState([])
+    const [selectedGalleryImageData, setSelectedGalleryImageData] = useState([])
+    const [files, setFiles] = useState([])
 
     const [categoryData, setCategoryData] = useState([])
     const [mainTitle, setMainTitle] = useState("")
@@ -74,6 +77,7 @@ export default function PostUploading() {
         }
         fetchCategory()
         searchCategories(searchText)
+        galleryImages()
     }, [])
 
 
@@ -137,9 +141,56 @@ export default function PostUploading() {
         const data = editor.getData();
         setContent(data)
     }
-
     const editUrl = (v) => {
         setUrl(v.split(' ').join('-'))
+    }
+
+    const galleryImageUpload = () => {
+        const formdata = new FormData()
+        formdata.append('image', selectedImage)
+        axios.post(`${defaultUrl}api/post/gallery-img-upload`, formdata).then((r) => {
+            if (r.data.success) {
+                toast.success(r.data.msg)
+                galleryImages()
+            } else {
+                toast.error(r.data.msg)
+            }
+        }).catch((e) => {
+            toast.error(e.response.data.msg)
+        })
+    }
+
+    const galleryImages = () => {
+        axios.get(`${defaultUrl}api/post/gallery`).then((r) => {
+            if (r.data?.success) {
+                setGalleryDatas(r.data?.data)
+            } else {
+                toast.error(r.data?.msg)
+            }
+        }).catch((e) => {
+            toast.error(e.response?.data?.msg)
+        })
+    }
+
+    const handleSelectionImage = (v) => {
+        if (selectedGalleryImageData.includes(v)) {
+            setSelectedGalleryImageData(selectedGalleryImageData.filter(k => k !== v))
+        } else {
+            setSelectedGalleryImageData(selectedGalleryImageData.concat(v))
+        }
+    }
+
+    const fileSelectedHandler = (e) => {
+        setFiles(e.target.files)
+    }
+
+    const handleUFE = () => {
+        let dataBuffer = ""
+        for (let data = 0; data < selectedGalleryImageData.length; data++) {
+            dataBuffer += `<figure class="image"><img src="${selectedGalleryImageData[data]}"></figure>`
+        }
+        setContent(content + dataBuffer)
+        setSelectedGalleryImageData([])
     }
 
     return (
@@ -167,32 +218,46 @@ export default function PostUploading() {
                             <Row className="RowMg">
                                 <div>
                                     <Form.Group controlId="formFileSm" className="mb-1">
-                                        <Form.Label>Select Your Image Files</Form.Label>
-                                        <Form.Control
+                                        <input type="file"
+                                            onChange={fileSelectedHandler}
+                                            multiple
+                                        />
+                                        {/* <Form.Control
                                             type="file"
                                             size="sm"
                                             multiple
-                                            maxLength={5} accept="image/jpg, image/jpeg, image/png, image/svg"
-                                            onChange={(e) => console.log(e.target.files)}
-                                        />
+                                           
+                                           
+                                        /> */}
                                     </Form.Group>
                                 </div>
-                                <div className="text-center">
-                                    <FcAddImage size={200} />
+                                <div>
+                                    <Button onClick={galleryImageUpload}>Upload Now</Button>
                                 </div>
                             </Row>
                         </Tab>
                         <Tab eventKey="g-all" title="Gallery">
+                            <Row>
+                                <Col xl={12}>
+                                    {
+                                        selectedGalleryImageData.length > 0 &&
+                                        <Button variant="success" size="sm" className="mb-2" onClick={handleUFE}>
+                                            Use for editor
+                                        </Button>
+                                    }
+                                </Col>
+                            </Row>
                             <Row className="RowMg">
                                 {
-                                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((v, i) =>
-                                        <Col xl={3}>
-                                            <div className="MediaGallery">
-                                                <Image src="https://media.istockphoto.com/id/1329568867/photo/smartphone-mockup-closeup-of-woman-using-mobile-phone-with-empty-screen-at-home.jpg?b=1&s=170667a&w=0&k=20&c=GTGeVBujOna8YFI2kqdqLaqb6ipnpJDNsLuczd-aBGM=" fluid />
-                                                <small className="mt-4 text-center"><b>Image</b></small>
-                                            </div>
-                                        </Col>
-                                    )
+                                    galleryDatas == null ? <h1>No Images</h1> :
+                                        galleryDatas?.map((v, i) =>
+                                            <Col xl={3}>
+                                                <div className={`MediaGallery  ${selectedGalleryImageData.includes(`${defaultUrl}` + v.img.replace('public/', '')) ? 'SelectedImg' : ''}`}
+                                                    onClick={() => handleSelectionImage(`${defaultUrl}` + v.img.replace('public/', ''))}>
+                                                    <Image src={`${defaultUrl}` + v.img.replace('public/', '')} fluid />
+                                                </div>
+                                            </Col>
+                                        )
                                 }
                             </Row>
                         </Tab>
@@ -200,7 +265,7 @@ export default function PostUploading() {
                 }
                 handleClose={() => setGalleryShow(false)}
             />
-            <Container fluid>
+            < Container fluid >
                 <Row className="MainSectionRow">
                     <Col xl={4} className="p-0">
                         <div className="Sidebar">
@@ -290,7 +355,9 @@ export default function PostUploading() {
                                                     suggestion &&
                                                     <div className="SuggestText">
                                                         <b>Suggest for add category "{searchText}"&nbsp;&nbsp;
-                                                            <Badge bg="success" className="BadgeClk" onClick={() => setShow(true)}>Add Now</Badge>
+                                                            <Badge bg="success" className="BadgeClk" onClick={() => setShow(true)}>
+                                                                <IoMdAddCircle size={20} />
+                                                            </Badge>
                                                         </b>
                                                     </div>
                                                 }
@@ -379,6 +446,7 @@ export default function PostUploading() {
                                     >
                                         <Tab eventKey="Content" title="Content">
                                             <CKEditor
+                                                data={content}
                                                 key={"content-editor"}
                                                 editor={ClassicEditor}
                                                 onChange={ckeditorstate}
@@ -424,7 +492,7 @@ export default function PostUploading() {
                         </div>
                     </Col>
                 </Row>
-            </Container>
-        </div>
+            </Container >
+        </div >
     )
 }

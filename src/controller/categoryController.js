@@ -70,6 +70,7 @@ const searchCategory = catchAsyncError(async (req, res, next) => {
             $regex: search,
             $options: "i",
         },
+        isDelete: false
     }).limit(5).sort({ createdAt: -1 }).lean()
     if (results) {
         if (results.length === 0) {

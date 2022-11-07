@@ -1,5 +1,5 @@
 const express = require('express')
-const { uploadImagesForGallery, resizePhoto, galleryController } = require('../controller/galleryController')
+const { uploadImagesForGallery, resizePhoto, galleryController, fetchAllgalleryImage } = require('../controller/galleryController')
 const { uploadPost, deletePost, getAllpost, getSinglePost } = require('../controller/postController')
 
 const postRouter = express.Router()
@@ -13,5 +13,6 @@ postRouter.post('/gallery-img-upload',
     resizePhoto,
     galleryController
 )
+postRouter.get('/gallery', fetchAllgalleryImage)
 
 module.exports = postRouter

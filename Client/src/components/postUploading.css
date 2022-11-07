@@ -111,6 +111,10 @@
     transition: all 0.5s ease;
 }
 
+.SelectedImg {
+    background-color: #5F9DF7;
+}
+
 .RowMg {
     height: 40rem;
     overflow: hidden;
