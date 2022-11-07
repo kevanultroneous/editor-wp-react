@@ -25,7 +25,7 @@ export default function EditPost() {
     }, [])
 
     const fetchParamPost = () => {
-        axios.get(`${defaultUrl}get-post/${postid}`)
+        axios.get(`${defaultUrl}api/post/get-post/${postid}`)
             .then((r) => {
                 if (r.data.success) {
                     setPostData(r.data.data)
