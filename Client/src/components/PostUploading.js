@@ -147,11 +147,14 @@ export default function PostUploading() {
 
     const galleryImageUpload = () => {
         const formdata = new FormData()
-        formdata.append('image', selectedImage)
+        for (let zf = 0; zf < files.length; zf++) {
+            formdata.append('image', files[zf])
+        }
         axios.post(`${defaultUrl}api/post/gallery-img-upload`, formdata).then((r) => {
             if (r.data.success) {
                 toast.success(r.data.msg)
                 galleryImages()
+                setGalleryShow(false)
             } else {
                 toast.error(r.data.msg)
             }

@@ -25,6 +25,20 @@ const getAllCategory = catchAsyncError(async (req, res) => {
     }
 })
 
+const getSubcategories = catchAsyncError(async (req, res) => {
+    const id = req.params['id']
+    try {
+        const singlecategory = await ECategory.findOne({ _id: id }).lean()
+        if (!singlecategory) {
+            sendResponse(res, 200, { success: true, data: null })
+        } else {
+            sendResponse(res, 200, { success: true, data: singlecategory })
+        }
+    } catch (e) {
+        sendResponse(res, 500, { success: false, data: null })
+    }
+})
+
 const deleteCategory = catchAsyncError(async (req, res) => {
     const { catid } = req.body
     if (!catid || !ObjectId.isValid(catid)) {
@@ -88,5 +102,6 @@ module.exports = {
     getAllCategory,
     deleteCategory,
     updateCategory,
-    searchCategory
+    searchCategory,
+    getSubcategories
 }
