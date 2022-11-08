@@ -13,6 +13,10 @@ const schema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    posttype: {
+        type: Number,
+        default: 0
+    },
     isDelete: {
         type: Boolean,
         default: false

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "./common/Header";
-import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge, Image } from "react-bootstrap"
+import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge, Image, Dropdown, SplitButton } from "react-bootstrap"
 import "./postUploading.css"
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -33,6 +33,7 @@ export default function PostUploading() {
     const [mainTitle, setMainTitle] = useState("")
     const [author, setAuthor] = useState("")
     const [category, setCategory] = useState([])
+    const [subcategory, setSubcategory] = useState([])
     const [seotitle, setSeoTitle] = useState("")
     const [seodescription, setSeoDescription] = useState("")
     const [seometatags, setSeoMetaTags] = useState("")
@@ -63,7 +64,6 @@ export default function PostUploading() {
             if (r.data.success) {
                 toast.success(r.data.msg)
                 handleClose()
-                fetchCategory()
                 setCatname("")
             } else {
                 toast.error(r.data.msg)
@@ -81,7 +81,6 @@ export default function PostUploading() {
         if (!(type === 'press-release' || type === "guest-post")) {
             navigate('/')
         }
-        fetchCategory()
         searchCategories(searchText)
         galleryImages()
     }, [])
@@ -113,13 +112,7 @@ export default function PostUploading() {
             .catch((e) => toast.error(e.response.data.msg))
     }
 
-    const fetchCategory = () => {
-        axios.get(`${defaultUrl}api/category/categories`).then((r) => {
-            if (r.data.success) {
-                setCategoryData(r.data.data)
-            }
-        }).catch((e) => toast.error(e.response.data.msg))
-    }
+
 
     const searchCategories = (search) => {
         setLoader(true)
@@ -135,13 +128,7 @@ export default function PostUploading() {
         }, 1000)
     }
 
-    const handleCategorySelection = (value) => {
-        if (category.includes(value)) {
-            setCategory(category.filter(i => i !== value))
-        } else {
-            setCategory(category.concat(value))
-        }
-    }
+
 
     const ckeditorstate = (event, editor) => {
         const data = editor.getData();
@@ -202,6 +189,31 @@ export default function PostUploading() {
         setSelectedGalleryImageData([])
     }
 
+    // const findParentandAddchild = (ary, parent, value) => {
+    //     for (let i = 0; i < category.length; i++) {
+    //         for (let j = 0; j < subcategory.length; j++) {
+    //             if (category[i])
+    //         }
+    //     }
+    // }
+
+    const handleCategorySelection = (e, v, k1, parent) => {
+
+        if (k1) {
+            if (e.target.checked) {
+                setSubcategory(subcategory.concat({ category: parent, id: v.id, name: v.name }))
+            } else {
+                setSubcategory(subcategory.filter(k => k.id !== v.id && k.category !== parent))
+            }
+        } else {
+            if (e.target.checked) {
+                setCategory(category.concat(v))
+            } else {
+                setCategory(category.filter(k => k._id !== v._id))
+            }
+        }
+    }
+
     return (
         <div>
             <Toaster
@@ -231,13 +243,6 @@ export default function PostUploading() {
                                             onChange={fileSelectedHandler}
                                             multiple
                                         />
-                                        {/* <Form.Control
-                                            type="file"
-                                            size="sm"
-                                            multiple
-                                           
-                                           
-                                        /> */}
                                     </Form.Group>
                                 </div>
                                 <div>
@@ -326,36 +331,39 @@ export default function PostUploading() {
                                             </div>
                                             :
                                             <>
-
-                                                <div className="ListOfCategories">
+                                                <div className="mt-3">
                                                     {
-                                                        searchCateg?.map((v, i) =>
-                                                            <div className="SearchList" onMouseOver={() =>
-                                                                v.subcategory.length > 0 ? setSubHover(true) : null
-                                                            }
-                                                                onMouseLeave={() => setSubHover(false)}>
-                                                                <label className="SearchText" >{v.title}</label>
-                                                                {v.subcategory.length > 0 ?
-                                                                    <>
-                                                                        <div style={{ float: "right" }} className="me-3">
-                                                                            <AiFillCaretRight />
-                                                                            {
-                                                                                subhover &&
-                                                                                <div className="Subcategory">
-                                                                                    {
-                                                                                        v.subcategory.map((v, i) =>
-                                                                                            <div className="SearchList">
-                                                                                                <label className="SearchText">
-                                                                                                    {v.name}
-                                                                                                </label>
+                                                        searchCateg?.map((k, i) =>
+                                                            <div>
+                                                                <input
+                                                                    checked={category.some(e => e._id === k._id)}
+                                                                    type="checkbox"
+                                                                    onChange={(e) => {
+                                                                        handleCategorySelection(e, k)
+                                                                    }}
+                                                                /> {k.title}
+                                                                <div>
+                                                                    {
+                                                                        category.some(e => e._id === k._id) ?
+                                                                            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                                                                {
+                                                                                    k?.subcategory.length > 0
+                                                                                        ?
+                                                                                        k?.subcategory.map((v, i) =>
+                                                                                            <div className="ms-3">
+                                                                                                <input
+                                                                                                    checked={subcategory.some(e => e.category === k._id && e.name === v.name)}
+                                                                                                    type="checkbox"
+                                                                                                    onChange={(e) => handleCategorySelection(e, v, true, k._id)} />
+                                                                                                {v.name}
                                                                                             </div>
                                                                                         )
-                                                                                    }
-                                                                                </div>
-                                                                            }
-                                                                        </div>
-                                                                    </>
-                                                                    : ""}
+                                                                                        : null
+                                                                                }
+                                                                            </div>
+                                                                            : null
+                                                                    }
+                                                                </div>
                                                             </div>
                                                         )
                                                     }
@@ -396,18 +404,7 @@ export default function PostUploading() {
                                     />
                                 </FloatingLabel>
                             </div>
-                            {/* <div className="mt-4">
-                                <Form.Label><strong>SEO Meta tags</strong></Form.Label>
-                                <FloatingLabel controlId="floatingTextarea2" label="Meta tags">
-                                    <Form.Control
-                                        value={seometatags}
-                                        onChange={(e) => setSeoMetaTags(e.target.value)}
-                                        as="textarea"
-                                        placeholder="Meta tags"
-                                        style={{ height: '100px' }}
-                                    />
-                                </FloatingLabel>
-                            </div> */}
+
                             <div className="mt-4">
                                 <Form.Label><strong>URL</strong></Form.Label>
                                 <InputGroup className="mb-3">
@@ -454,6 +451,10 @@ export default function PostUploading() {
                                         className="mb-3"
                                     >
                                         <Tab eventKey="Content" title="Content">
+                                            {JSON.stringify(category)}
+                                            {/* {
+                                                JSON.stringify(subcategory)
+                                            } */}
                                             <CKEditor
                                                 data={content}
                                                 key={"content-editor"}
@@ -462,11 +463,8 @@ export default function PostUploading() {
                                                 config={
                                                     {
                                                         ckfinder: {
-                                                            // The URL that the images are uploaded to.
                                                             uploadUrl: '/upload',
-                                                            // Enable the XMLHttpRequest.withCredentials property.
                                                             withCredentials: true,
-                                                            // Headers sent along with the XMLHttpRequest to the upload server.
                                                             headers: {
                                                                 'X-CSRF-TOKEN': 'CSFR-Token',
                                                                 Authorization: 'Bearer <JSON Web Token>'

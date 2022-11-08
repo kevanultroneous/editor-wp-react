@@ -30,10 +30,6 @@ const schema = new mongoose.Schema({
         type: String,
         default: '<strong>Some Content is nice !</strong>'
     },
-    smeta: {
-        type: String,
-        default: 'social meta'
-    },
     stitle: {
         type: String,
         default: 'social title'
@@ -50,7 +46,7 @@ const schema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    parent: {
+    posttype: {
         type: Number,
         default: 0
     },
