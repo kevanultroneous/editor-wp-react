@@ -2,7 +2,6 @@ import { Button, Col, Container, Row, Table } from "react-bootstrap"
 import React, { useEffect, useState } from "react"
 import Header from "../common/Header"
 import "./style.css"
-import "react-datepicker/dist/react-datepicker.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";

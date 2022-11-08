@@ -204,9 +204,9 @@ export default function PostUploading() {
 
         if (k1) {
             if (e.target.checked) {
-                setSubcategory(subcategory.concat({ category: parent, name: name, id: id }))
+                setSubcategory(subcategory.concat(name))
             } else {
-                setSubcategory(subcategory.filter(i => i.category !== parent && i.id !== id && i.name !== name))
+                setSubcategory(subcategory.filter(i => i !== name))
             }
         } else {
             if (e.target.checked) {
@@ -364,7 +364,7 @@ export default function PostUploading() {
                                                                                         k?.subcategory.map((v, i) =>
                                                                                             <div className="ms-3" key={i}>
                                                                                                 <input
-                                                                                                    checked={subcategory.find(e => e.category === v._id)}
+                                                                                                    checked={subcategory.includes(v.name)}
                                                                                                     type="checkbox"
                                                                                                     name={"subcategory"}
                                                                                                     onChange={(e) => handleCategorySelection(e, v, true, k._id, v.name, v.id)} />
@@ -448,7 +448,7 @@ export default function PostUploading() {
                                     variant="dark"
                                     className="text-white mt-5 mb-5"><FcGallery /> Media Gallery</Button>
                             </div>
-                            <Row className="EditorSpace">
+                            <Row className="EditorSpace p-0">
                                 <Col xl={6} className="EditorSize">
                                     <Tabs
                                         id="controlled-tab-example"
@@ -457,8 +457,7 @@ export default function PostUploading() {
                                         <Tab eventKey="Content" title="Content">
 
                                             <CKEditor
-                                                value={content}
-                                                key={"content-editor"}
+                                                data=""
                                                 editor={ClassicEditor}
                                                 onChange={ckeditorstate}
                                                 config={

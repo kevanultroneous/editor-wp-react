@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Col, Modal, Row } from "react-bootstrap";
 
-export default function DeleteModel({ show, onHide, handleNo, handleYes, title, mentionText }) {
+export default function DeleteModel({ show, onHide, handleNo, handleYes, title, mentionText, child, hidebuttons }) {
     return (
         <Modal
             size="md"
@@ -16,12 +16,16 @@ export default function DeleteModel({ show, onHide, handleNo, handleYes, title, 
             </Modal.Header>
             <Modal.Body>
                 <h6>{mentionText}</h6>
-                <Row>
-                    <Col xl={12}>
-                        <Button variant="info" onClick={handleNo}>No</Button>
-                        <Button variant="danger" className="ms-3" onClick={handleYes}>Yes</Button>
-                    </Col>
-                </Row>
+                {child}
+                {
+                    !hidebuttons &&
+                    <Row>
+                        <Col xl={12}>
+                            <Button variant="info" onClick={handleNo}>No</Button>
+                            <Button variant="danger" className="ms-3" onClick={handleYes}>Yes</Button>
+                        </Col>
+                    </Row>
+                }
             </Modal.Body>
         </Modal>
     )

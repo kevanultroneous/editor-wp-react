@@ -10,6 +10,7 @@ import EditPost from './components/EditPost';
 import PostUploading from './components/PostUploading';
 import "./app.css"
 import ViewPost from './components/Viewpost';
+import Contact from './components/contactComponet/contact';
 
 export default function App() {
   return (

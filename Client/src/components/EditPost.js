@@ -198,94 +198,9 @@ export default function EditPost() {
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
                                 {/* future use */}
-                                <div>
-                                    <Button
-                                        onClick={() => setShow(true)}
-                                        variant="secondary"
-                                        size="sm"
-                                        className="mb-3">
-                                        Add new Category
-                                    </Button>
-                                </div>
-                                {/* <div> */}
-                                {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
-                                <div className="TagsWrraper">
-                                    {
-                                        categoryData.map((v, i) =>
-                                            <div
-                                                onClick={() => handleCategorySelection(v._id)}
-                                                className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
-                                                &nbsp;&nbsp;<IoMdCloseCircleOutline />
-                                            </div>
-                                        )
-                                    }
-                                </div>
-                                {/* </select> */}
-                                {/* </div> */}
 
-                                {/* <div className="SearchWrraper">
-                                    <Form.Control
-                                        value={searchText}
-                                        onChange={(e) => {
-                                            searchCategories(e.target.value)
-                                            setSerachText(e.target.value)
-                                        }}
-                                        type="text"
-                                        placeholder="Search category...."
-                                    />
-                                    {
-                                        loader ?
-                                            <div className="mt-3 text-center">
-                                                <Spinner animation="border" variant="success" />
-                                            </div>
-                                            :
-                                            <>
 
-                                                <div className="ListOfCategories">
-                                                    {
-                                                        searchCateg?.map((v, i) =>
-                                                            <div className="SearchList" onMouseOver={() => setSubHover(true)}
-                                                                onMouseLeave={() => setSubHover(false)}>
-                                                                <label className="SearchText" >{v.title}</label>
-                                                                {v.subcategory.length > 0 ?
-                                                                    <>
-                                                                        <div style={{ float: "right" }} className="me-3">
-                                                                            <AiFillCaretRight />
-                                                                            {
-                                                                                subhover &&
-                                                                                <div className="Subcategory">
-                                                                                    {
-                                                                                        v.subcategory.map((v, i) =>
-                                                                                            <div className="SearchList">
-                                                                                                <label className="SearchText">
-                                                                                                    {v.name}
-                                                                                                </label>
-                                                                                            </div>
-                                                                                        )
-                                                                                    }
-                                                                                </div>
-                                                                            }
-                                                                        </div>
-                                                                    </>
-                                                                    : ""}
-                                                            </div>
-                                                        )
-                                                    }
-                                                </div>
-                                                {
-                                                    suggestion &&
-                                                    <div className="SuggestText">
-                                                        <b>Suggest for add category "{searchText}"&nbsp;&nbsp;
-                                                            <Badge bg="success" className="BadgeClk" onClick={() => {
-                                                                handleSave(searchText)
-                                                                searchCategories(searchText)
-                                                            }}>Add Now</Badge>
-                                                        </b>
-                                                    </div>
-                                                }
-                                            </>
-                                    }
-                                </div> */}
+
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>SEO Title</strong></Form.Label>

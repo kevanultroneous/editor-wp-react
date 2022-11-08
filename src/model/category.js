@@ -3,23 +3,24 @@ const mongoose = require("mongoose");
 const schema = new mongoose.Schema({
     title: {
         type: String,
-        default: 'category',
+        required: true,
         unique: true
     },
-    subcategory: {
+    parentCategory: {
+        type: mongoose.Types.ObjectId,
+        default: null
+    },
+    subCategory: {
         type: Array,
     },
-    selected: {
+    type: {
+        type: String,
+        default: 0,
+        enum: ['blog', 'press']
+    },
+    isActive: {
         type: Boolean,
         default: true
-    },
-    posttype: {
-        type: Number,
-        default: 0
-    },
-    isDelete: {
-        type: Boolean,
-        default: false
     }
 }, { timestamps: true })
 

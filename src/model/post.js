@@ -17,9 +17,7 @@ const schema = new mongoose.Schema({
     category: {
         type: Array,
     },
-    subcategory: {
-        type: Array,
-    },
+
     date: {
         type: Date,
         default: new Date()
@@ -58,7 +56,7 @@ const schema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const EPost = mongoose.model("editors", schema)
+const EPost = mongoose.model("posts", schema)
 module.exports = EPost
 
 
