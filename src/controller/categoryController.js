@@ -5,7 +5,7 @@ var ObjectId = require('mongoose').Types.ObjectId;
 
 const uploadCategory = catchAsyncError(async (req, res) => {
     const { title, subcategory } = req.body
-    if (!title || title === "null" || title.length <= 3 && !newtitle.length >= 30) {
+    if (!title || title === "null" || title.length < 3) {
         sendResponse(res, 400, { msg: "Enter valid category title ! ,length must be greater than 3 and lessthan 30 words !", success: false })
     } else {
         if (await ECategory.create({ title, subcategory })) {

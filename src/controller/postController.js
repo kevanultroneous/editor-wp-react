@@ -1,24 +1,22 @@
+const sharp = require('sharp');
 const EPost = require('../model/post');
 const catchAsyncError = require('../utils/catchAsyncError');
 const { sendResponse, upload } = require('../utils/commonFunctions');
 var ObjectId = require('mongoose').Types.ObjectId;
 
-const featureduploadUserPhoto = upload.single("fimg");
+const uploadImagesForFeatured = upload.single("image");
 
-const featuredresizePhoto = (req, res, next) => {
+const resizePhotoFimg = (req, res, next) => {
     if (!req.file) return next();
-
-    req.file.filename = `${new Date()}-${req.file.filename}`;
-
+    let newfile = `public/other/featured/${new Date() + req.file.originalname}.jpeg`
     sharp(req.file.buffer)
         .jpeg({ quality: 100 })
-        .toFile(`public/other/featured/${req.file.filename}.jpeg`);
-
+        .toFile(newfile);
+    req.sendfile = newfile.replace('public/', '')
     next();
 };
 
 const uploadPost = catchAsyncError(async (req, res) => {
-
     const { title,
         category,
         date,
@@ -33,7 +31,7 @@ const uploadPost = catchAsyncError(async (req, res) => {
 
     if (await EPost.create({
         title,
-        fimg: `other/featured/${req.file.filename}`,
+        fimg: req.sendfile,
         category,
         date,
         author,
@@ -100,6 +98,6 @@ module.exports = {
     getAllpost,
     deletePost,
     getSinglePost,
-    featuredresizePhoto,
-    featureduploadUserPhoto
+    uploadImagesForFeatured,
+    resizePhotoFimg
 }

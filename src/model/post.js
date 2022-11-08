@@ -16,7 +16,9 @@ const schema = new mongoose.Schema({
     },
     category: {
         type: Array,
-        required: true
+    },
+    subcategory: {
+        type: Array,
     },
     date: {
         type: Date,

@@ -14,7 +14,8 @@ import ViewPost from './components/Viewpost';
 export default function App() {
   return (
     <Routes>
-      <Route path='/' element={<Login />} />
+      {/* <Route path='/' element={<Login />} /> */}
+      <Route path='/' element={<Home />} />
       <Route path='/home' element={<Home />} />
       <Route path='/press-release' element={<PressRelease />} />
       <Route path='/guest-post' element={<GuestPost />} />
