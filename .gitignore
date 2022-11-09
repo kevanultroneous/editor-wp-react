@@ -1,4 +1,6 @@
 /node_modules
 /uploads
 /images
-/public
+/public/gallery/
+/public/other/featured/
+/public/other/uploads/
