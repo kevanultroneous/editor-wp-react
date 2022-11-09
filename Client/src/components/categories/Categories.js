@@ -2,97 +2,14 @@ import { Button, Col, Container, Row, Table, Modal, InputGroup, Form } from "rea
 import React, { useEffect, useState } from "react"
 import Header from "../common/Header"
 import "./style.css"
-import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";
-import { IoCloseCircle } from "react-icons/io5"
-import { MdOutlineUpdate } from "react-icons/md"
+
 import { defaultUrl } from "../../utils/default";
+import DeleteModel from "../common/DeleteModel"
+import ModelUpdate from "../common/UpdateModel"
+import ModelUpload from "../common/UploadCategoryModel"
 
-export const ModelUplaod = ({ show, handleClose, handleSave, catname, subcatname, changeCatname, changesubcatname, keyuphandler, selectedSubcategories }) => {
-
-    return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header>
-                <Modal.Title>Add new category..</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <InputGroup className="mb-3">
-                    <Form.Control
-                        value={catname}
-                        onChange={changeCatname}
-                        placeholder="Category name"
-                        aria-label="Category name"
-                        aria-describedby="basic-addon2"
-                    />
-                </InputGroup>
-                <InputGroup className="mb-3">
-                    <Form.Control
-                        value={subcatname}
-                        onChange={changesubcatname}
-                        onKeyUp={keyuphandler}
-                        placeholder="write Subcategory and press the enter"
-                        aria-label="Category name"
-                        aria-describedby="basic-addon2"
-                    />
-                </InputGroup>
-                <div className="mt-4">
-                    {selectedSubcategories}
-                </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleSave}>
-                    Upload
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    )
-}
-const ModelUpdate = ({ show, handleClose, handleUpdate, catname, changeCatname, currentTitle, subcatname, changesubcatname, keyuphandler, selectedSubcategories }) => {
-    return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header>
-                <Modal.Title>Update category {currentTitle}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <b>Update Category</b>
-                <InputGroup className="mb-3 mt-2">
-                    <Form.Control
-                        value={catname}
-                        onChange={changeCatname}
-                        placeholder="Category name"
-                        aria-label="Category name"
-                        aria-describedby="basic-addon2"
-                    />
-                </InputGroup>
-                <InputGroup className="mb-3">
-                    <Form.Control
-                        value={subcatname}
-                        onChange={changesubcatname}
-                        onKeyUp={keyuphandler}
-                        placeholder="write Subcategory and press the enter"
-                        aria-label="Category name"
-                        aria-describedby="basic-addon2"
-                    />
-                </InputGroup>
-                <div className="mt-4">
-                    {selectedSubcategories}
-                </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleUpdate}>
-                    Update
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    )
-}
 
 export default function Categories() {
 
@@ -100,22 +17,20 @@ export default function Categories() {
         fetchCategory()
     }, [])
 
+    const [switches, setSwitches] = useState(false)
+    const [switches2, setSwitches2] = useState(false)
     const [show, setShow] = useState(false);
     const [smShow, setSmShow] = useState(false);
     const [showUpd, setShowUpd] = useState(false);
 
     const [catname, setCatname] = useState("")
-    const [subcatname, setSubCatname] = useState("")
     const [subCategories, setSubCategories] = useState([])
+
+    const [selectedCategory, setSelectedCategory] = useState([])
 
     const [currentCatId, setCurrentCatId] = useState("")
     const [currentCatname, setCurrentCatname] = useState("")
     const [newcatname, setNewCatname] = useState("")
-    const [newsubcats, setNewSubCats] = useState([])
-
-    const [mainCheck, setMainCheck] = useState(false)
-    const [multiUpdate, setMultiUpdate] = useState([])
-
 
     const [categoryData, setCategoryData] = useState([])
 
@@ -129,23 +44,63 @@ export default function Categories() {
     const handleShowUpd = () => setShowUpd(true);
 
     const handleSave = () => {
-        axios.post(`${defaultUrl}api/category/upload-category`, {
-            title: catname,
-            subcategory: subCategories
-        }).then((r) => {
-            if (r.data.success) {
-                toast.success(r.data.msg)
-                handleClose()
-                fetchCategory()
-                setCatname("")
+        let parentid = currentCatId
+        let newrequestdata = []
+        if (switches2) {
+            if (parentid === "" || parentid === null) {
+                alert('select the category !')
             } else {
-                toast.error(r.data.msg)
+                if (subCategories.length > 0) {
+                    subCategories.map((v) => {
+                        newrequestdata.push({
+                            title: v,
+                            parentCategory: parentid,
+                            subCategory: [],
+                            type: switches == true ? "press" : "blog",
+                        })
+                    })
+                    axios.post(`${defaultUrl}api/category/upload-category`, {
+                        data: newrequestdata, parentid: parentid, upddata: subCategories, multiple: true
+                    }).then((r) => {
+                        if (r.data.success) {
+                            toast.success(r.data.msg)
+                            handleClose()
+                            fetchCategory()
+                            setCatname("")
+                            setCurrentCatId("")
+                        } else {
+                            toast.error(r.data.msg)
+                        }
+                    }).catch((e) => toast.error(e.response.data.msg))
+                } else {
+                    alert('Please enter maximum 1 subcategory !')
+                }
             }
-        }).catch((e) => toast.error(e.response.data.msg))
+        }
+        else {
+            if (catname.length <= 3) {
+                alert('category name is required !')
+            } else {
+                axios.post(`${defaultUrl}api/category/upload-category`, {
+                    title: catname,
+                    type: switches ? "press" : "blog"
+                }).then((r) => {
+                    if (r.data.success) {
+                        toast.success(r.data.msg)
+                        handleClose()
+                        fetchCategory()
+                        setCatname("")
+                        setSwitches(false)
+                    } else {
+                        toast.error(r.data.msg)
+                    }
+                }).catch((e) => toast.error(e.response.data.msg))
+            }
+        }
     }
 
     const fetchCategory = () => {
-        axios.get(`${defaultUrl}api/category/categories`).then((r) => {
+        axios.get(`${defaultUrl}api/category/all-category`).then((r) => {
             if (r.data.success) {
                 setCategoryData(r.data.data)
             }
@@ -165,49 +120,17 @@ export default function Categories() {
     }
 
     const handleUpdate = () => {
-        axios.post(`${defaultUrl}api/category/update-category`, { catid: currentCatId, newtitle: newcatname, subcategory: newsubcats }).then((r) => {
+        axios.post(`${defaultUrl}api/category/update-category`, { catid: currentCatId, newtitle: newcatname, type: switches ? 'press' : 'blog' }).then((r) => {
             if (r.data.success) {
                 toast.success(r.data.msg)
                 fetchCategory()
                 setCurrentCatId("")
                 setCurrentCatname("")
                 handleCloseUpd()
+
             }
         }).catch((e) => toast.error(e.response.data.msg))
     }
-
-    // future use
-    // const multiUnchecked = (v) => {
-    //     setMultiUpdate(multiUpdate.filter(k => k._id !== v))
-    //     setMultiUpdate(multiUpdate.concat({ _id: v, checked: false }))
-    // }
-    // const handleMultiUpdate = () => {
-    //     axios.post(`${defaultUrl}update-category`, { multiid: multiUpdate }).then((r) => {
-    //         if (r.data.success) {
-    //             toast.success(r.data.msg)
-    //             setMultiUpdate([])
-    //             fetchCategory()
-    //         }
-    //     }).catch((e) => toast.error(e.response.data.msg))
-    // }
-
-    const removeSelectedSubCategory = (id, upd) => {
-        if (upd) {
-            setNewSubCats(newsubcats.filter(v => v.id !== id))
-        } else {
-            setSubCategories(subCategories.filter(v => v.id !== id))
-        }
-    }
-
-    useEffect(() => {
-        if (mainCheck) {
-            categoryData.map((v) =>
-                setMultiUpdate(multiUpdate.concat({ _id: v._id, checked: true }))
-            )
-        } else {
-            setMultiUpdate([])
-        }
-    }, [mainCheck])
 
     return (
         <>
@@ -219,111 +142,67 @@ export default function Categories() {
             <Container fluid>
                 <Row className="AddActionSpace">
                     <Col xl={12}>
-                        <Button variant="success" onClick={handleShow}>Add Category</Button>
+                        <Button variant="success" onClick={handleShow}>Add Category  / Subcategory</Button>
                     </Col>
                 </Row>
-                {/* future use */}
-                {/* <Row className="AddActionSpace">
-                    {multiUpdate.length > 0 &&
-                        <Col xl={12}>
-                            <Button variant="warning" onClick={handleMultiUpdate}>Update Selection{" "}
-                                <MdOutlineUpdate />
-                            </Button>
-                        </Col>
-                    }
-                </Row> */}
-                <Row className="TableSpace">
-                    <Col xl={6}>
-                        <Table striped bordered hover variant="dark">
-                            <thead>
-                                <tr>
-                                    {/* future use selected  */}
-                                    {/* <th className="text-center">
-                                        <Form.Check
-                                            onChange={(e) =>
-                                                setMainCheck(e.target.checked)
-                                            }
-                                            value={mainCheck}
-                                            type="switch"
-                                            id="disabled-custom-switch"
-                                        />
-                                    </th> */}
-                                    <th className="text-center">Sr.no</th>
-                                    <th>Category</th>
-                                    <th className="text-center">Sub Category</th>
-                                    <th>Edit</th>
-                                    <th>Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    categoryData != null &&
-                                    categoryData.map((v, i) =>
-                                        <tr key={i}>
-                                            {/* future use */}
-                                            {/* <td className="text-center">
-                                                <Form.Check
-                                                    onChange={(e) =>
-                                                        e.target.checked ?
-                                                            setMultiUpdate(multiUpdate.concat({ _id: v._id, checked: true }))
-                                                            : multiUnchecked(v._id)
-                                                    }
-                                                    defaultChecked={v.selected ? v.selected : false}
-                                                    type="switch"
-                                                    id="disabled-custom-switch"
-                                                />
-                                            </td> */}
-                                            <td className="text-center">{i + 1}</td>
-                                            <td>{v.title}</td>
-                                            <td className="text-center">{v.subcategory.length > 0 ? "Yes" : "No"}</td>
-                                            <td><Button variant="info" style={{ width: "100%" }} onClick={() => {
-                                                handleShowUpd()
-                                                setCurrentCatId(v._id)
-                                                setCurrentCatname(v.title)
-                                                setNewCatname(v.title)
-                                                setNewSubCats(v.subcategory)
-                                            }}>Edit</Button></td>
-                                            <td><Button variant="danger" style={{ width: "100%" }} onClick={() => {
-                                                setSmShow(true)
-                                                setCurrentCatname(v.title)
-                                                setCurrentCatId(v._id)
-                                            }}>Delete</Button></td>
+                {
+                    !(categoryData.length === 0) ?
+                        <Row className="TableSpace">
+                            <Col xl={6}>
+
+                                <Table striped bordered hover variant="dark">
+                                    <thead>
+                                        <tr>
+                                            <th className="text-center">Sr.no</th>
+                                            <th>Category</th>
+                                            <th className="text-center">Global Type</th>
+                                            <th colSpan={3} className="text-center">Action</th>
                                         </tr>
-                                    )
-                                }
-                            </tbody>
-                        </Table>
-                    </Col>
-                </Row>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            categoryData?.map((v, i) =>
+                                                <tr key={i}>
+                                                    <td className="text-center">{i + 1}</td>
+                                                    <td>{v.title}</td>
+                                                    <td className="text-center">{v.type}</td>
+                                                    <td><Button variant="info" style={{ width: "100%" }} onClick={() => {
+                                                        handleShowUpd()
+                                                        setCurrentCatId(v._id)
+                                                        setCurrentCatname(v.title)
+                                                        setNewCatname(v.title)
+                                                        setSwitches(v.type === 'press' ? true : false)
+                                                        setSelectedCategory(v.childs)
+                                                    }}>Edit</Button></td>
+                                                    <td><Button variant="danger" style={{ width: "100%" }} onClick={() => {
+                                                        setSmShow(true)
+                                                        setCurrentCatname(v.title)
+                                                        setCurrentCatId(v._id)
+                                                    }}>Delete</Button></td>
+                                                </tr>
+                                            )
+                                        }
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
+                        :
+                        <h1 className="text-center">No categories</h1>
+                }
             </Container>
-            <Modal
-                size="md"
+
+            <DeleteModel
                 show={smShow}
                 onHide={() => setSmShow(false)}
-                aria-labelledby="example-modal-sizes-title-sm"
-            >
-                <Modal.Header>
-                    <Modal.Title id="example-modal-sizes-title-sm">
-                        Delete Category
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <h6>Are you sure to delete <b>{currentCatname}</b> category ?
-                    </h6>
-                    <small><b>{currentCatname}</b> category related all sub category will be also deleting !</small>
-                    <Row className="mt-3">
-                        <Col xl={12}>
-                            <Button variant="info" className="me-3" onClick={() => {
-                                setSmShow(false)
-                                setCurrentCatId("")
-                                setCurrentCatname("")
-                            }}>No</Button>
-                            <Button variant="danger" onClick={() => deleteCategory(currentCatId)}>Yes</Button>
-                        </Col>
-                    </Row>
-                </Modal.Body>
-            </Modal>
-
+                title={" Delete Category"}
+                mentionText={`Are you sure to delete ${currentCatname} category ?`}
+                handleYes={() => deleteCategory(currentCatId)}
+                handleNo={() => {
+                    setSmShow(false)
+                    setCurrentCatId("")
+                    setCurrentCatname("")
+                }}
+            />
             <ModelUpdate
                 catname={newcatname}
                 changeCatname={(e) => setNewCatname(e.target.value)}
@@ -331,73 +210,105 @@ export default function Categories() {
                 currentTitle={currentCatname}
                 handleClose={handleCloseUpd}
                 handleUpdate={handleUpdate}
-                subcatname={subcatname}
-                changesubcatname={(e) => setSubCatname(e.target.value)}
-                keyuphandler={(e) => {
-                    const num = Math.floor(Math.random() * 9000 + 1000)
-                    const num2 = Math.floor(Math.random() * 900 + 100 * 50 + 20.10)
-                    if (e.keyCode === 13) {
-                        setNewSubCats(newsubcats.concat({ id: num + num2, name: subcatname }))
-                        setSubCatname("")
-                    }
-                }}
+                switches={switches}
+                changeswitch={(e) => setSwitches(!switches)}
                 selectedSubcategories={
-                    <>
-                        {newsubcats.length > 0 &&
-                            <>
-                                <div className="d-block mb-4">
-                                    <label className="clearBtn" onClick={() => setNewSubCats([])}><b>Clear All</b></label>
-                                </div>
-                                <div className="SubCategoryWrraper">
-                                    {
-                                        newsubcats.map((v, i) =>
-                                            <div className="SubCatTag" onClick={() => removeSelectedSubCategory(v.id, true)}>{v.name}&nbsp;
-                                                <IoCloseCircle />
-                                            </div>
-                                        )
-                                    }
-                                </div>
-                            </>
-                        }
-                    </>
+                    <div>
+                        <Row className="TableSpace">
+                            <Col xl={12}>
+                                {
+                                    selectedCategory?.length <= 0 || selectedCategory === null
+                                        ?
+                                        <h2>No subcategories</h2>
+                                        :
+                                        <>
+                                            <h4>Subcategories</h4>
+                                            <Table striped bordered hover variant="dark">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="text-center">Sr.no</th>
+                                                        <th>Sub Category{selectedCategory.length === 0 ? "Blank" : "No"}</th>
+                                                        <th className="text-center">Global Type</th>
+                                                        <th colSpan={3} className="text-center">Action</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    {
+                                                        selectedCategory?.map((v, i) =>
+                                                            <tr key={i}>
+                                                                <td className="text-center">{i + 1}</td>
+                                                                <td>{v.title}</td>
+                                                                <td className="text-center">{v.type}</td>
+                                                                <td><Button variant="info" style={{ width: "100%" }} onClick={() => {
+                                                                    handleShowUpd()
+                                                                    setCurrentCatId(v._id)
+                                                                    setCurrentCatname(v.title)
+                                                                    setNewCatname(v.title)
+                                                                    setSwitches(v.type === 'press' ? true : false)
+
+                                                                }}>Edit</Button></td>
+                                                                <td><Button variant="danger" style={{ width: "100%" }} onClick={() => {
+                                                                    setSmShow(true)
+                                                                    setCurrentCatname(v.title)
+                                                                    setCurrentCatId(v._id)
+                                                                }}>Delete</Button></td>
+                                                            </tr>
+                                                        )
+                                                    }
+                                                </tbody>
+                                            </Table>
+                                        </>
+                                }
+                            </Col>
+                        </Row>
+                    </div>
                 }
             />
-            <ModelUplaod
+            <ModelUpload
+                handleparentcategory={(e) => {
+                    setCurrentCatId(e.target.value)
+                }}
                 catname={catname}
                 changeCatname={(e) => setCatname(e.target.value)}
                 show={show}
                 handleClose={handleClose}
                 handleSave={handleSave}
-                subcatname={subcatname}
-                changesubcatname={(e) => setSubCatname(e.target.value)}
-                keyuphandler={(e) => {
-                    const num = Math.floor(Math.random() * 9000 + 1000)
-                    const num2 = Math.floor(Math.random() * 900 + 100 * 50 + 20.10)
-                    if (e.keyCode === 13) {
-                        setSubCategories(subCategories.concat({ id: num + num2, name: subcatname }))
-                        setSubCatname("")
+                switches={switches}
+                chnageswitch={(e) => {
+                    e.target.checked ?
+                        setSwitches(true) : setSwitches(false)
+                }}
+                switchessubcategory={switches2}
+                chnageswitchsubcategory={(e) => {
+                    e.target.checked ?
+                        setSwitches2(true) : setSwitches2(false)
+                }}
+                keydown={(e) => {
+                    if (e.key === 'Enter') {
+                        if (subCategories.includes(catname)) {
+                            alert('category you have already added !')
+                        } else {
+                            if (catname === '' || catname.length <= 3) {
+                                alert('enter valid category name ,category length required 4 letter !')
+                            } else {
+                                setSubCategories(subCategories.concat(catname))
+                                setCatname('')
+                            }
+                        }
                     }
                 }}
+
                 selectedSubcategories={
-                    <>
-                        {subCategories.length > 0 &&
-                            <>
-                                <div className="d-block mb-4">
-                                    <label className="clearBtn" onClick={() => setSubCategories([])}><b>Clear All</b></label>
-                                </div>
-                                <div className="SubCategoryWrraper">
-                                    {
-                                        subCategories.map((v, i) =>
-                                            <div className="SubCatTag" onClick={() => removeSelectedSubCategory(v.id)}>{v.name}&nbsp;
-                                                <IoCloseCircle />
-                                            </div>
-                                        )
-                                    }
-                                </div>
-                            </>
+                    subCategories.length > 0 &&
+                    <div className="SubCategoryWrraper">
+                        {
+                            subCategories.map((v, i) =>
+                                <div className="SubCatTag" onClick={() => setSubCategories(subCategories.filter(k => k !== v))}>{v}</div>
+                            )
                         }
-                    </>
-                }
+                    </div>}
+                data={categoryData}
             />
         </>
     )

@@ -2,7 +2,6 @@ import { Button, Col, Container, Row, Table } from "react-bootstrap"
 import React, { useEffect, useState } from "react"
 import Header from "../common/Header"
 import "./style.css"
-import "react-datepicker/dist/react-datepicker.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";
@@ -86,6 +85,7 @@ const GuestPost = () => {
                                     <th>#</th>
                                     <th>Title</th>
                                     <th>Author</th>
+                                    <th>Status</th>
                                     <th>Published Date</th>
                                     <th colSpan={3}>Action</th>
                                 </tr>
@@ -98,6 +98,7 @@ const GuestPost = () => {
                                                 <td>{i + 1}</td>
                                                 <td>{v.title}</td>
                                                 <td>{v.author}</td>
+                                                <td>{v.status === 1 ? "Published" : "Drafted"}</td>
                                                 <td>{timestampToDate(v.date)}</td>
                                                 <td>
                                                     <Link to={`/view-guest-post/${v._id}`}>

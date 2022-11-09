@@ -10,11 +10,13 @@ import EditPost from './components/EditPost';
 import PostUploading from './components/PostUploading';
 import "./app.css"
 import ViewPost from './components/Viewpost';
+import Contact from './components/contactComponet/contact';
 
 export default function App() {
   return (
     <Routes>
-      <Route path='/' element={<Login />} />
+      {/* <Route path='/' element={<Login />} /> */}
+      <Route path='/' element={<Home />} />
       <Route path='/home' element={<Home />} />
       <Route path='/press-release' element={<PressRelease />} />
       <Route path='/guest-post' element={<GuestPost />} />

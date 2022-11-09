@@ -16,8 +16,8 @@ const schema = new mongoose.Schema({
     },
     category: {
         type: Array,
-        required: true
     },
+
     date: {
         type: Date,
         default: new Date()
@@ -29,10 +29,6 @@ const schema = new mongoose.Schema({
     content: {
         type: String,
         default: '<strong>Some Content is nice !</strong>'
-    },
-    smeta: {
-        type: String,
-        default: 'social meta'
     },
     stitle: {
         type: String,
@@ -50,7 +46,7 @@ const schema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    parent: {
+    posttype: {
         type: Number,
         default: 0
     },
@@ -60,7 +56,7 @@ const schema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const EPost = mongoose.model("editors", schema)
+const EPost = mongoose.model("posts", schema)
 module.exports = EPost
 
 

@@ -10,7 +10,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
 import { useNavigate, useParams } from "react-router-dom";
-import { ModelUplaod } from "./categories/Categories";
+import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
 import { defaultUrl } from "../utils/default";
@@ -25,7 +25,7 @@ export default function EditPost() {
     }, [])
 
     const fetchParamPost = () => {
-        axios.get(`${defaultUrl}get-post/${postid}`)
+        axios.get(`${defaultUrl}api/post/get-post/${postid}`)
             .then((r) => {
                 if (r.data.success) {
                     setPostData(r.data.data)
@@ -57,7 +57,6 @@ export default function EditPost() {
     const [searchText, setSerachText] = useState("")
     const [suggestion, setSuggestion] = useState(false)
     const [loader, setLoader] = useState(false)
-    const [subhover, setSubHover] = useState(false)
 
     // category upload
     const [show, setShow] = useState(false);
@@ -158,7 +157,7 @@ export default function EditPost() {
                 position="top-right"
                 reverseOrder={false}
             />
-            <ModelUplaod
+            <ModelUpload
                 catname={catname}
                 changeCatname={(e) => setCatname(e.target.value)}
                 show={show}
@@ -198,94 +197,9 @@ export default function EditPost() {
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
                                 {/* future use */}
-                                <div>
-                                    <Button
-                                        onClick={() => setShow(true)}
-                                        variant="secondary"
-                                        size="sm"
-                                        className="mb-3">
-                                        Add new Category
-                                    </Button>
-                                </div>
-                                {/* <div> */}
-                                {/* <select multiple onClick={(e) => handleCategorySelection(e.target.value)} style={{ width: "100%" }}> */}
-                                <div className="TagsWrraper">
-                                    {
-                                        categoryData.map((v, i) =>
-                                            <div
-                                                onClick={() => handleCategorySelection(v._id)}
-                                                className={`TagsCategory ${category.includes(v._id) ? 'SelectedCategory' : ''}`} >{v.title}
-                                                &nbsp;&nbsp;<IoMdCloseCircleOutline />
-                                            </div>
-                                        )
-                                    }
-                                </div>
-                                {/* </select> */}
-                                {/* </div> */}
 
-                                {/* <div className="SearchWrraper">
-                                    <Form.Control
-                                        value={searchText}
-                                        onChange={(e) => {
-                                            searchCategories(e.target.value)
-                                            setSerachText(e.target.value)
-                                        }}
-                                        type="text"
-                                        placeholder="Search category...."
-                                    />
-                                    {
-                                        loader ?
-                                            <div className="mt-3 text-center">
-                                                <Spinner animation="border" variant="success" />
-                                            </div>
-                                            :
-                                            <>
 
-                                                <div className="ListOfCategories">
-                                                    {
-                                                        searchCateg?.map((v, i) =>
-                                                            <div className="SearchList" onMouseOver={() => setSubHover(true)}
-                                                                onMouseLeave={() => setSubHover(false)}>
-                                                                <label className="SearchText" >{v.title}</label>
-                                                                {v.subcategory.length > 0 ?
-                                                                    <>
-                                                                        <div style={{ float: "right" }} className="me-3">
-                                                                            <AiFillCaretRight />
-                                                                            {
-                                                                                subhover &&
-                                                                                <div className="Subcategory">
-                                                                                    {
-                                                                                        v.subcategory.map((v, i) =>
-                                                                                            <div className="SearchList">
-                                                                                                <label className="SearchText">
-                                                                                                    {v.name}
-                                                                                                </label>
-                                                                                            </div>
-                                                                                        )
-                                                                                    }
-                                                                                </div>
-                                                                            }
-                                                                        </div>
-                                                                    </>
-                                                                    : ""}
-                                                            </div>
-                                                        )
-                                                    }
-                                                </div>
-                                                {
-                                                    suggestion &&
-                                                    <div className="SuggestText">
-                                                        <b>Suggest for add category "{searchText}"&nbsp;&nbsp;
-                                                            <Badge bg="success" className="BadgeClk" onClick={() => {
-                                                                handleSave(searchText)
-                                                                searchCategories(searchText)
-                                                            }}>Add Now</Badge>
-                                                        </b>
-                                                    </div>
-                                                }
-                                            </>
-                                    }
-                                </div> */}
+
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>SEO Title</strong></Form.Label>

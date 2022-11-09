@@ -1,12 +1,23 @@
+const sharp = require('sharp');
 const EPost = require('../model/post');
 const catchAsyncError = require('../utils/catchAsyncError');
-const { sendResponse } = require('../utils/commonFunctions');
+const { sendResponse, upload } = require('../utils/commonFunctions');
 var ObjectId = require('mongoose').Types.ObjectId;
 
-const uploadPost = catchAsyncError(async (req, res) => {
+const uploadImagesForFeatured = upload.single("image");
 
+const resizePhotoFimg = (req, res, next) => {
+    if (!req.file) return next();
+    let newfile = `public/other/featured/${new Date() + req.file.originalname}.jpeg`
+    sharp(req.file.buffer)
+        .jpeg({ quality: 100 })
+        .toFile(newfile);
+    req.sendfile = newfile.replace('public/', '')
+    next();
+};
+
+const uploadPost = catchAsyncError(async (req, res) => {
     const { title,
-        fimg,
         category,
         date,
         author,
@@ -20,7 +31,7 @@ const uploadPost = catchAsyncError(async (req, res) => {
 
     if (await EPost.create({
         title,
-        fimg,
+        fimg: req.sendfile,
         category,
         date,
         author,
@@ -30,7 +41,7 @@ const uploadPost = catchAsyncError(async (req, res) => {
         sdesc,
         url,
         status,
-        parent
+        posttype: parent
     })) {
         sendResponse(res, 200, {
             msg: status == 1 ? "Post uploaded !" : "Post drafted !",
@@ -43,7 +54,7 @@ const uploadPost = catchAsyncError(async (req, res) => {
 
 const getAllpost = catchAsyncError(async (req, res) => {
     const num = req.params['num']
-    const allpost = await EPost.find({ parent: num }).sort({ createdAt: -1 }).lean()
+    const allpost = await EPost.find({ posttype: num }).sort({ createdAt: -1 }).lean()
     if (allpost) {
         if (allpost.length <= 0) {
             sendResponse(res, 200, { success: true, data: null })
@@ -86,5 +97,7 @@ module.exports = {
     uploadPost,
     getAllpost,
     deletePost,
-    getSinglePost
+    getSinglePost,
+    uploadImagesForFeatured,
+    resizePhotoFimg
 }

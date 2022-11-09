@@ -38,14 +38,9 @@ export default function ViewPost() {
             <Header />
             <div className="mt-5">
                 <Container>
-                    <h1>{gpostid}</h1>
-                    <h2>{JSON.stringify(postData.content)}</h2>
                     <div>
                         <Markup content={postData?.content} />
                     </div>
-                </Container>
-                <Container>
-
                 </Container>
             </div>
         </div>

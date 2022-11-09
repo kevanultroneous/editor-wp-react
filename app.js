@@ -12,7 +12,7 @@ const categoryRouter = require('./src/router/category.router');
 dotenv.config()
 const PORT = process.env.PORT || 8000;
 const app = express();
-const MuiltiPartyMiddleware = multiparty({ uploadDir: "./images" });
+const MuiltiPartyMiddleware = multiparty({ uploadDir: __dirname + "/public/other/uploads/" });
 
 app.use(cors())
 app.use(express.static('public'))
@@ -25,22 +25,18 @@ app.get('/test', async (req, res) => res.send('working...'))
 app.post('/upload', MuiltiPartyMiddleware, async (req, res) => {
     var TempFile = req.files.upload;
     var TempPathfile = TempFile.path;
-
-    const targetPathUrl = path.join(__dirname, "./uploads/" + TempFile.name);
+    const targetPathUrl = path.join(__dirname + "/public/other/uploads/" + TempFile.name);
 
     if (path.extname(TempFile.originalFilename).toLowerCase() === ".png" || ".jpg") {
-
         fs.rename(TempPathfile, targetPathUrl, err => {
-
             res.status(200).json({
                 uploaded: true,
-                url: `http://192.168.1.28:8000/${TempFile.originalFilename}`
+                url: `${process.env.URL_FOR_GALLERY}/other/uploads/${TempFile.originalFilename}`
             });
 
             if (err) return console.log(err);
         })
     }
-    // console.log(req.files);
 })
 
 app.use('/api/post/', postRouter)
