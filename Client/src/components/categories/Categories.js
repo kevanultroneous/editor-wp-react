@@ -22,8 +22,6 @@ export default function Categories() {
     const [show, setShow] = useState(false);
     const [smShow, setSmShow] = useState(false);
     const [showUpd, setShowUpd] = useState(false);
-    const [subcategoriesData, setsubcategoriesData] = useState([])
-    const [viewSubcats, setViewSubcats] = useState(false)
 
     const [catname, setCatname] = useState("")
     const [subCategories, setSubCategories] = useState([])
@@ -101,8 +99,6 @@ export default function Categories() {
         }
     }
 
-
-
     const fetchCategory = () => {
         axios.get(`${defaultUrl}api/category/all-category`).then((r) => {
             if (r.data.success) {
@@ -149,28 +145,6 @@ export default function Categories() {
                         <Button variant="success" onClick={handleShow}>Add Category  / Subcategory</Button>
                     </Col>
                 </Row>
-                <DeleteModel
-                    hidebuttons
-                    title={"Subcategory"}
-                    show={viewSubcats}
-                    onHide={() => setViewSubcats(false)}
-                    child={
-                        <div>
-                            <div className="mb-3">
-                                <strong>Add New categories</strong>
-                            </div>
-                            <div className="SubCategoryWrraper">
-                                {
-                                    subcategoriesData?.subCategory?.map((v) =>
-                                        <div className="SubCatTag">{v.subcategory}
-                                        </div>
-                                    )
-                                }
-                            </div>
-                        </div>
-                    }
-                />
-
                 {
                     !(categoryData.length === 0) ?
                         <Row className="TableSpace">
@@ -187,7 +161,6 @@ export default function Categories() {
                                     </thead>
                                     <tbody>
                                         {
-                                            categoryData != null &&
                                             categoryData?.map((v, i) =>
                                                 <tr key={i}>
                                                     <td className="text-center">{i + 1}</td>
@@ -262,7 +235,6 @@ export default function Categories() {
 
                                                 <tbody>
                                                     {
-                                                        selectedCategory != null &&
                                                         selectedCategory?.map((v, i) =>
                                                             <tr key={i}>
                                                                 <td className="text-center">{i + 1}</td>
@@ -289,7 +261,6 @@ export default function Categories() {
                                         </>
                                 }
                             </Col>
-
                         </Row>
                     </div>
                 }
