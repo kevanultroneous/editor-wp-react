@@ -10,4 +10,6 @@ categoryRouter.post('/delete-category', deleteCategory)
 categoryRouter.post('/update-category', updateCategory)
 categoryRouter.post('/search-category', searchCategory)
 
+// upload category , subcategory adding , update subcategory(delete) , delete category  , get by type categories , single category  view 
+
 module.exports = categoryRouter

@@ -10,9 +10,9 @@ const schema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         default: null
     },
-    subCategory: {
-        type: Array,
-    },
+    // subCategory: {
+    //     type: Array,
+    // },
     type: {
         type: String,
         default: 0,

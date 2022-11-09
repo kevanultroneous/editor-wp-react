@@ -5,16 +5,25 @@ const { sendResponse } = require("../utils/commonFunctions");
 var ObjectId = require('mongoose').Types.ObjectId;
 
 const uploadCategory = catchAsyncError(async (req, res) => {
-    const { title, type } = req.body
-    if (!title || title === "null" || title.length < 3) {
-        sendResponse(res, 400, { msg: "Enter valid category title ! ,length must be greater than 3 and lessthan 30 words !", success: false })
-    } else if (!(type === 'press' || type === 'blog')) {
-        sendResponse(res, 400, { msg: "type is not valid !", success: false })
-    } else {
-        if (await ECategory.create({ title, type })) {
+    const { title, type, data, parentid, upddata, multiple } = req.body
+    if (multiple) {
+        if (await ECategory.create(data)) {
+            await ECategory.findByIdAndUpdate(parentid, { subCategory: upddata })
             sendResponse(res, 200, { msg: "Category uploaded !", success: true })
         } else {
             sendResponse(res, 500, { msg: "Category not uploaded !", success: false })
+        }
+    } else {
+        if (!title || title === "null" || title.length < 3) {
+            sendResponse(res, 400, { msg: "Enter valid category title ! ,length must be greater than 3 and lessthan 30 words !", success: false })
+        } else if (!(type === 'press' || type === 'blog')) {
+            sendResponse(res, 400, { msg: "type is not valid !", success: false })
+        } else {
+            if (await ECategory.create({ title, type })) {
+                sendResponse(res, 200, { msg: "Category uploaded !", success: true })
+            } else {
+                sendResponse(res, 500, { msg: "Category not uploaded !", success: false })
+            }
         }
     }
 })
