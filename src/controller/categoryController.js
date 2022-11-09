@@ -4,11 +4,10 @@ const catchAsyncError = require("../utils/catchAsyncError");
 const { sendResponse } = require("../utils/commonFunctions");
 var ObjectId = require('mongoose').Types.ObjectId;
 
-const uploadCategory = catchAsyncError(async (req, res) => {
+exports.uploadCategory = catchAsyncError(async (req, res) => {
     const { title, type, data, parentid, upddata, multiple } = req.body
     if (multiple) {
         if (await ECategory.create(data)) {
-            await ECategory.findByIdAndUpdate(parentid, { subCategory: upddata })
             sendResponse(res, 200, { msg: "Category uploaded !", success: true })
         } else {
             sendResponse(res, 500, { msg: "Category not uploaded !", success: false })
@@ -28,39 +27,24 @@ const uploadCategory = catchAsyncError(async (req, res) => {
     }
 })
 
-const uploadSubcategory = catchAsyncError(async (req, res) => {
-    const { parentid, subcategory } = req.body
-    if (!ObjectId.isValid(parentid)) {
-        sendResponse(res, 400, { status: false, msg: "parent id is not valid !" })
-    } else if (subcategory.length <= 0) {
-        sendResponse(res, 400, { status: false, msg: "subcategory is required !" })
+exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
+    const category = await ECategory.find({ isActive: true, parentCategory: null }).sort({ createdAt: -1 }).lean()
+    var subcategory
+    if (category.length > 0) {
+        for (let k = 0; k < category.length; k++) {
+            subcategory = await ECategory.find({ parentCategory: category[k]._id, isActive: true }).sort({ createdAt: -1 }).lean()
+            category[k].childs = subcategory
+        }
+        sendResponse(res, 200, { msg: "Data available !", success: true, data: category })
     } else {
-        const newId = mongoose.Types.ObjectId();
-        let newarry = []
-        for (let x = 0; x < subcategory.length; x++) {
-            newarry.push({ _id: newId, subcategory: subcategory[x] })
-        }
-        if (await ECategory.findByIdAndUpdate(parentid, { parentCategory: parentid, subCategory: newarry })) {
-            sendResponse(res, 200, { msg: "subcategory uploaded !", success: true })
-        } else {
-            sendResponse(res, 500, { msg: "subcategory uploading failed !", success: false })
-        }
+        sendResponse(res, 200, { msg: "Data not availabel !", success: false, data: null })
     }
 })
 
-const getAllCategory = catchAsyncError(async (req, res) => {
-    const cats = await ECategory.find({ isActive: true }).sort({ createdAt: -1 }).lean()
-    if (cats.length > 0) {
-        sendResponse(res, 200, { success: true, data: cats, msg: 'category availabel !' })
-    } else {
-        sendResponse(res, 200, { success: true, data: null, msg: 'category not availabel !' })
-    }
-})
-
-const getSubcategories = catchAsyncError(async (req, res) => {
+exports.getSubcategories = catchAsyncError(async (req, res) => {
     const id = req.params['id']
     try {
-        const singlecategory = await ECategory.findOne({ parentCategory: id }).select('subCategory').lean()
+        const singlecategory = await ECategory.find({ parentCategory: id }).select('subCategory').lean()
         if (!singlecategory) {
             sendResponse(res, 200, { success: true, data: null })
         } else {
@@ -71,7 +55,7 @@ const getSubcategories = catchAsyncError(async (req, res) => {
     }
 })
 
-const deleteCategory = catchAsyncError(async (req, res) => {
+exports.deleteCategory = catchAsyncError(async (req, res) => {
     const { catid } = req.body
     if (!catid || !ObjectId.isValid(catid)) {
         sendResponse(res, 400, { success: false, msg: 'catid is not valid !' })
@@ -85,7 +69,7 @@ const deleteCategory = catchAsyncError(async (req, res) => {
     }
 })
 
-const updateCategory = catchAsyncError(async (req, res) => {
+exports.updateCategory = catchAsyncError(async (req, res) => {
     const { catid, newtitle, type } = req.body
     if (!newtitle || newtitle === "null" || newtitle.length <= 3 && !newtitle.length >= 30) {
         sendResponse(res, 400, {
@@ -112,9 +96,7 @@ const updateCategory = catchAsyncError(async (req, res) => {
 
 })
 
-
-
-const searchCategory = catchAsyncError(async (req, res, next) => {
+exports.searchCategory = catchAsyncError(async (req, res, next) => {
     const { search } = req.body;
     const results = await ECategory.find({
         title: {
@@ -134,12 +116,3 @@ const searchCategory = catchAsyncError(async (req, res, next) => {
     }
 })
 
-module.exports = {
-    uploadCategory,
-    getAllCategory,
-    deleteCategory,
-    updateCategory,
-    searchCategory,
-    getSubcategories,
-    uploadSubcategory
-}

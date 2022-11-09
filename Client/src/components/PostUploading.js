@@ -10,7 +10,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
 import { useNavigate, useParams } from "react-router-dom";
-import { ModelUplaod } from "./categories/Categories";
+import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdAddCircle, IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
 import { defaultUrl } from "../utils/default";
@@ -223,7 +223,7 @@ export default function PostUploading() {
                 position="top-right"
                 reverseOrder={false}
             />
-            <ModelUplaod
+            <ModelUpload
                 catname={catname}
                 changeCatname={(e) => setCatname(e.target.value)}
                 show={show}

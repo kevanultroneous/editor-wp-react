@@ -98,7 +98,7 @@ const PressRelease = () => {
                                                 <td>{i + 1}</td>
                                                 <td>{v.title}</td>
                                                 <td>{v.author}</td>
-                                                <td>{v.status == 1 ? "Published" : "Drafted"}</td>
+                                                <td>{v.status === 1 ? "Published" : "Drafted"}</td>
                                                 <td>{timestampToDate(v.date)}</td>
                                                 <td>
                                                     <Link to={`/view-press-release/${v._id}`}>

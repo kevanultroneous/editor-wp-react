@@ -10,7 +10,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
 import { useNavigate, useParams } from "react-router-dom";
-import { ModelUplaod } from "./categories/Categories";
+import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
 import { defaultUrl } from "../utils/default";
@@ -57,7 +57,6 @@ export default function EditPost() {
     const [searchText, setSerachText] = useState("")
     const [suggestion, setSuggestion] = useState(false)
     const [loader, setLoader] = useState(false)
-    const [subhover, setSubHover] = useState(false)
 
     // category upload
     const [show, setShow] = useState(false);
@@ -158,7 +157,7 @@ export default function EditPost() {
                 position="top-right"
                 reverseOrder={false}
             />
-            <ModelUplaod
+            <ModelUpload
                 catname={catname}
                 changeCatname={(e) => setCatname(e.target.value)}
                 show={show}
