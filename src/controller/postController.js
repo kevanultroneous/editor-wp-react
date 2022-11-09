@@ -7,12 +7,19 @@ var ObjectId = require('mongoose').Types.ObjectId;
 const uploadImagesForFeatured = upload.single("image");
 
 const resizePhotoFimg = (req, res, next) => {
-    let newfile = `public/other/featured/${new Date() + req.file.originalname}.jpeg`
-    sharp(req.file.buffer)
-        .jpeg({ quality: 100 })
-        .toFile(newfile);
-    req.sendfile = newfile.replace('public/', '')
-    next();
+
+    if (req.file) {
+
+        let newfile = `public/other/featured/${new Date() + req.file.originalname}.jpeg`
+        sharp(req.file.buffer)
+            .jpeg({ quality: 100 })
+            .toFile(newfile);
+        req.sendfile = newfile.replace('public/', '')
+        next();
+    } else {
+        next()
+    }
+
 };
 
 const uploadPost = catchAsyncError(async (req, res) => {

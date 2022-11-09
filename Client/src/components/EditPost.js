@@ -23,12 +23,31 @@ export default function EditPost() {
 
     const { postid, type } = useParams()
 
+    useEffect(() => {
+        fetchParamPost()
+    }, [])
+
+    const fetchParamPost = () => {
+        axios.get(`${defaultUrl}api/post/get-post/${postid}`)
+            .then((r) => {
+                if (r.data?.success) {
+                    setAuthor(r.data?.data?.author)
+                    setMainTitle(r.data?.data?.title)
+                    setSeoTitle(r.data?.data?.stitle)
+                    setSeoDescription(r.data?.data?.sdesc)
+                    setContent(r.data?.data?.content)
+                    setUrl(r.data?.data?.url)
+                    setPublish(r.data?.data?.status)
+                    setSelectedCategory(r.data?.data?.category)
+                    setSelectedSubCategory(r.data?.data?.subcategory)
+                }
+            }).catch((e) => toast.error(e.response.data.msg))
+    }
+
     const [selectedCategory, setSelectedCategory] = useState([])
 
     const [selectedSubCategory, setSelectedSubCategory] = useState([])
     const [selectedSubCategory2, setSelectedSubCategory2] = useState([])
-
-
     //gallery 
     const [galleryShow, setGalleryShow] = useState(false)
     const [selectedImage, setSelectedImage] = useState([])
@@ -50,9 +69,7 @@ export default function EditPost() {
     const [content, setContent] = useState('')
     const [htmlEditor, setHtmlEditor] = useState('')
 
-    useEffect(() => {
-        setHtmlEditor(content)
-    }, [content])
+
 
     //search category
     const [searchCateg, setSearchCateg] = useState([])
@@ -80,10 +97,6 @@ export default function EditPost() {
     }
 
     const navigate = useNavigate()
-    // status 0 draft
-    // status 1 publish
-    // parent 0 press release
-    // parent 1 guest post
 
     useEffect(() => {
         if (!(type === 'press-release' || type === "guest-post")) {
@@ -100,12 +113,12 @@ export default function EditPost() {
     }
 
     const formdata = new FormData()
-    const cleansing = cleanArray(selectedSubCategory2)
 
+    formdata.append("parentid", postid)
     formdata.append("image", ffile)
     formdata.append("title", mainTitle)
     selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v))
-    cleansing.map((v, i) => formdata.append(`subcategory[${i}]`, v))
+    selectedSubCategory.map((v, i) => formdata.append(`subcategory[${i}]`, v))
     formdata.append("author", author)
     formdata.append("content", content)
     formdata.append("smeta", seometatags)
@@ -116,14 +129,12 @@ export default function EditPost() {
     formdata.append("parent", type === 'press-release' ? 0 : 1)
 
     const postUpload = () => {
-        if (ffile == null) {
-            alert('Featured image is required !')
-        } else if (mainTitle == "") {
+        if (mainTitle == "") {
             alert('Title is required !')
         } else if (selectedCategory.length <= 0) {
             alert('Please select one or more category !')
         } else {
-            axios.post(`${defaultUrl}api/post/upload-post`, formdata)
+            axios.post(`${defaultUrl}api/post/update-post`, formdata)
                 .then((r) => {
                     if (r.data.success) {
                         toast.success(r.data.msg)
@@ -213,23 +224,37 @@ export default function EditPost() {
         setSelectedGalleryImageData([])
     }
 
+    const updateSubcategory = (ary) => {
+        console.log("call")
+        let x = ""
+        for (let t = 0; t < ary.length; t++) {
+            x = ary[t]
+        }
+        setSelectedSubCategory(selectedSubCategory.filter(k => k !== x))
+    }
 
-
-    const handleCategorySelection = (e, v, k1, num) => {
+    const handleCategorySelection = (e, v, k1) => {
         if (k1) {
             if (selectedSubCategory.includes(v._id)) {
                 setSelectedSubCategory(selectedSubCategory.filter(i => i !== v._id))
-                setSelectedSubCategory2(selectedSubCategory2.filter(i => i.num !== num && i.id !== v._id))
             } else {
                 setSelectedSubCategory(selectedSubCategory.concat(v._id))
-                setSelectedSubCategory2(selectedSubCategory2.concat({ num: num, id: v._id }))
             }
         } else {
             if (e.target.checked) {
                 setSelectedCategory(selectedCategory.concat(v._id))
             } else {
                 setSelectedCategory(selectedCategory.filter(k => k !== v._id))
-                setSelectedSubCategory2(selectedSubCategory2.filter(l => l.num !== v._id))
+                let earry = []
+                for (let y = 0; y < searchCateg.length; y++) {
+                    for (let r = 0; r < searchCateg[y].childs.length; r++) {
+                        if (selectedSubCategory.includes(searchCateg[y].childs[r]._id)) {
+                            // console.log("remove" + searchCateg[y].childs[r]._id)
+                            earry.push(searchCateg[y].childs[r]._id)
+                        }
+                    }
+                }
+                updateSubcategory(earry)
             }
         }
     }
@@ -303,7 +328,7 @@ export default function EditPost() {
                     <Col xl={4} className="p-0">
                         <div className="Sidebar">
                             <div>
-                                <h3>Add New Post</h3>
+                                <h3>Update Post</h3>
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Publish / Draft</strong></Form.Label>
@@ -337,7 +362,7 @@ export default function EditPost() {
                                 />
                             </div>
                             <div className="mt-4">
-                                <Form.Label><strong>Featured Image</strong></Form.Label>
+                                <Form.Label><strong>Update Featured Image</strong></Form.Label>
                                 <Form.Control type="file" onChange={(e) => setFFile(e.target.files[0])} />
                             </div>
                             <div className="mt-4">
@@ -465,7 +490,7 @@ export default function EditPost() {
                                         <Tab eventKey="Content" title="Content">
 
                                             <CKEditor
-                                                data=""
+                                                data={content}
                                                 editor={ClassicEditor}
                                                 onChange={ckeditorstate}
                                                 config={
