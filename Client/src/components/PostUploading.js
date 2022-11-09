@@ -354,29 +354,7 @@ export default function PostUploading() {
                                                                         handleCategorySelection(e, k)
                                                                     }}
                                                                 /> {k.title}
-                                                                <div>
-                                                                    {
-                                                                        category.includes(k._id) ?
-                                                                            <div className="TagsWrraper">
-                                                                                {
-                                                                                    k?.subcategory.length > 0
-                                                                                        ?
-                                                                                        k?.subcategory.map((v, i) =>
-                                                                                            <div className="ms-3" key={i}>
-                                                                                                <input
-                                                                                                    checked={subcategory.includes(v.name)}
-                                                                                                    type="checkbox"
-                                                                                                    name={"subcategory"}
-                                                                                                    onChange={(e) => handleCategorySelection(e, v, true, k._id, v.name, v.id)} />
-                                                                                                {v.name}
-                                                                                            </div>
-                                                                                        )
-                                                                                        : null
-                                                                                }
-                                                                            </div>
-                                                                            : null
-                                                                    }
-                                                                </div>
+                                                                {JSON.stringify(k.childs)}
                                                             </div>
                                                         )
                                                     }

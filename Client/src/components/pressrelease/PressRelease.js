@@ -1,4 +1,4 @@
-import { Button, Col, Container, Row, Table } from "react-bootstrap"
+import { Button, Col, Container, Image, Row, Table } from "react-bootstrap"
 import React, { useEffect, useState } from "react"
 import Header from "../common/Header"
 import "./style.css"
@@ -83,6 +83,7 @@ const PressRelease = () => {
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Cover</th>
                                     <th>Title</th>
                                     <th>Author</th>
                                     <th>Status</th>
@@ -96,6 +97,9 @@ const PressRelease = () => {
                                         postData.map((v, i) =>
                                             <tr key={i}>
                                                 <td>{i + 1}</td>
+                                                <td>
+                                                    <Image src={`${defaultUrl + v.fimg}`} height={50} width={"100%"} />
+                                                </td>
                                                 <td>{v.title}</td>
                                                 <td>{v.author}</td>
                                                 <td>{v.status === 1 ? "Published" : "Drafted"}</td>
