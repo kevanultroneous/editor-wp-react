@@ -1,6 +1,6 @@
 const express = require('express')
 const { uploadImagesForGallery, resizePhoto, galleryController, fetchAllgalleryImage } = require('../controller/galleryController')
-const { uploadPost, deletePost, getAllpost, getSinglePost, featuredresizePhoto, featureduploadUserPhoto, uploadImagesForFeatured, resizePhotoFimg } = require('../controller/postController')
+const { uploadPost, deletePost, getAllpost, getSinglePost, featuredresizePhoto, featureduploadUserPhoto, uploadImagesForFeatured, resizePhotoFimg, updatepost } = require('../controller/postController')
 
 const postRouter = express.Router()
 
@@ -8,6 +8,11 @@ postRouter.post('/upload-post',
     uploadImagesForFeatured,
     resizePhotoFimg,
     uploadPost
+)
+postRouter.post('/update-post',
+    uploadImagesForFeatured,
+    resizePhotoFimg,
+    updatepost
 )
 
 postRouter.post('/delete-post', deletePost)

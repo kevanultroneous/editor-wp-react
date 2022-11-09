@@ -21,7 +21,7 @@ export default function App() {
       <Route path='/press-release' element={<PressRelease />} />
       <Route path='/guest-post' element={<GuestPost />} />
       <Route path='/categories' element={<Categories />} />
-      <Route path='/edit-post/:postid' element={<EditPost />} />
+      <Route path='/edit-post/:type/:postid' element={<EditPost />} />
       <Route path='/upload-post/:type' element={<PostUploading />} />
       <Route path='/view-press-release/:postid' element={<ViewPost />} />
       <Route path='/view-guest-post/:gpostid' element={<ViewPost />} />

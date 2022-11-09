@@ -23,6 +23,12 @@ export default function PostUploading() {
 
     const { type } = useParams()
 
+    const [selectedCategory, setSelectedCategory] = useState([])
+
+    const [selectedSubCategory, setSelectedSubCategory] = useState([])
+    const [selectedSubCategory2, setSelectedSubCategory2] = useState([])
+
+
     //gallery 
     const [galleryShow, setGalleryShow] = useState(false)
     const [selectedImage, setSelectedImage] = useState([])
@@ -86,10 +92,20 @@ export default function PostUploading() {
         searchCategories(searchText)
         galleryImages()
     }, [])
+
+    const cleanArray = (ary) => {
+        const newarry = []
+        ary.map((v) => newarry.push(v.id))
+        return newarry
+    }
+
     const formdata = new FormData()
+    const cleansing = cleanArray(selectedSubCategory2)
+
     formdata.append("image", ffile)
     formdata.append("title", mainTitle)
-    formdata.append("category", category)
+    selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v))
+    cleansing.map((v, i) => formdata.append(`subcategory[${i}]`, v))
     formdata.append("author", author)
     formdata.append("content", content)
     formdata.append("smeta", seometatags)
@@ -104,7 +120,7 @@ export default function PostUploading() {
             alert('Featured image is required !')
         } else if (mainTitle == "") {
             alert('Title is required !')
-        } else if (category.length <= 0) {
+        } else if (selectedCategory.length <= 0) {
             alert('Please select one or more category !')
         } else {
             axios.post(`${defaultUrl}api/post/upload-post`, formdata)
@@ -118,7 +134,6 @@ export default function PostUploading() {
                 })
                 .catch((e) => toast.error(e.response.data.msg))
             setFFile(null)
-
         }
     }
 
@@ -200,19 +215,21 @@ export default function PostUploading() {
 
 
 
-    const handleCategorySelection = (e, v, k1, parent, name, id) => {
-
+    const handleCategorySelection = (e, v, k1, num) => {
         if (k1) {
-            if (e.target.checked) {
-                setSubcategory(subcategory.concat(name))
+            if (selectedSubCategory.includes(v._id)) {
+                setSelectedSubCategory(selectedSubCategory.filter(i => i !== v._id))
+                setSelectedSubCategory2(selectedSubCategory2.filter(i => i.num !== num && i.id !== v._id))
             } else {
-                setSubcategory(subcategory.filter(i => i !== name))
+                setSelectedSubCategory(selectedSubCategory.concat(v._id))
+                setSelectedSubCategory2(selectedSubCategory2.concat({ num: num, id: v._id }))
             }
         } else {
             if (e.target.checked) {
-                setCategory(category.concat(v._id))
+                setSelectedCategory(selectedCategory.concat(v._id))
             } else {
-                setCategory(category.filter(k => k !== v._id))
+                setSelectedCategory(selectedCategory.filter(k => k !== v._id))
+                setSelectedSubCategory2(selectedSubCategory2.filter(l => l.num !== v._id))
             }
         }
     }
@@ -346,16 +363,28 @@ export default function PostUploading() {
                                                 <div className="mt-3">
                                                     {
                                                         searchCateg?.map((k, i) =>
-                                                            <div>
-                                                                <input
-                                                                    checked={category.includes(k._id)}
-                                                                    type="checkbox"
-                                                                    onChange={(e) => {
-                                                                        handleCategorySelection(e, k)
-                                                                    }}
-                                                                /> {k.title}
-                                                                {JSON.stringify(k.childs)}
-                                                            </div>
+                                                            <>
+                                                                <div key={i}>
+                                                                    <input
+                                                                        checked={selectedCategory.includes(k._id) ? true : false}
+                                                                        type="checkbox"
+                                                                        onChange={(e) => handleCategorySelection(e, k)}
+                                                                    /> {k.title}
+                                                                </div>
+                                                                {
+                                                                    selectedCategory?.includes(k._id) ?
+                                                                        <div className="TagsWrraper">
+                                                                            {
+                                                                                k?.childs?.map((v, i) =>
+                                                                                    <div
+                                                                                        key={i}
+                                                                                        onClick={(e) => handleCategorySelection(e, v, true, k._id)}
+                                                                                        className={`TagsCategory ${selectedSubCategory.includes(v._id) ? 'SelectedCategory' : ''}`}>{v.title}</div>
+                                                                                )
+                                                                            }
+                                                                        </div> : null
+                                                                }
+                                                            </>
                                                         )
                                                     }
                                                 </div>
@@ -412,6 +441,7 @@ export default function PostUploading() {
                         <div className="EditorWrraper">
                             <div>
                                 <h3>Add Content
+
                                     <Button
                                         onClick={() => postUpload()}
                                         className="ms-4"

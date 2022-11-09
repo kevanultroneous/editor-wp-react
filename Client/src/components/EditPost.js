@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
 import Header from "./common/Header";
-import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge } from "react-bootstrap"
+import "./postUploading.css"
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, Badge, Image, Dropdown, SplitButton } from "react-bootstrap"
 import "./postUploading.css"
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -11,52 +12,54 @@ import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
 import { useNavigate, useParams } from "react-router-dom";
 import ModelUpload from "./common/UploadCategoryModel";
-import { IoMdCloseCircleOutline } from "react-icons/io"
+import { IoMdAddCircle, IoMdCloseCircleOutline } from "react-icons/io"
 import { AiFillCaretRight } from "react-icons/ai"
 import { defaultUrl } from "../utils/default";
+import { FcAddImage, FcGallery } from "react-icons/fc"
+import MediaGallery from "../components/common/MediaGallery"
+
 
 export default function EditPost() {
 
-    const { postid, gpostid } = useParams()
-    const [postData, setPostData] = useState([])
+    const { postid, type } = useParams()
 
-    useEffect(() => {
-        fetchParamPost()
-    }, [])
+    const [selectedCategory, setSelectedCategory] = useState([])
 
-    const fetchParamPost = () => {
-        axios.get(`${defaultUrl}api/post/get-post/${postid}`)
-            .then((r) => {
-                if (r.data.success) {
-                    setPostData(r.data.data)
-                    setAuthor(r.data?.data?.author)
-                    setPublish(r.data?.data?.status)
-                    setSeoTitle(r.data?.data?.stitle)
-                    setSeoDescription(r.data?.data?.sdesc)
-                    setContent(r.data?.data?.content)
-                    setUrl(r.data?.data?.url)
-                    setPublish(r.data?.data?.status)
-                }
-            }).catch((e) => toast.error(e.response.data.msg))
-    }
-    // 
+    const [selectedSubCategory, setSelectedSubCategory] = useState([])
+    const [selectedSubCategory2, setSelectedSubCategory2] = useState([])
+
+
+    //gallery 
+    const [galleryShow, setGalleryShow] = useState(false)
+    const [selectedImage, setSelectedImage] = useState([])
+    const [galleryDatas, setGalleryDatas] = useState([])
+    const [selectedGalleryImageData, setSelectedGalleryImageData] = useState([])
+    const [files, setFiles] = useState([])
+    const [ffile, setFFile] = useState(null)
 
     const [categoryData, setCategoryData] = useState([])
     const [mainTitle, setMainTitle] = useState("")
     const [author, setAuthor] = useState("")
     const [category, setCategory] = useState([])
+    const [subcategory, setSubcategory] = useState([])
     const [seotitle, setSeoTitle] = useState("")
     const [seodescription, setSeoDescription] = useState("")
     const [seometatags, setSeoMetaTags] = useState("")
-    const [url, setUrl] = useState("")
-    const [publish, setPublish] = useState()
+    const [url, setUrl] = useState(mainTitle)
+    const [publish, setPublish] = useState(0)
     const [content, setContent] = useState('')
+    const [htmlEditor, setHtmlEditor] = useState('')
+
+    useEffect(() => {
+        setHtmlEditor(content)
+    }, [content])
 
     //search category
     const [searchCateg, setSearchCateg] = useState([])
     const [searchText, setSerachText] = useState("")
     const [suggestion, setSuggestion] = useState(false)
     const [loader, setLoader] = useState(false)
+    const [subhover, setSubHover] = useState(false)
 
     // category upload
     const [show, setShow] = useState(false);
@@ -69,7 +72,6 @@ export default function EditPost() {
             if (r.data.success) {
                 toast.success(r.data.msg)
                 handleClose()
-                fetchCategory()
                 setCatname("")
             } else {
                 toast.error(r.data.msg)
@@ -84,44 +86,58 @@ export default function EditPost() {
     // parent 1 guest post
 
     useEffect(() => {
-        fetchCategory()
+        if (!(type === 'press-release' || type === "guest-post")) {
+            navigate('/')
+        }
         searchCategories(searchText)
+        galleryImages()
     }, [])
 
-
-    const dataready = {
-        title: mainTitle,
-        category: category,
-        author: author,
-        content: content,
-        smeta: seometatags,
-        stitle: seotitle,
-        sdesc: seodescription,
-        url: url,
-        status: publish,
-        parent: 1,
+    const cleanArray = (ary) => {
+        const newarry = []
+        ary.map((v) => newarry.push(v.id))
+        return newarry
     }
+
+    const formdata = new FormData()
+    const cleansing = cleanArray(selectedSubCategory2)
+
+    formdata.append("image", ffile)
+    formdata.append("title", mainTitle)
+    selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v))
+    cleansing.map((v, i) => formdata.append(`subcategory[${i}]`, v))
+    formdata.append("author", author)
+    formdata.append("content", content)
+    formdata.append("smeta", seometatags)
+    formdata.append("stitle", seotitle)
+    formdata.append("sdesc", seodescription)
+    formdata.append("url", url)
+    formdata.append("status", publish)
+    formdata.append("parent", type === 'press-release' ? 0 : 1)
 
     const postUpload = () => {
-        axios.post(`${defaultUrl}api/post/upload-post`, dataready)
-            .then((r) => {
-                if (r.data.success) {
-                    toast.success(r.data.msg)
-                    navigate('/home')
-                } else {
-                    toast.error(r.data.msg)
-                }
-            })
-            .catch((e) => toast.error(e.response.data.msg))
+        if (ffile == null) {
+            alert('Featured image is required !')
+        } else if (mainTitle == "") {
+            alert('Title is required !')
+        } else if (selectedCategory.length <= 0) {
+            alert('Please select one or more category !')
+        } else {
+            axios.post(`${defaultUrl}api/post/upload-post`, formdata)
+                .then((r) => {
+                    if (r.data.success) {
+                        toast.success(r.data.msg)
+                        navigate(type === 'press-release' ? '/press-release' : '/guest-post')
+                    } else {
+                        toast.error(r.data.msg)
+                    }
+                })
+                .catch((e) => toast.error(e.response.data.msg))
+            setFFile(null)
+        }
     }
 
-    const fetchCategory = () => {
-        axios.get(`${defaultUrl}api/category/categories`).then((r) => {
-            if (r.data.success) {
-                setCategoryData(r.data.data)
-            }
-        }).catch((e) => toast.error(e.response.data.msg))
-    }
+
 
     const searchCategories = (search) => {
         setLoader(true)
@@ -137,19 +153,86 @@ export default function EditPost() {
         }, 1000)
     }
 
-    const handleCategorySelection = (value) => {
-        if (category.includes(value)) {
-            setCategory(category.filter(i => i !== value))
-        } else {
-            setCategory(category.concat(value))
-        }
-    }
+
 
     const ckeditorstate = (event, editor) => {
         const data = editor.getData();
         setContent(data)
     }
+    const editUrl = (v) => {
+        setUrl(v.split(' ').join('-'))
+    }
 
+    const galleryImageUpload = () => {
+        const formdata = new FormData()
+        for (let zf = 0; zf < files.length; zf++) {
+            formdata.append('image', files[zf])
+        }
+        axios.post(`${defaultUrl}api/post/gallery-img-upload`, formdata).then((r) => {
+            if (r.data.success) {
+                toast.success(r.data.msg)
+                galleryImages()
+                setGalleryShow(false)
+            } else {
+                toast.error(r.data.msg)
+            }
+        }).catch((e) => {
+            toast.error(e.response.data.msg)
+        })
+    }
+
+    const galleryImages = () => {
+        axios.get(`${defaultUrl}api/post/gallery`).then((r) => {
+            if (r.data?.success) {
+                setGalleryDatas(r.data?.data)
+            } else {
+                toast.error(r.data?.msg)
+            }
+        }).catch((e) => {
+            toast.error(e.response?.data?.msg)
+        })
+    }
+
+    const handleSelectionImage = (v) => {
+        if (selectedGalleryImageData.includes(v)) {
+            setSelectedGalleryImageData(selectedGalleryImageData.filter(k => k !== v))
+        } else {
+            setSelectedGalleryImageData(selectedGalleryImageData.concat(v))
+        }
+    }
+
+    const fileSelectedHandler = (e) => setFiles(e.target.files[0])
+
+
+    const handleUFE = () => {
+        let dataBuffer = ""
+        for (let data = 0; data < selectedGalleryImageData.length; data++) {
+            dataBuffer += `<figure class="image"><img src="${selectedGalleryImageData[data]}"></figure>`
+        }
+        setContent(content + dataBuffer)
+        setSelectedGalleryImageData([])
+    }
+
+
+
+    const handleCategorySelection = (e, v, k1, num) => {
+        if (k1) {
+            if (selectedSubCategory.includes(v._id)) {
+                setSelectedSubCategory(selectedSubCategory.filter(i => i !== v._id))
+                setSelectedSubCategory2(selectedSubCategory2.filter(i => i.num !== num && i.id !== v._id))
+            } else {
+                setSelectedSubCategory(selectedSubCategory.concat(v._id))
+                setSelectedSubCategory2(selectedSubCategory2.concat({ num: num, id: v._id }))
+            }
+        } else {
+            if (e.target.checked) {
+                setSelectedCategory(selectedCategory.concat(v._id))
+            } else {
+                setSelectedCategory(selectedCategory.filter(k => k !== v._id))
+                setSelectedSubCategory2(selectedSubCategory2.filter(l => l.num !== v._id))
+            }
+        }
+    }
 
     return (
         <div>
@@ -165,7 +248,57 @@ export default function EditPost() {
                 handleSave={handleSave}
             />
             <Header />
-            <Container fluid>
+            <MediaGallery
+                heading={"Media Gallery"}
+                show={galleryShow}
+                body={
+                    <Tabs
+                        className="mb-3"
+                    >
+                        <Tab eventKey="g-upd" title="Upload Image">
+                            <Row className="RowMg">
+                                <div>
+                                    <Form.Group controlId="formFileSm" className="mb-1">
+                                        <input type="file"
+                                            onChange={fileSelectedHandler}
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div>
+                                    <Button onClick={galleryImageUpload}>Upload Now</Button>
+                                </div>
+                            </Row>
+                        </Tab>
+                        <Tab eventKey="g-all" title="Gallery">
+                            <Row>
+                                <Col xl={12}>
+                                    {
+                                        selectedGalleryImageData.length > 0 &&
+                                        <Button variant="success" size="sm" className="mb-2" onClick={handleUFE}>
+                                            Use for editor
+                                        </Button>
+                                    }
+                                </Col>
+                            </Row>
+                            <Row className="RowMg">
+                                {
+                                    galleryDatas == null ? <h1>No Images</h1> :
+                                        galleryDatas?.map((v, i) =>
+                                            <Col xl={3}>
+                                                <div className={`MediaGallery  ${selectedGalleryImageData.includes(`${defaultUrl}` + v.img.replace('public/', '')) ? 'SelectedImg' : ''}`}
+                                                    onClick={() => handleSelectionImage(`${defaultUrl}` + v.img.replace('public/', ''))}>
+                                                    <Image src={`${defaultUrl}` + v.img.replace('public/', '')} fluid />
+                                                </div>
+                                            </Col>
+                                        )
+                                }
+                            </Row>
+                        </Tab>
+                    </Tabs>
+                }
+                handleClose={() => setGalleryShow(false)}
+            />
+            < Container fluid >
                 <Row className="MainSectionRow">
                     <Col xl={4} className="p-0">
                         <div className="Sidebar">
@@ -173,10 +306,23 @@ export default function EditPost() {
                                 <h3>Add New Post</h3>
                             </div>
                             <div className="mt-4">
+                                <Form.Label><strong>Publish / Draft</strong></Form.Label>
+                                <Form.Check
+                                    onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
+                                    checked={publish}
+                                    type="switch"
+                                    id="custom-switch"
+                                    label="Publish"
+                                />
+                            </div>
+                            <div className="mt-4">
                                 <Form.Label><strong>Title</strong></Form.Label>
                                 <Form.Control
-                                    value={postData.title}
-                                    onChange={(e) => setMainTitle(e.target.value)}
+                                    value={mainTitle}
+                                    onChange={(e) => {
+                                        setMainTitle(e.target.value)
+                                        editUrl(e.target.value)
+                                    }}
                                     type="text"
                                     placeholder="Enter title here"
                                 />
@@ -192,19 +338,74 @@ export default function EditPost() {
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Featured Image</strong></Form.Label>
-                                <Form.Control type="file" />
+                                <Form.Control type="file" onChange={(e) => setFFile(e.target.files[0])} />
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
-                                {/* future use */}
 
-
-
+                                <div className="SearchWrraper">
+                                    <Form.Control
+                                        value={searchText}
+                                        onChange={(e) => {
+                                            searchCategories(e.target.value)
+                                            setSerachText(e.target.value)
+                                        }}
+                                        type="text"
+                                        placeholder="Search category...."
+                                    />
+                                    {
+                                        loader ?
+                                            <div className="mt-3 text-center">
+                                                <Spinner animation="border" variant="success" />
+                                            </div>
+                                            :
+                                            <>
+                                                <div className="mt-3">
+                                                    {
+                                                        searchCateg?.map((k, i) =>
+                                                            <>
+                                                                <div key={i}>
+                                                                    <input
+                                                                        checked={selectedCategory.includes(k._id) ? true : false}
+                                                                        type="checkbox"
+                                                                        onChange={(e) => handleCategorySelection(e, k)}
+                                                                    /> {k.title}
+                                                                </div>
+                                                                {
+                                                                    selectedCategory?.includes(k._id) ?
+                                                                        <div className="TagsWrraper">
+                                                                            {
+                                                                                k?.childs?.map((v, i) =>
+                                                                                    <div
+                                                                                        key={i}
+                                                                                        onClick={(e) => handleCategorySelection(e, v, true, k._id)}
+                                                                                        className={`TagsCategory ${selectedSubCategory.includes(v._id) ? 'SelectedCategory' : ''}`}>{v.title}</div>
+                                                                                )
+                                                                            }
+                                                                        </div> : null
+                                                                }
+                                                            </>
+                                                        )
+                                                    }
+                                                </div>
+                                                {
+                                                    suggestion &&
+                                                    <div className="SuggestText">
+                                                        <b>Suggest for add category "{searchText}"&nbsp;&nbsp;
+                                                            <Badge bg="success" className="BadgeClk" onClick={() => setShow(true)}>
+                                                                <IoMdAddCircle size={20} />
+                                                            </Badge>
+                                                        </b>
+                                                    </div>
+                                                }
+                                            </>
+                                    }
+                                </div>
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>SEO Title</strong></Form.Label>
                                 <Form.Control
-                                    value={postData.stitle}
+                                    value={seotitle}
                                     onChange={(e) => setSeoTitle(e.target.value)}
                                     type="text"
                                     placeholder="Enter Page title here"
@@ -215,7 +416,7 @@ export default function EditPost() {
                                 <Form.Label><strong>SEO Description</strong></Form.Label>
                                 <FloatingLabel controlId="floatingTextarea2" label="SEO Description">
                                     <Form.Control
-                                        value={postData.sdesc}
+                                        value={seodescription}
                                         onChange={(e) => setSeoDescription(e.target.value)}
                                         as="textarea"
                                         placeholder="SEO Description"
@@ -230,25 +431,17 @@ export default function EditPost() {
                                     <InputGroup.Text id="basic-addon3">
                                         https://unmediabuzz.com/
                                     </InputGroup.Text>
-                                    <Form.Control id="basic-url" aria-describedby="basic-addon3" value={postData.url} onChange={(e) => setUrl(e.target.value)} />
+                                    <Form.Control id="basic-url" aria-describedby="basic-addon3" value={url} onChange={(e) => setUrl(e.target.value)} />
                                 </InputGroup>
                             </div>
-                            <div className="mt-4">
-                                <Form.Label><strong>Publish / Draft</strong></Form.Label>
-                                <Form.Check
-                                    onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
-                                    defaultChecked={publish}
-                                    type="switch"
-                                    id="custom-switch"
-                                    label="Publish"
-                                />
-                            </div>
+
                         </div>
                     </Col>
                     <Col xl={8}>
                         <div className="EditorWrraper">
                             <div>
                                 <h3>Add Content
+
                                     <Button
                                         onClick={() => postUpload()}
                                         className="ms-4"
@@ -257,29 +450,40 @@ export default function EditPost() {
                                         Save as {publish === 1 ? "Publish" : "Draft"}
                                     </Button></h3>
                             </div>
-                            <Row className="EditorSpace">
+                            <div>
+                                <Button
+                                    onClick={() => setGalleryShow(true)}
+                                    variant="dark"
+                                    className="text-white mt-5 mb-5"><FcGallery /> Media Gallery</Button>
+                            </div>
+                            <Row className="EditorSpace p-0">
                                 <Col xl={6} className="EditorSize">
                                     <Tabs
                                         id="controlled-tab-example"
                                         className="mb-3"
                                     >
                                         <Tab eventKey="Content" title="Content">
+
                                             <CKEditor
+                                                data=""
                                                 editor={ClassicEditor}
-                                                data={postData.content}
                                                 onChange={ckeditorstate}
                                                 config={
                                                     {
                                                         ckfinder: {
-                                                            // The URL that the images are uploaded to.
                                                             uploadUrl: '/upload',
-                                                            // Enable the XMLHttpRequest.withCredentials property.
                                                             withCredentials: true,
-                                                            // Headers sent along with the XMLHttpRequest to the upload server.
                                                             headers: {
                                                                 'X-CSRF-TOKEN': 'CSFR-Token',
                                                                 Authorization: 'Bearer <JSON Web Token>'
                                                             }
+                                                        },
+                                                        mediaEmbed: {
+                                                            providers: [
+                                                                {
+
+                                                                }
+                                                            ]
                                                         }
                                                     }
                                                 }
@@ -303,7 +507,7 @@ export default function EditPost() {
                         </div>
                     </Col>
                 </Row>
-            </Container>
-        </div>
+            </Container >
+        </div >
     )
 }
