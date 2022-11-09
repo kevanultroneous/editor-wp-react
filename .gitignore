@@ -1,3 +1,6 @@
 /node_modules
 /uploads
 /images
+/public/gallery/
+/public/other/featured/
+/public/other/uploads/
