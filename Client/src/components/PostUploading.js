@@ -16,6 +16,7 @@ import { AiFillCaretRight } from "react-icons/ai"
 import { defaultUrl } from "../utils/default";
 import { FcAddImage, FcGallery } from "react-icons/fc"
 import MediaGallery from "../components/common/MediaGallery"
+import e from "cors";
 
 
 
@@ -95,12 +96,12 @@ export default function PostUploading() {
 
     const cleanArray = (ary) => {
         const newarry = []
-        ary.map((v) => newarry.push(v.id))
+        ary.map((v) => newarry.push(v.s))
         return newarry
     }
 
     const formdata = new FormData()
-    const cleansing = cleanArray(selectedSubCategory2)
+    const cleansing = cleanArray(selectedSubCategory)
 
     formdata.append("image", ffile)
     formdata.append("title", mainTitle)
@@ -214,27 +215,32 @@ export default function PostUploading() {
         setSelectedGalleryImageData([])
     }
 
+  
+    const handleCategorySelection = (event, value, subcates) => {
+    
+        if (subcates) {
+            let newarry = [...selectedSubCategory]
+            if(selectedSubCategory.some(item=>item.p==value.parentCategory)){
+                newarry.filter(items=>items.p!==value.parentCategory)
+                newarry.concat({p:value.parentCategory,s:value._id})
+                setSelectedSubCategory(newarry)
 
-
-    const handleCategorySelection = (e, v, k1, num) => {
-        if (k1) {
-            if (selectedSubCategory.includes(v._id)) {
-                setSelectedSubCategory(selectedSubCategory.filter(i => i !== v._id))
-                setSelectedSubCategory2(selectedSubCategory2.filter(i => i.num !== num && i.id !== v._id))
-            } else {
-                setSelectedSubCategory(selectedSubCategory.concat(v._id))
-                setSelectedSubCategory2(selectedSubCategory2.concat({ num: num, id: v._id }))
+            }else{
+                if(event.target.checked){     
+                    setSelectedSubCategory(selectedSubCategory.concat({p:value.parentCategory,s:value._id}))
+                }
             }
         } else {
-            if (e.target.checked) {
-                setSelectedCategory(selectedCategory.concat(v._id))
+            if (event.target.checked) {
+                setSelectedCategory(selectedCategory.concat(value._id))
             } else {
-                setSelectedCategory(selectedCategory.filter(k => k !== v._id))
-                setSelectedSubCategory2(selectedSubCategory2.filter(l => l.num !== v._id))
+                setSelectedCategory(selectedCategory.filter(k => k !== value._id))
+                
             }
         }
     }
-
+    
+    console.log(selectedSubCategory)
     return (
         <div>
             <Toaster
@@ -439,7 +445,7 @@ export default function PostUploading() {
                                                                     <input
                                                                         checked={selectedCategory.includes(k._id) ? true : false}
                                                                         type="checkbox"
-                                                                        onChange={(e) => handleCategorySelection(e, k)}
+                                                                        onChange={(e) => handleCategorySelection(e, k,false)}
                                                                     /> {k.title}
                                                                 </div>
                                                                 {
@@ -447,10 +453,19 @@ export default function PostUploading() {
                                                                         <div className="TagsWrraper">
                                                                             {
                                                                                 k?.childs?.map((v, i) =>
-                                                                                    <div
-                                                                                        key={i}
-                                                                                        onClick={(e) => handleCategorySelection(e, v, true, k._id)}
-                                                                                        className={`TagsCategory ${selectedSubCategory.includes(v._id) ? 'SelectedCategory' : ''}`}>{v.title}</div>
+                                                                                <>
+                                                                                <input type="radio" 
+                                                                                name={k._id} 
+                                                                                defaultChecked={selectedSubCategory.some(item=>item.p == v.parentCategory && item.s == v._id)}
+                                                                                // checked={}
+                                                                                onChange={(e)=>{
+                                                                                    handleCategorySelection(e, v,true)
+                                                                                    }}/>{v.title}&nbsp;
+                                                                                </>
+                                                                                // <div
+                                                                                    //     key={i}
+                                                                                    //     onClick={(e) => handleCategorySelection(e, v, true, k._id)}
+                                                                                    //     className={`TagsCategory ${selectedSubCategory.includes(v._id) ? 'SelectedCategory' : ''}`}>{v.title}</div>
                                                                                 )
                                                                             }
                                                                         </div> : null

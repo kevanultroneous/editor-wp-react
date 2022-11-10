@@ -22,7 +22,7 @@ import MediaGallery from "../components/common/MediaGallery"
 export default function EditPost() {
 
     const { postid, type } = useParams()
-
+    
     useEffect(() => {
         fetchParamPost()
     }, [])
@@ -232,26 +232,21 @@ export default function EditPost() {
 
     const handleCategorySelection = (event, value, secondone,parentid) => {
         if (secondone) {
-            if (selectedSubCategory.includes(value._id)) {
-                setSelectedSubCategory(selectedSubCategory.filter(i => i !== value._id))
-            } else {
-                setSelectedSubCategory(selectedSubCategory.concat(value._id))
+            let newarry = [...selectedSubCategory2]
+            if(selectedSubCategory.some(item=>item.p==value.parentCategory)){
+                newarry.filter(items=>items.p!==value.parentCategory)
+                newarry.concat({p:value.parentCategory,s:value._id})
+                setSelectedSubCategory(newarry)
+            }else{
+                if(event.target.checked){     
+                    setSelectedSubCategory(selectedSubCategory.concat({p:value.parentCategory,s:value._id}))
+                }
             }
         } else {
             if (event.target.checked) {
                 setSelectedCategory(selectedCategory.concat(value._id))
             } else {
-                setSelectedCategory(selectedCategory.filter(k => k !== value._id))
-                // let earry = []
-                // for (let y = 0; y < searchCateg.length; y++) {
-                //     for (let r = 0; r < searchCateg[y].childs.length; r++) {
-                //         if (selectedSubCategory.includes(searchCateg[y].childs[r]._id)) {
-                //             // consolevent.log("remove" + searchCateg[y].childs[r]._id)
-                //             earry.push(searchCateg[y].childs[r]._id)
-                //         }
-                //     }
-                // }
-                // updateSubcategory(earry)
+                setSelectedCategory(selectedCategory.filter(k => k !== value._id)) 
             }
         }
     }
@@ -468,10 +463,17 @@ export default function EditPost() {
                                                                         <div className="TagsWrraper">
                                                                             {
                                                                                 k?.childs?.map((v, i) =>
-                                                                                    <div
-                                                                                        key={i}
-                                                                                        onClick={(e) => handleCategorySelection(e, v, true, k._id)}
-                                                                                        className={`TagsCategory ${selectedSubCategory.includes(v._id) ? 'SelectedCategory' : ''}`}>{v.title}</div>
+                                                                                <>
+                                                                                <input type="radio" 
+                                                                                name={k._id} 
+                                                                                defaultChecked={selectedSubCategory.includes(v._id)}
+                                                                                // checked={}
+                                                                                onChange={(e)=>{
+                                                                                    handleCategorySelection(e, v,true)
+                                                                                    }}/>{v.title}&nbsp;
+
+                                                                                </>
+                                                                                  
                                                                                 )
                                                                             }
                                                                         </div> : null
