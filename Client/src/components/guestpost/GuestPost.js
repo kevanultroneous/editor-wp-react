@@ -89,7 +89,6 @@ const GuestPost = () => {
                                     <th>URL</th>
                                     <th>Status</th>
                                     <th>Published Date</th>
-                                    <th>Updated Date</th>
                                     <th colSpan={3}>Action</th>
                                 </tr>
                             </thead>

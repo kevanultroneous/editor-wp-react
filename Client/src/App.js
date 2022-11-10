@@ -15,7 +15,7 @@ import Contact from './components/contactComponet/contact';
 export default function App() {
   return (
     <Routes>
-      {/* <Route path='/' element={<Login />} /> */}
+       {/* <Route path='/' element={<Contact />} /> */}
       <Route path='/' element={<Home />} />
       <Route path='/home' element={<Home />} />
       <Route path='/press-release' element={<PressRelease />} />

@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import axios from "axios"
-import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+
 import { Markup } from 'interweave';
-import CKEditor from '@ckeditor/ckeditor5-react'
+
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 import { Button, Col, Container, FloatingLabel, Form, Row } from "react-bootstrap"
 import "./style.css"
 import { AiFillEye, AiFillEyeInvisible, AiFillHtml5, AiFillSave, AiTwotoneTool } from "react-icons/ai"
@@ -41,7 +44,29 @@ export default function Contact() {
         <Container fluid>
             <Row className="EditorSpace">
                 <Col xl={5} className="EditorSize">
+                    <div id="hu">
                     <CKEditor
+                            editor={ClassicEditor}
+                            data=""
+                            config={
+                                {
+                                    ckfinder: {
+                                        // The URL that the images are uploaded to.
+                                        uploadUrl: '/upload',
+                                        // Enable the XMLHttpRequest.withCredentials property.
+                                        withCredentials: true,
+                                        // Headers sent along with the XMLHttpRequest to the upload server.
+                                        headers: {
+                                            'X-CSRF-TOKEN': 'CSFR-Token',
+                                            Authorization: 'Bearer <JSON Web Token>'
+                                        }
+                                    }
+                                }
+                            }
+                            // onChange={this.AddproductInformation}
+                          />
+                    {/* <CKEditor
+                       
                         data={content}
                         editor={ClassicEditor}
                         onChange={ckeditorstate}
@@ -60,7 +85,8 @@ export default function Contact() {
                                 }
                             }
                         }
-                    />
+                        /> */}
+                        </div>
 
                 </Col>
                 {

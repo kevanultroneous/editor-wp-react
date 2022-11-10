@@ -32,6 +32,7 @@ const multerFilter = (req, file, cb) => {
   if (whitelist.includes(file.mimetype)) {
     cb(null, true);
   } else {
+   
     cb(new AppError(401, "Only jpeg, png, jpg and webp files are allowed"));
   }
 };

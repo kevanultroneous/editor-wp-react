@@ -4,8 +4,8 @@ import { Container, Row, Col, Form, InputGroup, FloatingLabel, Button, Spinner, 
 import "./postUploading.css"
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import CKEditor from '@ckeditor/ckeditor5-react'
-import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Markup } from "interweave";
@@ -132,7 +132,8 @@ export default function PostUploading() {
                         toast.error(r.data.msg)
                     }
                 })
-                .catch((e) => toast.error(e.response.data.msg))
+                .catch((e) =>{
+                    toast.error(e.response.data.msg)})
             setFFile(null)
         }
     }
