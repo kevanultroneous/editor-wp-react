@@ -104,13 +104,10 @@ export default function EditPost() {
         }
         searchCategories(searchText)
         galleryImages()
+        
     }, [])
 
-    const cleanArray = (ary) => {
-        const newarry = []
-        ary.map((v) => newarry.push(v.id))
-        return newarry
-    }
+    
 
     const formdata = new FormData()
 
@@ -233,28 +230,28 @@ export default function EditPost() {
         setSelectedSubCategory(selectedSubCategory.filter(k => k !== x))
     }
 
-    const handleCategorySelection = (e, v, k1) => {
-        if (k1) {
-            if (selectedSubCategory.includes(v._id)) {
-                setSelectedSubCategory(selectedSubCategory.filter(i => i !== v._id))
+    const handleCategorySelection = (event, value, secondone,parentid) => {
+        if (secondone) {
+            if (selectedSubCategory.includes(value._id)) {
+                setSelectedSubCategory(selectedSubCategory.filter(i => i !== value._id))
             } else {
-                setSelectedSubCategory(selectedSubCategory.concat(v._id))
+                setSelectedSubCategory(selectedSubCategory.concat(value._id))
             }
         } else {
-            if (e.target.checked) {
-                setSelectedCategory(selectedCategory.concat(v._id))
+            if (event.target.checked) {
+                setSelectedCategory(selectedCategory.concat(value._id))
             } else {
-                setSelectedCategory(selectedCategory.filter(k => k !== v._id))
-                let earry = []
-                for (let y = 0; y < searchCateg.length; y++) {
-                    for (let r = 0; r < searchCateg[y].childs.length; r++) {
-                        if (selectedSubCategory.includes(searchCateg[y].childs[r]._id)) {
-                            // console.log("remove" + searchCateg[y].childs[r]._id)
-                            earry.push(searchCateg[y].childs[r]._id)
-                        }
-                    }
-                }
-                updateSubcategory(earry)
+                setSelectedCategory(selectedCategory.filter(k => k !== value._id))
+                // let earry = []
+                // for (let y = 0; y < searchCateg.length; y++) {
+                //     for (let r = 0; r < searchCateg[y].childs.length; r++) {
+                //         if (selectedSubCategory.includes(searchCateg[y].childs[r]._id)) {
+                //             // consolevent.log("remove" + searchCateg[y].childs[r]._id)
+                //             earry.push(searchCateg[y].childs[r]._id)
+                //         }
+                //     }
+                // }
+                // updateSubcategory(earry)
             }
         }
     }
