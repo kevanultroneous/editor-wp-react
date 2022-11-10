@@ -115,7 +115,7 @@ export default function EditPost() {
     const formdata = new FormData()
 
     formdata.append("parentid", postid)
-    formdata.append("image", ffile)
+    formdata.append("image", files)
     formdata.append("title", mainTitle)
     selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v))
     selectedSubCategory.map((v, i) => formdata.append(`subcategory[${i}]`, v))
@@ -176,8 +176,8 @@ export default function EditPost() {
 
     const galleryImageUpload = () => {
         const formdata = new FormData()
-        for (let zf = 0; zf < files.length; zf++) {
-            formdata.append('image', files[zf])
+        for (let zf = 0; zf < ffile.length; zf++) {
+            formdata.append('image', ffile[zf])
         }
         axios.post(`${defaultUrl}api/post/gallery-img-upload`, formdata).then((r) => {
             if (r.data.success) {
@@ -212,7 +212,7 @@ export default function EditPost() {
         }
     }
 
-    const fileSelectedHandler = (e) => setFiles(e.target.files[0])
+    const fileSelectedHandler = (e) => setFFile(e.target.files)
 
 
     const handleUFE = () => {
@@ -286,6 +286,7 @@ export default function EditPost() {
                                     <Form.Group controlId="formFileSm" className="mb-1">
                                         <input type="file"
                                             onChange={fileSelectedHandler}
+                                            multiple
                                         />
                                     </Form.Group>
                                 </div>
@@ -363,7 +364,7 @@ export default function EditPost() {
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Update Featured Image</strong></Form.Label>
-                                <Form.Control type="file" onChange={(e) => setFFile(e.target.files[0])} />
+                                <Form.Control type="file" onChange={(e) => setFiles(e.target.files[0])} />
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>

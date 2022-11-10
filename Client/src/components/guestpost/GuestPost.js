@@ -1,4 +1,4 @@
-import { Button, Col, Container, Row, Table } from "react-bootstrap"
+import { Button, Col, Container, Image, Row, Table } from "react-bootstrap"
 import React, { useEffect, useState } from "react"
 import Header from "../common/Header"
 import "./style.css"
@@ -7,6 +7,7 @@ import axios from "axios"
 import toast, { Toaster } from "react-hot-toast";
 import DeleteModel from "../common/DeleteModel";
 import { defaultUrl } from "../../utils/default";
+import { MdDone, MdDoneAll } from "react-icons/md";
 
 const GuestPost = () => {
     const navigate = useNavigate()
@@ -63,8 +64,8 @@ const GuestPost = () => {
             />
             <Header />
             <DeleteModel
-                title={"Delete Press Release"}
-                mentionText={`Are you sure to delete this ${currentPost} Press Release ?`}
+                title={"Delete guest post"}
+                mentionText={`Are you sure to delete this ${currentPost} Press guest post ?`}
                 show={deleteShow}
                 onHide={handleDeleteHide}
                 handleYes={deletePosts}
@@ -73,20 +74,22 @@ const GuestPost = () => {
             <Container fluid>
                 <Row className="AddActionSpace">
                     <Col xl={12}>
-                        <Button variant="success" onClick={() => navigate('/upload-post/guest-post')}>Add new Guest post</Button>
+                        <Button variant="success" onClick={() => navigate('/upload-post/guest-post')}>Add new guest post</Button>
                     </Col>
                 </Row>
                 <Row className="TableSpace">
 
-                    <Col xl={6}>
+                    <Col xl={12}>
                         <Table striped bordered hover variant="dark">
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Cover</th>
                                     <th>Title</th>
-                                    <th>Author</th>
+                                    <th>URL</th>
                                     <th>Status</th>
                                     <th>Published Date</th>
+                                    <th>Updated Date</th>
                                     <th colSpan={3}>Action</th>
                                 </tr>
                             </thead>
@@ -96,16 +99,24 @@ const GuestPost = () => {
                                         postData.map((v, i) =>
                                             <tr key={i}>
                                                 <td>{i + 1}</td>
+                                                <td>
+                                                    <Image src={`${defaultUrl + v.fimg}`} height={50} width={50} />
+                                                </td>
                                                 <td>{v.title}</td>
-                                                <td>{v.author}</td>
-                                                <td>{v.status === 1 ? "Published" : "Drafted"}</td>
+                                                <td>https://unmediabuzz.com/PressRelease/{v.url}</td>
+                                                <td className="text-center">
+                                                    {v.status === 1 ? <MdDoneAll color="green" size={30} /> : <MdDone color="green" size={30} />}
+                                                    <p>{v.status === 1 ? "Published" : "Drafted"}</p>
+                                                </td>
+
                                                 <td>{timestampToDate(v.date)}</td>
+                                                <td>{timestampToDate(v.updatedAt)}</td>
                                                 <td>
                                                     <Link to={`/view-guest-post/${v._id}`}>
                                                         <Button variant="primary" style={{ width: "100%" }}>View</Button>
                                                     </Link>
                                                 </td>
-                                                <td><Button variant="info" style={{ width: "100%" }} onClick={() => navigate(`/edit-post/${v._id}`)}>Edit</Button></td>
+                                                <td><Button variant="info" style={{ width: "100%" }} onClick={() => navigate(`/edit-post/guest-post/${v._id}`)}>Edit</Button></td>
                                                 <td><Button
                                                     onClick={() => handleDelete(v._id, v.title)}
                                                     variant="danger"

@@ -16,12 +16,12 @@ function Home() {
                         <Col xl={12} className="mb-3">
                             <h3>Visit Now</h3>
                         </Col>
-                        <Col xl={3}>
+                        <Col sm={12} md={4} lg={4} xl={4}>
                             <div className="LinkedCard" onClick={() => navigate('/press-release')}>
                                 Press Release
                             </div>
                         </Col>
-                        <Col xl={3}>
+                        <Col sm={12} md={4} lg={4} xl={4}>
                             <div className="LinkedCard" onClick={() => navigate('/guest-post')}>
                                 Guest Post
                             </div>

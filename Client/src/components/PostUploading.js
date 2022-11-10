@@ -201,7 +201,7 @@ export default function PostUploading() {
         }
     }
 
-    const fileSelectedHandler = (e) => setFiles(e.target.files[0])
+    const fileSelectedHandler = (e) => setFiles(e.target.files)
 
 
     const handleUFE = () => {
@@ -261,6 +261,7 @@ export default function PostUploading() {
                                     <Form.Group controlId="formFileSm" className="mb-1">
                                         <input type="file"
                                             onChange={fileSelectedHandler}
+                                            multiple
                                         />
                                     </Form.Group>
                                 </div>
@@ -300,7 +301,7 @@ export default function PostUploading() {
             />
             < Container fluid >
                 <Row className="MainSectionRow">
-                    <Col xl={4} className="p-0">
+                    <Col xl={4} lg={6} md={12} xs={12} className="p-0">
                         <div className="Sidebar">
                             <div>
                                 <h3>Add New Post</h3>
@@ -437,7 +438,7 @@ export default function PostUploading() {
 
                         </div>
                     </Col>
-                    <Col xl={8}>
+                    <Col xl={8} lg={6} md={12} xs={12}>
                         <div className="EditorWrraper">
                             <div>
                                 <h3>Add Content
