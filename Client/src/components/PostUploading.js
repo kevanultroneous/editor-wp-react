@@ -301,6 +301,75 @@ export default function PostUploading() {
             />
             < Container fluid >
                 <Row className="MainSectionRow">
+                <Col xl={8} lg={6} md={12} xs={12}>
+                        <div className="EditorWrraper">
+                            <div>
+                                <h3>Add Content
+
+                                    <Button
+                                        onClick={() => postUpload()}
+                                        className="ms-4"
+                                        variant={publish === 1 ? "success" : "secondary"}
+                                    >
+                                        Save as {publish === 1 ? "Publish" : "Draft"}
+                                    </Button></h3>
+                            </div>
+                            <div>
+                                <Button
+                                    onClick={() => setGalleryShow(true)}
+                                    variant="dark"
+                                    className="text-white mt-5 mb-5"><FcGallery /> Media Gallery</Button>
+                            </div>
+                            <Row className="EditorSpace p-0">
+                                <Col xl={6} className="EditorSize">
+                                    <Tabs
+                                        id="controlled-tab-example"
+                                        className="mb-3"
+                                    >
+                                        <Tab eventKey="Content" title="Content">
+
+                                            <CKEditor
+                                                data=""
+                                                editor={ClassicEditor}
+                                                onChange={ckeditorstate}
+                                                config={
+                                                    {
+                                                        ckfinder: {
+                                                            uploadUrl: '/upload',
+                                                            withCredentials: true,
+                                                            headers: {
+                                                                'X-CSRF-TOKEN': 'CSFR-Token',
+                                                                Authorization: 'Bearer <JSON Web Token>'
+                                                            }
+                                                        },
+                                                        mediaEmbed: {
+                                                            providers: [
+                                                                {
+
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            />
+                                        </Tab>
+                                        <Tab eventKey="Html" title="Html">
+                                            <textarea
+                                                onChange={(e) => setContent(e.target.value)}
+                                                value={content}
+                                                style={{ height: "100vh", width: "100%", border: "none", outline: "none" }}
+                                                placeholder="write your html......"
+                                            >
+                                            </textarea>
+                                        </Tab>
+                                        <Tab eventKey="Preview" title="Preview">
+                                            <Markup content={content} />
+                                        </Tab>
+                                    </Tabs>
+                                </Col>
+                            </Row>
+                        </div>
+                    </Col>
                     <Col xl={4} lg={6} md={12} xs={12} className="p-0">
                         <div className="Sidebar">
                             <div>
@@ -438,75 +507,7 @@ export default function PostUploading() {
 
                         </div>
                     </Col>
-                    <Col xl={8} lg={6} md={12} xs={12}>
-                        <div className="EditorWrraper">
-                            <div>
-                                <h3>Add Content
-
-                                    <Button
-                                        onClick={() => postUpload()}
-                                        className="ms-4"
-                                        variant={publish === 1 ? "success" : "secondary"}
-                                    >
-                                        Save as {publish === 1 ? "Publish" : "Draft"}
-                                    </Button></h3>
-                            </div>
-                            <div>
-                                <Button
-                                    onClick={() => setGalleryShow(true)}
-                                    variant="dark"
-                                    className="text-white mt-5 mb-5"><FcGallery /> Media Gallery</Button>
-                            </div>
-                            <Row className="EditorSpace p-0">
-                                <Col xl={6} className="EditorSize">
-                                    <Tabs
-                                        id="controlled-tab-example"
-                                        className="mb-3"
-                                    >
-                                        <Tab eventKey="Content" title="Content">
-
-                                            <CKEditor
-                                                data=""
-                                                editor={ClassicEditor}
-                                                onChange={ckeditorstate}
-                                                config={
-                                                    {
-                                                        ckfinder: {
-                                                            uploadUrl: '/upload',
-                                                            withCredentials: true,
-                                                            headers: {
-                                                                'X-CSRF-TOKEN': 'CSFR-Token',
-                                                                Authorization: 'Bearer <JSON Web Token>'
-                                                            }
-                                                        },
-                                                        mediaEmbed: {
-                                                            providers: [
-                                                                {
-
-                                                                }
-                                                            ]
-                                                        }
-                                                    }
-                                                }
-                                            />
-                                        </Tab>
-                                        <Tab eventKey="Html" title="Html">
-                                            <textarea
-                                                onChange={(e) => setContent(e.target.value)}
-                                                value={content}
-                                                style={{ height: "100vh", width: "100%", border: "none", outline: "none" }}
-                                                placeholder="write your html......"
-                                            >
-                                            </textarea>
-                                        </Tab>
-                                        <Tab eventKey="Preview" title="Preview">
-                                            <Markup content={content} />
-                                        </Tab>
-                                    </Tabs>
-                                </Col>
-                            </Row>
-                        </div>
-                    </Col>
+                  
                 </Row>
             </Container >
         </div >
