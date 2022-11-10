@@ -240,7 +240,6 @@ export default function PostUploading() {
         }
     }
     
-    console.log(selectedSubCategory)
     return (
         <div>
             <Toaster
