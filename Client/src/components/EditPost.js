@@ -427,7 +427,7 @@ export default function EditPost() {
                                 <Form.Label><strong>Update Featured Image</strong></Form.Label>
                                 <Form.Control type="file" onChange={(e) => setFiles(e.target.files[0])} />
                             </div>
-                            <div className="mt-4">
+                            {/* <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
 
                                 <div className="SearchWrraper">
@@ -495,7 +495,7 @@ export default function EditPost() {
                                             </>
                                     }
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="mt-4">
                                 <Form.Label><strong>SEO Title</strong></Form.Label>
                                 <Form.Control
