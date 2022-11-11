@@ -10,11 +10,3 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>,
 )
-// ReactDOM.render(
-//   <React.StrictMode>
-//     <BrowserRouter>
-//       <App />
-//     </BrowserRouter>
-//   </React.StrictMode>,
-//   document.getElementById('root')
-// );
