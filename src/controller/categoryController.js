@@ -28,6 +28,7 @@ exports.uploadCategory = catchAsyncError(async (req, res) => {
 })
 
 exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
+    const {type} = req.params
     const category = await ECategory.find({ isActive: true, parentCategory: null }).sort({ createdAt: -1 }).lean()
     var subcategory
     if (category.length > 0) {

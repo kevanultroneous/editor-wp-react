@@ -231,14 +231,22 @@ export default function PostUploading() {
                 }
             }
         } else {
+            setSelectedSubCategory([])
             if (event.target.checked) {
                 setSelectedCategory(selectedCategory.concat(value._id))
             } else {
+                let newarry = [...selectedSubCategory]
                 setSelectedCategory(selectedCategory.filter(k => k !== value._id))
-                
+                for(let  i= 0;i<selectedSubCategory.length;i++){
+                    if(selectedSubCategory[i].p == value._id){
+                        newarry.filter(i=>i.p!==value._id)
+                    }
+                }
+                setSelectedSubCategory(newarry)
             }
         }
     }
+    console.log(JSON.stringify(selectedSubCategory))
     
     return (
         <div>
