@@ -176,7 +176,7 @@ export default function EditPost() {
         });
     }, 1000);
   };
-
+  // code here
   useEffect(() => {
     let newarry = [];
     if (selectedSubCategory.length > 0) {
