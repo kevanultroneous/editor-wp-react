@@ -118,7 +118,7 @@ export default function PostUploading() {
 
     const postUpload = () => {
         if (ffile == null) {
-            alert('Featured image is required !')
+            alert('Featured image i s required !')
         } else if (mainTitle == "") {
             alert('Title is required !')
         } else if (selectedCategory.length <= 0) {
@@ -236,6 +236,7 @@ export default function PostUploading() {
                 setSelectedCategory(selectedCategory.concat(value._id))
             } else {
                 let newarry = [...selectedSubCategory]
+<<<<<<< HEAD
                 setSelectedCategory(selectedCategory.filter(k => k !== value._id))
                 for(let  i= 0;i<selectedSubCategory.length;i++){
                     if(selectedSubCategory[i].p == value._id){
@@ -243,6 +244,13 @@ export default function PostUploading() {
                     }
                 }
                 setSelectedSubCategory(newarry)
+=======
+                if(selectedSubCategory.some(item=>item.p==value._id)){
+                    newarry.filter(items=>items.p!==value._id)
+                }
+                setSelectedSubCategory(newarry)
+                setSelectedCategory(selectedCategory.filter(k => k !== value._id))
+>>>>>>> dbc3efeb9c643814c6850de82d798d1678a9cd94
             }
         }
     }
@@ -422,7 +430,21 @@ export default function PostUploading() {
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Featured Image</strong></Form.Label>
-                                <Form.Control type="file" onChange={(e) => setFFile(e.target.files[0])} />
+                                <Form.Control
+                                style={{background:"transparent",border:"none",boxShadow:"none",color:"transparent",userSelect:"none"}}
+                                type="file" onChange={(e) => setFFile(e.target.files[0])} accept="image/png,image/jpg,image/jpeg,image/svg"/>
+                                <center className="mt-3">
+
+                                {
+                                    ffile!=null &&
+                                    <>
+                                    <Image src={URL.createObjectURL(ffile)} width={100}/>
+                                    <div>
+                                    <Badge bg="danger" onClick={()=>setFFile(null)}>Remove</Badge>
+                                    </div>
+                                    </>
+                                }
+                                </center>
                             </div>
                             <div className="mt-4">
                                 <Form.Label><strong>Categories</strong></Form.Label>
