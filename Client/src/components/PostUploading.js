@@ -615,7 +615,7 @@ export default function PostUploading() {
                 </Form.Label>
                 <InputGroup className="mb-3">
                   <InputGroup.Text id="basic-addon3">
-                    https://unmediabuzz.com/
+                    https://xyz.com/
                   </InputGroup.Text>
                   <Form.Control
                     id="basic-url"
