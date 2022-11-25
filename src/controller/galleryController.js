@@ -19,7 +19,7 @@ exports.resizePhoto = (req, res, next) => {
     next()
 };
 
-exports.galleryController = catchAsyncError(async (req, res, next) => {
+exports.createGalleryPost = catchAsyncError(async (req, res, next) => {
     let user = await Gallery.create(req.filedata)
     if (user) {
         sendResponse(res, 200, { success: true, msg: 'Image uploaded successfully', data: user });

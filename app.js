@@ -7,8 +7,10 @@ const fs = require('fs');
 const cors = require('cors');
 const dotenv = require('dotenv')
 
-const postRouter = require('./src/router/post.router');
-const categoryRouter = require('./src/router/category.router');
+const postRouter = require('./src/router/postRouter');
+const categoryRouter = require('./src/router/categoryRouter');
+const planRouter = require('./src/router/planRouter');
+
 dotenv.config()
 const PORT = process.env.PORT || 8000;
 const app = express();
@@ -21,10 +23,15 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
 // content image upload
-app.get('/test', async (req, res) => res.send('working...'))
+app.get('/test', async (req, res) => {
+    const {a, b} = req.body;
+
+    console.log(a, b);
+    res.send("working")
+})
 app.post('/upload', MuiltiPartyMiddleware, async (req, res) => {
-    var TempFile = req.files.upload;
-    var TempPathfile = TempFile.path;
+    let TempFile = req.files.upload;
+    let TempPathfile = TempFile.path;
     const targetPathUrl = path.join(__dirname + "/public/other/uploads/" + TempFile.name);
 
     if (path.extname(TempFile.originalFilename).toLowerCase() === ".png" || ".jpg") {
@@ -41,6 +48,7 @@ app.post('/upload', MuiltiPartyMiddleware, async (req, res) => {
 
 app.use('/api/post/', postRouter)
 app.use('/api/category/', categoryRouter)
+app.use('/api/plan', planRouter);
 
 // listining
 app.listen(PORT, console.log(`Server Started at PORT :${PORT}`))
