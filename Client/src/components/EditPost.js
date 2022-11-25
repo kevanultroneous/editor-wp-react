@@ -38,6 +38,7 @@ export default function EditPost() {
     fetchParamPost();
   }, []);
 
+  let bucketforsubcategory = [];
   const fetchParamPost = () => {
     axios
       .get(`${defaultUrl}api/post/get-post/${postid}`)
@@ -51,7 +52,7 @@ export default function EditPost() {
           setUrl(r.data?.data?.url);
           setPublish(r.data?.data?.status);
           setSelectedCategory(r.data?.data?.category);
-          setSelectedSubCategory(r.data?.data?.subcategory);
+          setSelectedSubCategory2(r.data?.data?.subcategory);
         }
       })
       .catch((e) => toast.error(e.response.data.msg));
@@ -120,14 +121,21 @@ export default function EditPost() {
     searchCategories(searchText);
     galleryImages();
   }, []);
-
+  useEffect(() => {
+    if (selectedSubCategory2.length > 0) {
+      selectedSubCategory2.map((v) => bucketforsubcategory.push(JSON.parse(v)));
+      setSelectedSubCategory(bucketforsubcategory);
+    }
+  }, [selectedSubCategory2]);
   const formdata = new FormData();
 
   formdata.append("parentid", postid);
   formdata.append("image", files);
   formdata.append("title", mainTitle);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
-  selectedSubCategory.map((v, i) => formdata.append(`subcategory[${i}]`, v));
+  selectedSubCategory.map((v, i) =>
+    formdata.append(`subcategory[${i}]`, JSON.stringify(v))
+  );
   formdata.append("author", author);
   formdata.append("content", content);
   formdata.append("smeta", seometatags);
@@ -270,28 +278,46 @@ export default function EditPost() {
     setSelectedSubCategory(selectedSubCategory.filter((k) => k !== x));
   };
 
-  const handleCategorySelection = (event, value, secondone, parentid) => {
-    if (secondone) {
-      let newarry = [...selectedSubCategory2];
-      if (selectedSubCategory.some((item) => item.p == value.parentCategory)) {
-        newarry.filter((items) => items.p !== value.parentCategory);
-        newarry.concat({ p: value.parentCategory, s: value._id });
+  const handleCategorySelection = (event, value, subcates) => {
+    if (subcates) {
+      let newarry = [...selectedSubCategory];
+      if (
+        selectedSubCategory.some(
+          (item) => item.parent_category == value.parentCategory
+        )
+      ) {
+        newarry.filter(
+          (items) => items.parent_category !== value.parentCategory
+        );
+        newarry.concat({
+          parent_category: value.parentCategory,
+          sub_category: value._id,
+        });
         setSelectedSubCategory(newarry);
       } else {
         if (event.target.checked) {
           setSelectedSubCategory(
             selectedSubCategory.concat({
-              p: value.parentCategory,
-              s: value._id,
+              parent_category: value.parentCategory,
+              sub_category: value._id,
             })
           );
         }
       }
+      console.log(selectedSubCategory);
     } else {
+      setSelectedSubCategory([]);
       if (event.target.checked) {
         setSelectedCategory(selectedCategory.concat(value._id));
       } else {
+        let newarry = [...selectedSubCategory];
         setSelectedCategory(selectedCategory.filter((k) => k !== value._id));
+        for (let i = 0; i < selectedSubCategory.length; i++) {
+          if (selectedSubCategory[i].parent_category == value._id) {
+            newarry.filter((i) => i.parent_category !== value._id);
+          }
+        }
+        setSelectedSubCategory(newarry);
       }
     }
   };
@@ -307,7 +333,7 @@ export default function EditPost() {
         handleSave={handleSave}
       />
       <Header />
-      <MediaGallery
+      {/* <MediaGallery
         heading={"Media Gallery"}
         show={galleryShow}
         body={
@@ -376,7 +402,7 @@ export default function EditPost() {
           </Tabs>
         }
         handleClose={() => setGalleryShow(false)}
-      />
+      /> */}
       <Container fluid>
         <Row className="MainSectionRow">
           <Col xl={8} lg={6} md={12} xs={12}>
@@ -393,7 +419,7 @@ export default function EditPost() {
                   </Button>
                 </h3>
               </div>
-              <div>
+              {/* <div>
                 <Button
                   onClick={() => setGalleryShow(true)}
                   variant="dark"
@@ -401,7 +427,7 @@ export default function EditPost() {
                 >
                   <FcGallery /> Media Gallery
                 </Button>
-              </div>
+              </div> */}
               <Row className="EditorSpace p-0">
                 <Col xs={12} lg={6} md={5} xl={6} className="EditorSize">
                   <Tabs id="controlled-tab-example" className="mb-3">
@@ -442,6 +468,7 @@ export default function EditPost() {
                       <Markup content={content} />
                     </Tab>
                   </Tabs>
+                  <p>{JSON.stringify(selectedSubCategory)}</p>
                 </Col>
               </Row>
             </div>
@@ -540,10 +567,12 @@ export default function EditPost() {
                                     <input
                                       type="radio"
                                       name={k._id}
-                                      defaultChecked={selectedSubCategory.includes(
-                                        v._id
+                                      defaultChecked={selectedSubCategory.some(
+                                        (item) =>
+                                          item.parent_category ==
+                                            v.parentCategory &&
+                                          item.sub_category == v._id
                                       )}
-                                      // checked={}
                                       onChange={(e) => {
                                         handleCategorySelection(e, v, true);
                                       }}

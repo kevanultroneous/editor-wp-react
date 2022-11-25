@@ -1,18 +1,15 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./common/Header";
 import {
   Container,
   Row,
   Col,
   Form,
-  InputGroup,
   FloatingLabel,
   Button,
   Spinner,
   Badge,
   Image,
-  Dropdown,
-  SplitButton,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -24,12 +21,8 @@ import Tabs from "react-bootstrap/Tabs";
 import { Markup } from "interweave";
 import { useNavigate, useParams } from "react-router-dom";
 import ModelUpload from "./common/UploadCategoryModel";
-import { IoMdAddCircle, IoMdCloseCircleOutline } from "react-icons/io";
-import { AiFillCaretRight } from "react-icons/ai";
+import { IoMdAddCircle } from "react-icons/io";
 import { defaultUrl } from "../utils/default";
-import { FcAddImage, FcGallery } from "react-icons/fc";
-import MediaGallery from "../components/common/MediaGallery";
-import e from "cors";
 
 export default function PostUploading() {
   const { type } = useParams();
@@ -37,7 +30,6 @@ export default function PostUploading() {
   const [selectedCategory, setSelectedCategory] = useState([]);
 
   const [selectedSubCategory, setSelectedSubCategory] = useState([]);
-  const [selectedSubCategory2, setSelectedSubCategory2] = useState([]);
 
   //gallery
   const [galleryShow, setGalleryShow] = useState(false);
@@ -103,7 +95,7 @@ export default function PostUploading() {
       navigate("/");
     }
     searchCategories(searchText);
-    galleryImages();
+    // galleryImages();
   }, []);
 
   const cleanArray = (ary) => {
@@ -118,7 +110,9 @@ export default function PostUploading() {
   formdata.append("image", ffile);
   formdata.append("title", mainTitle);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
-  cleansing.map((v, i) => formdata.append(`subcategory[${i}]`, v));
+  selectedSubCategory.map((v, i) =>
+    formdata.append(`subcategory[${i}]`, JSON.stringify(v))
+  );
   formdata.append("author", author);
   formdata.append("content", content);
   formdata.append("smeta", seometatags);
@@ -180,76 +174,85 @@ export default function PostUploading() {
     setUrl(v.split(" ").join("-"));
   };
 
-  const galleryImageUpload = () => {
-    const formdata = new FormData();
-    for (let zf = 0; zf < files.length; zf++) {
-      formdata.append("image", files[zf]);
-    }
-    axios
-      .post(`${defaultUrl}api/post/gallery-img-upload`, formdata)
-      .then((r) => {
-        if (r.data.success) {
-          toast.success(r.data.msg);
-          galleryImages();
-          setGalleryShow(false);
-        } else {
-          toast.error(r.data.msg);
-        }
-      })
-      .catch((e) => {
-        toast.error(e.response.data.msg);
-      });
-  };
+  // const galleryImageUpload = () => {
+  //   const formdata = new FormData();
+  //   for (let zf = 0; zf < files.length; zf++) {
+  //     formdata.append("image", files[zf]);
+  //   }
+  //   axios
+  //     .post(`${defaultUrl}api/post/gallery-img-upload`, formdata)
+  //     .then((r) => {
+  //       if (r.data.success) {
+  //         toast.success(r.data.msg);
+  //         galleryImages();
+  //         setGalleryShow(false);
+  //       } else {
+  //         toast.error(r.data.msg);
+  //       }
+  //     })
+  //     .catch((e) => {
+  //       toast.error(e.response.data.msg);
+  //     });
+  // };
 
-  const galleryImages = () => {
-    axios
-      .get(`${defaultUrl}api/post/gallery`)
-      .then((r) => {
-        if (r.data?.success) {
-          setGalleryDatas(r.data?.data);
-        } else {
-          toast.error(r.data?.msg);
-        }
-      })
-      .catch((e) => {
-        toast.error(e.response?.data?.msg);
-      });
-  };
+  // const galleryImages = () => {
+  //   axios
+  //     .get(`${defaultUrl}api/post/gallery`)
+  //     .then((r) => {
+  //       if (r.data?.success) {
+  //         setGalleryDatas(r.data?.data);
+  //       } else {
+  //         toast.error(r.data?.msg);
+  //       }
+  //     })
+  //     .catch((e) => {
+  //       toast.error(e.response?.data?.msg);
+  //     });
+  // };
 
-  const handleSelectionImage = (v) => {
-    if (selectedGalleryImageData.includes(v)) {
-      setSelectedGalleryImageData(
-        selectedGalleryImageData.filter((k) => k !== v)
-      );
-    } else {
-      setSelectedGalleryImageData(selectedGalleryImageData.concat(v));
-    }
-  };
+  // const handleSelectionImage = (v) => {
+  //   if (selectedGalleryImageData.includes(v)) {
+  //     setSelectedGalleryImageData(
+  //       selectedGalleryImageData.filter((k) => k !== v)
+  //     );
+  //   } else {
+  //     setSelectedGalleryImageData(selectedGalleryImageData.concat(v));
+  //   }
+  // };
 
-  const fileSelectedHandler = (e) => setFiles(e.target.files);
+  // const fileSelectedHandler = (e) => setFiles(e.target.files);
 
-  const handleUFE = () => {
-    let dataBuffer = "";
-    for (let data = 0; data < selectedGalleryImageData.length; data++) {
-      dataBuffer += `<figure class="image"><img src="${selectedGalleryImageData[data]}"></figure>`;
-    }
-    setContent(content + dataBuffer);
-    setSelectedGalleryImageData([]);
-  };
+  // const handleUFE = () => {
+  //   let dataBuffer = "";
+  //   for (let data = 0; data < selectedGalleryImageData.length; data++) {
+  //     dataBuffer += `<figure class="image"><img src="${selectedGalleryImageData[data]}"></figure>`;
+  //   }
+  //   setContent(content + dataBuffer);
+  //   setSelectedGalleryImageData([]);
+  // };
 
   const handleCategorySelection = (event, value, subcates) => {
     if (subcates) {
       let newarry = [...selectedSubCategory];
-      if (selectedSubCategory.some((item) => item.p == value.parentCategory)) {
-        newarry.filter((items) => items.p !== value.parentCategory);
-        newarry.concat({ p: value.parentCategory, s: value._id });
+      if (
+        selectedSubCategory.some(
+          (item) => item.parent_category == value.parentCategory
+        )
+      ) {
+        newarry.filter(
+          (items) => items.parent_category !== value.parentCategory
+        );
+        newarry.concat({
+          parent_category: value.parentCategory,
+          sub_category: value._id,
+        });
         setSelectedSubCategory(newarry);
       } else {
         if (event.target.checked) {
           setSelectedSubCategory(
             selectedSubCategory.concat({
-              p: value.parentCategory,
-              s: value._id,
+              parent_category: value.parentCategory,
+              sub_category: value._id,
             })
           );
         }
@@ -262,8 +265,8 @@ export default function PostUploading() {
         let newarry = [...selectedSubCategory];
         setSelectedCategory(selectedCategory.filter((k) => k !== value._id));
         for (let i = 0; i < selectedSubCategory.length; i++) {
-          if (selectedSubCategory[i].p == value._id) {
-            newarry.filter((i) => i.p !== value._id);
+          if (selectedSubCategory[i].parent_category == value._id) {
+            newarry.filter((i) => i.parent_category !== value._id);
           }
         }
         setSelectedSubCategory(newarry);
@@ -282,7 +285,8 @@ export default function PostUploading() {
         handleSave={handleSave}
       />
       <Header />
-      <MediaGallery
+
+      {/* <MediaGallery
         heading={"Media Gallery"}
         show={galleryShow}
         body={
@@ -351,12 +355,13 @@ export default function PostUploading() {
           </Tabs>
         }
         handleClose={() => setGalleryShow(false)}
-      />
+      /> */}
+
       <Container fluid>
         <Row className="MainSectionRow">
           <Col xl={8} lg={6} md={12} xs={12}>
             <div className="EditorWrraper">
-              <div>
+              <div className="mb-5">
                 <h3>
                   Add Content
                   <Button
@@ -368,7 +373,8 @@ export default function PostUploading() {
                   </Button>
                 </h3>
               </div>
-              <div>
+
+              {/* <div>
                 <Button
                   onClick={() => setGalleryShow(true)}
                   variant="dark"
@@ -376,7 +382,8 @@ export default function PostUploading() {
                 >
                   <FcGallery /> Media Gallery
                 </Button>
-              </div>
+              </div> */}
+
               <Row className="EditorSpace p-0">
                 <Col xl={6} className="EditorSize">
                   <Tabs id="controlled-tab-example" className="mb-3">
@@ -611,19 +618,16 @@ export default function PostUploading() {
 
               <div className="mt-4">
                 <Form.Label>
-                  <strong>URL</strong>
+                  <strong>Slug URL</strong>
                 </Form.Label>
-                <InputGroup className="mb-3">
-                  <InputGroup.Text id="basic-addon3">
-                    https://xyz.com/
-                  </InputGroup.Text>
-                  <Form.Control
-                    id="basic-url"
-                    aria-describedby="basic-addon3"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                  />
-                </InputGroup>
+
+                <Form.Control
+                  placeholder="My-New-post"
+                  id="basic-url"
+                  aria-describedby="basic-addon3"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
               </div>
             </div>
           </Col>
