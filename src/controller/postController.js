@@ -75,6 +75,7 @@ exports.uploadPost = catchAsyncError(async (req, res) => {
 
 exports.updatePost = catchAsyncError(async (req, res) => {
   const {
+    parentid,
     title,
     summary,
     category,

@@ -111,7 +111,6 @@ export default function PostUploading() {
   formdata.append("isApproved", false);
 
   const postUpload = () => {
-    // title , content , paid status , home page pin ,featured img
     if (ffile == null) {
       toast.error("Featured image is required !");
     } else if (mainTitle == "") {
@@ -173,30 +172,31 @@ export default function PostUploading() {
           (item) => item.parent_category == value.parentCategory
         )
       ) {
-        newarry.filter(
-          (items) => items.parent_category !== value.parentCategory
+        let updating = newarry.filter(
+          (i) => i.parent_category !== value.parentCategory
         );
-        newarry.concat({
+
+        updating.push({
           parent_category: value.parentCategory,
           sub_category: value._id,
         });
-        setSelectedSubCategory(newarry);
+        setSelectedSubCategory(updating);
       } else {
+        let pushingArray = [...selectedSubCategory];
         if (event.target.checked) {
-          setSelectedSubCategory(
-            selectedSubCategory.concat({
-              parent_category: value.parentCategory,
-              sub_category: value._id,
-            })
-          );
+          pushingArray.push({
+            parent_category: value.parentCategory,
+            sub_category: value._id,
+          });
+          setSelectedSubCategory(pushingArray);
         }
       }
     } else {
-      setSelectedSubCategory([]);
       if (event.target.checked) {
         setSelectedCategory(selectedCategory.concat(value._id));
       } else {
         let newarry = [...selectedSubCategory];
+
         setSelectedCategory(selectedCategory.filter((k) => k !== value._id));
         for (let i = 0; i < selectedSubCategory.length; i++) {
           if (selectedSubCategory[i].parent_category == value._id) {
