@@ -433,33 +433,7 @@ export default function PostUploading() {
               <div>
                 <h3>Add New Post</h3>
               </div>
-              <div className="d-flex">
-                <div className="mt-4">
-                  <Form.Label>
-                    <strong>Publish / Draft</strong>
-                  </Form.Label>
-                  <Form.Check
-                    onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
-                    checked={publish}
-                    type="switch"
-                    id="custom-switch"
-                    label="Publish"
-                  />
-                </div>
 
-                <div className="mt-4">
-                  <Form.Label>
-                    <strong>Paid / Not paid</strong>
-                  </Form.Label>
-                  <Form.Check
-                    onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
-                    checked={publish}
-                    type="switch"
-                    id="custom-switch"
-                    label="Paid"
-                  />
-                </div>
-              </div>
               <div className="mt-4">
                 <Form.Label>
                   <strong>Title</strong>
@@ -672,6 +646,56 @@ export default function PostUploading() {
                   aria-describedby="basic-addon3"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Web URL</strong>
+                </Form.Label>
+
+                <Form.Control
+                  placeholder="My-New-post"
+                  id="basic-url"
+                  aria-describedby="basic-addon3"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Publish / Draft</strong>
+                </Form.Label>
+                <Form.Check
+                  onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
+                  checked={publish}
+                  type="switch"
+                  id="custom-switch"
+                  label="Publish"
+                />
+              </div>
+
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Paid / Not paid</strong>
+                </Form.Label>
+                <Form.Check
+                  onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
+                  checked={publish}
+                  type="switch"
+                  id="custom-switch"
+                  label="Paid"
+                />
+              </div>
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Pin to Home page</strong>
+                </Form.Label>
+                <Form.Check
+                  onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
+                  checked={publish}
+                  type="switch"
+                  id="custom-switch"
+                  label="Pin to Home page"
                 />
               </div>
             </div>
