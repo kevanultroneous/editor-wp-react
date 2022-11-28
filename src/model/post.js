@@ -1,68 +1,109 @@
 const mongoose = require("mongoose");
 
-// status 0 draft
-// status 1 publish
-// parent 0 press release
-// parent 1 guest post
-
-const schema = new mongoose.Schema({
+const schema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        default: 'Title'
+      type: String,
+      default: "Title",
     },
     fimg: {
-        type: String,
-        default: 'img'
+      type: String,
+      default: "img",
     },
-    category: {
-        type: Array,
+    featuredImage: {
+      type: mongoose.Types.ObjectId,
+      ref: "gallery",
     },
-    subcategory: {
-        type: Array,
-    },
-    date: {
-        type: Date,
-        default: new Date()
+    category: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
+    subCategory: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
+    content: {
+      type: String,
+      required: true,
+      default: "<strong>Some Content is nice !</strong>",
     },
     author: {
-        type: String,
-        default: 'Ultroneous'
+      type: String,
+      default: "Ultroneous",
     },
-    content: {
-        type: String,
-        default: '<strong>Some Content is nice !</strong>'
+    companyName: {
+      type: String,
+      default: "Ultroneous Technologies",
     },
     stitle: {
-        type: String,
-        default: 'social title'
+      type: String,
+      default: "social title",
     },
     sdesc: {
-        type: String,
-        default: 'description'
+      type: String,
+      default: "description",
     },
-    url: {
-        type: String,
-        default: 'www.ultroneous.com'
+    seoKeywords: {
+      type: String,
+      default: "keywords",
+    },
+    backlinkUrl: {
+      type: String,
+      default: "www.ultroneous.com",
     },
     status: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
-    posttype: {
-        type: Number,
-        default: 0
+    draftStatus: {
+      type: String,
+      default: "draft",
+      enum: ["draft", "published"],
+    },
+    postType: {
+      type: String,
+      default: "press",
+      enum: ["blog", "press"],
+    },
+    releaseDate: {
+      type: Date,
+      default: new Date(),
+    },
+    submittedDate: {
+      type: Date,
+      default: new Date(),
+    },
+    paidStatus: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    plan: {
+      type: mongoose.Types.ObjectId,
+      ref: "Plan",
+    },
+    totalPaidAmount: {
+      type: String,
+      default: 0,
+      ref: "Plan",
+    },
+    homePageStatus: {
+      type: Boolean,
+      required: false,
+    },
+    isApproved: {
+      type: Boolean,
+      requrired: false,
     },
     isActive: {
-        type: Boolean,
-        default: true
-    }
-}, { timestamps: true })
-
-const EPost = mongoose.model("posts", schema)
-module.exports = EPost
-
-
-
-
-
-
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);

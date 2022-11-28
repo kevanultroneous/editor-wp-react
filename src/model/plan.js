@@ -2,19 +2,17 @@ const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema(
   {
-    title: {
+    planName: {
       type: String,
       required: true,
       unique: true,
     },
-    parentCategory: {
-      type: mongoose.Types.ObjectId,
-      ref: "Category",
-    },
-    type: {
+    planDescription: {
       type: String,
-      default: 0,
-      enum: ["blog", "press"],
+    },
+    planPrice: {
+      type: Number,
+      required: true,
     },
     isActive: {
       type: Boolean,
@@ -24,5 +22,5 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Category = mongoose.model("Category", schema);
-module.exports = Category;
+const Plan = mongoose.model("Plan", schema);
+module.exports = Plan;
