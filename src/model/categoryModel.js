@@ -9,7 +9,7 @@ const schema = new mongoose.Schema(
     },
     parentCategory: {
       type: mongoose.Types.ObjectId,
-      ref: "categories",
+      ref: "Category",
     },
     postType: {
       type: String,
@@ -24,5 +24,5 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Category = mongoose.model("categories", schema)
-module.exports = Category
+const Category = mongoose.model("Category", schema);
+module.exports = Category;

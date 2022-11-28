@@ -10,21 +10,26 @@ const schema = new mongoose.Schema(
     summary: {
       type: String,
     },
+    featuredImage: {
+      type: String,
+    },
     category: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "categories",
+        ref: "Category",
       },
     ],
-    subcategory: Array,
+    subCategory: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
     content: {
       type: String,
       required: true,
       default:
         "<h2>Title</h2><p><strong>Write here !. </strong> your content is important !.</p>",
-    },
-    featuredImage: {
-      type: String,
     },
     author: {
       type: String,
@@ -32,6 +37,7 @@ const schema = new mongoose.Schema(
     },
     companyName: {
       type: String,
+      default: "Ultroneous Technologies",
     },
     seoTitle: {
       type: String,
@@ -41,7 +47,11 @@ const schema = new mongoose.Schema(
       type: String,
       default: "description",
     },
-    webUrl: {
+    seoKeywords: {
+      type: String,
+      default: "keywords",
+    },
+    backlinkUrl: {
       type: String,
       default: "www.ultroneous.com",
     },
@@ -50,8 +60,9 @@ const schema = new mongoose.Schema(
       unique: true,
     },
     draftStatus: {
-      type: Boolean,
-      default: 0,
+      type: String,
+      default: "draft",
+      enum: ["draft", "published"],
     },
     postType: {
       type: String,
@@ -62,26 +73,36 @@ const schema = new mongoose.Schema(
       type: Date,
       default: new Date(),
     },
-    submitDate: {
+    submittedDate: {
       type: Date,
       default: new Date(),
     },
     // paidStatus: {
-    //   type: mongoose.Types.ObjectId,
-    //   ref: "contentplan",
+    //   type: Boolean,
     //   required: true,
+    //   default: false,
     // },
+    plan: {
+      type: mongoose.Types.ObjectId,
+      ref: "Plan",
+    },
+    totalPaidAmount: {
+      type: String,
+      default: 0,
+      ref: "Plan",
+    },
     homePageStatus: {
       type: Boolean,
-      required: true,
+      required: false,
     },
     isApproved: {
       type: Boolean,
+      requrired: false,
     },
     isActive: {
       type: Boolean,
       required: true,
-      default: true,
+      default: false,
     },
   },
   { timestamps: true }

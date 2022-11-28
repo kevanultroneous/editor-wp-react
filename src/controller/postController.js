@@ -1,16 +1,20 @@
 const sharp = require("sharp");
-const Post = require("../model/post");
-const catchAsyncError = require("../utils/catchAsyncError");
-const { sendResponse, upload } = require("../utils/commonFunctions");
 let ObjectId = require("mongoose").Types.ObjectId;
 
+const catchAsyncError = require("../utils/catchAsyncError");
+const { sendResponse, upload } = require("../utils/commonFunctions");
+
+const Post = require("../model/postModel");
+const { errorMessages } = require("../utils/messages");
+const { default: mongoose } = require("mongoose");
+
+// add in common functions => check kyc
 exports.uploadImagesForFeatured = upload.single("image");
 
 exports.resizePhotoFimg = (req, res, next) => {
   if (req.file) {
-    let newfile = `public/other/featured/${
-      new Date() + req.file.originalname
-    }.jpeg`;
+    let newfile = `public/featured/${new Date() + req.file.originalname}.jpeg`;
+
     sharp(req.file.buffer).jpeg({ quality: 100 }).toFile(newfile);
     req.sendfile = newfile.replace("public/", "");
     next();
@@ -19,18 +23,19 @@ exports.resizePhotoFimg = (req, res, next) => {
   }
 };
 
-exports.uploadPost = catchAsyncError(async (req, res) => {
+exports.addPost = catchAsyncError(async (req, res) => {
   const {
     title,
     summary,
     category,
-    subcategory,
+    subCategory,
     content,
     author,
     companyName,
     seoTitle,
     seoDescription,
-    webUrl,
+    seoKeywords,
+    backlinkUrl,
     slugUrl,
     draftStatus,
     postType,
@@ -41,36 +46,49 @@ exports.uploadPost = catchAsyncError(async (req, res) => {
     isApproved,
   } = req.body;
 
-  if (
-    await Post.create({
-      title,
-      featuredImage: req.sendfile,
-      summary,
-      category,
-      subcategory,
-      content,
-      author,
-      companyName,
-      seoTitle,
-      seoDescription,
-      webUrl,
-      slugUrl,
-      draftStatus,
-      postType,
-      releaseDate,
-      submitDate,
-      // paidStatus,
-      homePageStatus,
-      isApproved,
-    })
-  ) {
-    sendResponse(res, 200, {
-      msg: draftStatus == 1 ? "Post uploaded !" : "Post drafted !",
-      success: true,
-    });
-  } else {
-    sendResponse(res, 500, { msg: "Post not uploaded !", success: false });
+  let newPost = {
+    title: title,
+    featuredImage: req.sendfile,
+    summary,
+    category,
+    subCategory,
+    content,
+    author,
+    companyName,
+    seoTitle,
+    seoDescription,
+    seoKeywords,
+    backlinkUrl,
+    slugUrl,
+    draftStatus,
+    postType,
+    releaseDate,
+    // paidStatus,
+    homePageStatus,
+    isApproved,
+  };
+
+  if (subCategory) {
+    newPost.subCategory = subCategory.map((subCate) => subCate.subCategory);
   }
+
+  let post = await Post.create(newPost);
+
+  if (post) {
+    return sendResponse(res, 200, {
+      msg:
+        draftStatus !== "draft"
+          ? errorMessages.post.postPublished
+          : errorMessages.post.postDraft,
+      success: true,
+      data: subCategory,
+    });
+  }
+
+  return sendResponse(res, 500, {
+    msg: errorMessages.post.uploadError,
+    success: false,
+  });
 });
 
 exports.updatePost = catchAsyncError(async (req, res) => {
@@ -79,126 +97,120 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     title,
     summary,
     category,
-    subcategory,
+    subCategory,
     content,
     author,
     companyName,
-    seoTitle,
+
     seoDescription,
-    webUrl,
-    slugUrl,
+    seoKeywords,
+    backlinkUrl,
+
     draftStatus,
     postType,
     releaseDate,
-    submitDate,
+
     paidStatus,
     homePageStatus,
     isApproved,
   } = req.body;
 
   if (!ObjectId.isValid(parentid)) {
-    sendResponse(res, 500, { msg: "parent id is not valid !", success: false });
+    sendResponse(res, 500, {
+      msg: errorMessages.post.inValidParentID,
+      success: false,
+    });
   }
-  if (
-    await Post.findByIdAndUpdate(
-      parentid,
-      req.sendfile
-        ? {
-            title,
-            featuredImage: req.sendfile,
-            summary,
-            category,
-            subcategory,
-            content,
-            author,
-            companyName,
-            seoTitle,
-            seoDescription,
-            webUrl,
-            slugUrl,
-            draftStatus,
-            postType,
-            releaseDate,
-            submitDate,
-            paidStatus,
-            homePageStatus,
-            isApproved,
-          }
-        : {
-            title,
-            summary,
-            category,
-            subcategory,
-            content,
-            author,
-            companyName,
-            seoTitle,
-            seoDescription,
-            webUrl,
-            slugUrl,
-            draftStatus,
-            postType,
-            releaseDate,
-            submitDate,
-            paidStatus,
-            homePageStatus,
-            isApproved,
-          }
-    )
-  ) {
+
+  const postTobeupdated = {
+    summary,
+    category,
+    subCategory,
+    content,
+    author,
+    companyName,
+
+    seoDescription,
+    seoKeywords,
+
+    backlinkUrl,
+
+    draftStatus,
+    postType,
+    releaseDate,
+
+    paidStatus,
+    homePageStatus,
+    isApproved,
+  };
+
+  if (req.sendfile) postTobeupdated.featuredImage = req.sendfile;
+
+  const updatedPost = await Post.findByIdAndUpdate(parentid, postTobeupdated);
+
+  if (updatedPost) {
     sendResponse(res, 200, {
-      msg: "Post updated !",
+      msg: errorMessages.post.postUpdated,
       success: true,
+      data: updatedPost,
     });
   } else {
-    sendResponse(res, 500, { msg: "Post not updated !", success: false });
-  }
-});
-
-exports.getAllpost = catchAsyncError(async (req, res) => {
-  const allpost = await Post.find({ isActive: true })
-    .sort({ createdAt: -1 })
-    .lean();
-  if (allpost) {
-    if (allpost.length <= 0) {
-      sendResponse(res, 200, { success: true, data: null });
-    } else {
-      sendResponse(res, 200, { success: true, data: allpost });
-    }
-  } else {
-    sendResponse(res, 500, { success: false, data: "Internal server error !" });
+    sendResponse(res, 500, {
+      msg: errorMessages.post.postUpdatedError,
+      success: false,
+    });
   }
 });
 
 exports.deletePost = catchAsyncError(async (req, res) => {
   const { postid } = req.body;
+
   if (!ObjectId.isValid(postid)) {
-    sendResponse(res, 500, { msg: "id is not valid !", success: false });
-  } else {
-    if (await Post.findByIdAndUpdate(postid, { isActive: false })) {
-      sendResponse(res, 200, {
-        msg: "Post deleted successfully !",
-        success: true,
-      });
-    } else {
-      sendResponse(res, 500, { msg: "Post not deleted !", success: false });
-    }
+    return sendResponse(res, 500, { msg: "id is not valid !", success: false });
   }
+
+  const softDeletePost = await Post.findByIdAndUpdate(postid, {
+    isActive: false,
+  });
+
+  // make it same as add post
+  if (softDeletePost) {
+    sendResponse(res, 200, {
+      msg: errorMessages.post.postDeleted,
+      success: true,
+      data: softDeletePost,
+    });
+  }
+  sendResponse(res, 500, {
+    msg: errorMessages.post.postDeleteError,
+    success: false,
+  });
 });
 
-exports.getSinglePost = catchAsyncError(async (req, res) => {
-  const postid = req.params["postid"];
-  try {
-    const singlepost = await Post.findOne({
-      _id: postid,
-      isActive: true,
-    }).lean();
-    if (!singlepost) {
-      sendResponse(res, 200, { success: true, data: null });
-    } else {
-      sendResponse(res, 200, { success: true, data: singlepost });
-    }
-  } catch (e) {
-    sendResponse(res, 500, { success: false, data: null });
+exports.getAllpost = catchAsyncError(async (req, res) => {
+  const { postid } = req.body;
+
+  let getFullpost;
+
+  if (!postid) {
+    getFullpost = await Post.find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .lean();
+  } else {
+    if (postid && !mongoose.isValidObjectId(postid))
+      return sendResponse(res, 500, {
+        success: false,
+        msg: errorMessages.post.invalidPostID,
+      });
+
+    getFullpost = await Post.findOne({ _id: postid, isActive: true });
   }
+
+  if (getFullpost)
+    return sendResponse(res, 200, { success: true, data: getFullpost });
+
+  return sendResponse(res, 500, {
+    success: false,
+    data: errorMessages.other.InternServErr,
+  });
 });
