@@ -1,17 +1,11 @@
 const mongoose = require("mongoose");
 
-const schema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-    },
-    path: {
-      type: String,
-      default: "gallery/def.jpg",
-    },
-  },
-  { timestamps: true }
-);
+const schema = new mongoose.Schema({
+    image: {
+        type: String,
+        default: 'gallery/def.jpg'
+    }
+}, { timestamps: true })
 
-const Gallery = mongoose.model("Gallery", schema);
+const Gallery = mongoose.model("gallery", schema)
 module.exports = Gallery;

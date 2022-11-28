@@ -2,17 +2,14 @@ const express = require("express");
 
 const postController = require("../controller/postController");
 const galleryController = require("../controller/galleryController");
-
 const postRouter = express.Router();
-
-// a single middleware that runs on all the routes below it. add that middleware above all the links that require jwt. that middleware is used for taking the auth bearer token
 
 //create post
 postRouter.post(
   "/upload-post",
   postController.uploadImagesForFeatured,
   postController.resizePhotoFimg,
-  postController.addPost
+  postController.uploadPost
 );
 
 //update post

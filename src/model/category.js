@@ -9,11 +9,11 @@ const schema = new mongoose.Schema(
     },
     parentCategory: {
       type: mongoose.Types.ObjectId,
-      ref: "Category",
+      ref: "categories",
     },
-    type: {
+    postType: {
       type: String,
-      default: 0,
+      default: "press",
       enum: ["blog", "press"],
     },
     isActive: {
@@ -24,5 +24,5 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Category = mongoose.model("Category", schema);
-module.exports = Category;
+const Category = mongoose.model("categories", schema)
+module.exports = Category

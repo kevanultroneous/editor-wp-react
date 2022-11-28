@@ -51,7 +51,7 @@ export default function EditPost() {
           setUrl(r.data?.data?.url);
           setPublish(r.data?.data?.status);
           setSelectedCategory(r.data?.data?.category);
-          setSelectedSubCategory(r.data?.data?.subCategory);
+          setSelectedSubCategory(r.data?.data?.subcategory);
         }
       })
       .catch((e) => toast.error(e.response.data.msg));
@@ -74,7 +74,7 @@ export default function EditPost() {
   const [mainTitle, setMainTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState([]);
-  const [subCategory, setSubcategory] = useState([]);
+  const [subcategory, setSubcategory] = useState([]);
   const [seotitle, setSeoTitle] = useState("");
   const [seodescription, setSeoDescription] = useState("");
   const [seometatags, setSeoMetaTags] = useState("");
@@ -127,7 +127,7 @@ export default function EditPost() {
   formdata.append("image", files);
   formdata.append("title", mainTitle);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
-  selectedSubCategory.map((v, i) => formdata.append(`subCategory[${i}]`, v));
+  selectedSubCategory.map((v, i) => formdata.append(`subcategory[${i}]`, v));
   formdata.append("author", author);
   formdata.append("content", content);
   formdata.append("smeta", seometatags);
