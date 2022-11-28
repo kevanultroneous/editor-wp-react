@@ -145,9 +145,8 @@ exports.updatePost = catchAsyncError(async (req, res) => {
   };
 
   if (req.sendfile) postTobeupdated.featuredImage = req.sendfile;
-
+  console.log(subCategory);
   const updatedPost = await Post.findByIdAndUpdate(parentid, postTobeupdated);
-
   if (updatedPost) {
     sendResponse(res, 200, {
       msg: errorMessages.post.postUpdated,

@@ -45,7 +45,7 @@ export default function PostUploading() {
   const [summary, setSummary] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [weburl, setWeburl] = useState("");
-
+  const [seokeywords, setSeokeywords] = useState("");
   //search category
   const [searchCateg, setSearchCateg] = useState([]);
   const [searchText, setSerachText] = useState("");
@@ -92,7 +92,7 @@ export default function PostUploading() {
   formdata.append("summary", summary);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
   selectedSubCategory.map((v, i) =>
-    formdata.append(`subcategory[${i}]`, JSON.stringify(v))
+    formdata.append(`subCategory[${i}]`, JSON.stringify(v))
   );
   formdata.append("content", content);
   formdata.append("image", ffile);
@@ -100,9 +100,10 @@ export default function PostUploading() {
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
   formdata.append("seoDescription", seodescription);
-  formdata.append("webUrl", weburl);
+  formdata.append("seoKeywords", seokeywords);
+  formdata.append("backlinkUrl", weburl);
   formdata.append("slugUrl", url);
-  formdata.append("draftStatus", publish);
+  formdata.append("draftStatus", publish ? "published" : "draft");
   formdata.append("postType", "press");
   formdata.append("releaseDate", new Date(releaseDate));
   formdata.append("submitDate", new Date());
@@ -121,7 +122,7 @@ export default function PostUploading() {
       toast.error("Content required 100 words !");
     } else {
       axios
-        .post(`${defaultUrl}api/post/upload-post`, formdata)
+        .post(`${defaultUrl}api/post/create-post`, formdata)
         .then((r) => {
           if (r.data.success) {
             toast.success(r.data.msg);
@@ -195,15 +196,12 @@ export default function PostUploading() {
       if (event.target.checked) {
         setSelectedCategory(selectedCategory.concat(value._id));
       } else {
-        let newarry = [...selectedSubCategory];
-
-        setSelectedCategory(selectedCategory.filter((k) => k !== value._id));
-        for (let i = 0; i < selectedSubCategory.length; i++) {
-          if (selectedSubCategory[i].parent_category == value._id) {
-            newarry.filter((i) => i.parent_category !== value._id);
-          }
+        setSelectedCategory(selectedCategory.filter((i) => i !== value._id));
+        if (selectedSubCategory.some((i) => i.parent_category == value._id)) {
+          setSelectedSubCategory(
+            selectedSubCategory.filter((i) => i.parent_category !== value._id)
+          );
         }
-        setSelectedSubCategory(newarry);
       }
     }
   };
@@ -405,6 +403,24 @@ export default function PostUploading() {
 
               <div className="mt-4">
                 <Form.Label>
+                  <strong>SEO Keywords</strong>
+                </Form.Label>
+                <FloatingLabel
+                  controlId="floatingTextarea2"
+                  label="SEO Keywords"
+                >
+                  <Form.Control
+                    value={seokeywords}
+                    onChange={(e) => setSeokeywords(e.target.value)}
+                    as="textarea"
+                    placeholder="SEO Keywords"
+                    style={{ height: "100px" }}
+                  />
+                </FloatingLabel>
+              </div>
+
+              <div className="mt-4">
+                <Form.Label>
                   <strong>Release Date</strong>
                 </Form.Label>
                 <Form.Control
@@ -463,8 +479,9 @@ export default function PostUploading() {
                                       name={k._id}
                                       defaultChecked={selectedSubCategory.some(
                                         (item) =>
-                                          item.p == v.parentCategory &&
-                                          item.s == v._id
+                                          item.parent_category ==
+                                            v.parentCategory &&
+                                          item.sub_category == v._id
                                       )}
                                       // checked={}
                                       onChange={(e) => {

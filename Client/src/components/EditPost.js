@@ -47,7 +47,8 @@ export default function EditPost() {
   const [approved, setApproved] = useState(false);
   const [weburl, setWeburl] = useState("");
   const [dummyImg, setDummyImg] = useState("");
-
+  const [selectedSubCategoryC, setSelectedSubCategoryC] = useState([]);
+  const [load, setLoad] = useState(true);
   //search category
   const [searchCateg, setSearchCateg] = useState([]);
   const [searchText, setSerachText] = useState("");
@@ -77,15 +78,19 @@ export default function EditPost() {
           setWeburl(r.data?.data?.webUrl);
           setPublish(r.data?.data?.draftStatus);
           setSelectedCategory(r.data?.data?.category);
-          setSelectedSubCategory(r.data?.data.subcategory);
+          setSelectedSubCategory(r.data?.data?.subCategory);
           setCompany(r.data?.data?.companyName);
           setReleaseDate(r.data?.data?.releaseDate);
           setHomePin(r.data?.data?.homePageStatus);
           setDummyImg(defaultUrl + r.data?.data?.featuredImage);
           setApproved(r.data?.data?.isApproved);
+          setLoad(false);
         }
       })
-      .catch((e) => toast.error(e.response.data.msg));
+      .catch((e) => {
+        toast.error(e.response.data.msg);
+        setLoad(false);
+      });
   };
 
   // category upload
@@ -123,8 +128,8 @@ export default function EditPost() {
   formdata.append("title", mainTitle);
   formdata.append("summary", summary);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
-  selectedSubCategory.map((v, i) =>
-    formdata.append(`subcategory[${i}]`, JSON.stringify(v))
+  selectedSubCategoryC.map((v, i) =>
+    formdata.append(`subCategory[${i}]`, JSON.stringify(v))
   );
   formdata.append("content", content);
   formdata.append("image", ffile);
@@ -144,7 +149,6 @@ export default function EditPost() {
   formdata.append("parentid", postid);
 
   const postUpload = () => {
-    // title , content , paid status , home page pin ,featured img
     if (mainTitle == "") {
       toast.error("Title is required !");
     } else if (selectedCategory.length <= 0) {
@@ -171,19 +175,18 @@ export default function EditPost() {
     }
   };
 
+  const JsonToObject = (arry) => {
+    let newbucket = [];
+    arry.map((v) => newbucket.push(JSON.parse(v)));
+    return newbucket;
+  };
   useEffect(() => {
     searchCategories(searchText);
     fetchParamPost();
-    // setSelectedSubCategory(JsonToObject(selectedSubCategory));
   }, []);
-
-  const JsonToObject = (arry) => {
-    let newbucket;
-    if (arry.length > 0) {
-      arry.map((v) => newbucket.push(JSON.parse(v)));
-    }
-    return newbucket;
-  };
+  useEffect(() => {
+    setSelectedSubCategoryC(JsonToObject(selectedSubCategory));
+  }, [selectedSubCategory]);
 
   const searchCategories = (search) => {
     setLoader(true);
@@ -209,46 +212,45 @@ export default function EditPost() {
   const editUrl = (v) => {
     setUrl(v.split(" ").join("-"));
   };
+  console.log(selectedSubCategoryC);
 
   const handleCategorySelection = (event, value, subcates) => {
     if (subcates) {
-      let newarry = [...selectedSubCategory];
+      let newarry = [...selectedSubCategoryC];
       if (
-        selectedSubCategory.some(
+        selectedSubCategoryC.some(
           (item) => item.parent_category == value.parentCategory
         )
       ) {
-        newarry.filter(
-          (items) => items.parent_category !== value.parentCategory
+        let updating = newarry.filter(
+          (i) => i.parent_category !== value.parentCategory
         );
-        newarry.concat({
+
+        updating.push({
           parent_category: value.parentCategory,
           sub_category: value._id,
         });
-        setSelectedSubCategory(newarry);
+        setSelectedSubCategoryC(updating);
       } else {
+        let pushingArray = [...selectedSubCategoryC];
         if (event.target.checked) {
-          setSelectedSubCategory(
-            selectedSubCategory.concat({
-              parent_category: value.parentCategory,
-              sub_category: value._id,
-            })
-          );
+          pushingArray.push({
+            parent_category: value.parentCategory,
+            sub_category: value._id,
+          });
+          setSelectedSubCategoryC(pushingArray);
         }
       }
     } else {
-      setSelectedSubCategory([]);
       if (event.target.checked) {
         setSelectedCategory(selectedCategory.concat(value._id));
       } else {
-        let newarry = [...selectedSubCategory];
-        setSelectedCategory(selectedCategory.filter((k) => k !== value._id));
-        for (let i = 0; i < selectedSubCategory.length; i++) {
-          if (selectedSubCategory[i].parent_category == value._id) {
-            newarry.filter((i) => i.parent_category !== value._id);
-          }
+        setSelectedCategory(selectedCategory.filter((i) => i !== value._id));
+        if (selectedSubCategoryC.some((i) => i.parent_category == value._id)) {
+          setSelectedSubCategoryC(
+            selectedSubCategoryC.filter((i) => i.parent_category !== value._id)
+          );
         }
-        setSelectedSubCategory(newarry);
       }
     }
   };
@@ -529,10 +531,11 @@ export default function EditPost() {
                                     <input
                                       type="radio"
                                       name={k._id}
-                                      defaultChecked={selectedSubCategory.some(
+                                      defaultChecked={selectedSubCategoryC.some(
                                         (item) =>
-                                          item.p == v.parentCategory &&
-                                          item.s == v._id
+                                          item.parent_category ==
+                                            v.parentCategory &&
+                                          item.sub_category == v._id
                                       )}
                                       // checked={}
                                       onChange={(e) => {
