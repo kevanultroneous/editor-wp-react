@@ -18,7 +18,27 @@ exports.resizePhotoFimg = (req, res, next) => {
     next();
   }
 };
-
+// {
+//   title
+//   summary
+//   category
+//   subcategory
+//   content
+//   featuredImage
+//   author
+//   companyName
+//   seoTitle
+//   seoDescription
+//   webUrl
+//   slugUrl
+//   draftStatus
+//   postType
+//   releaseDate
+//   submitDate:
+//   paidStatus:
+//   homePageStatus:
+//   isApproved
+// },
 exports.uploadPost = catchAsyncError(async (req, res) => {
   const {
     title,

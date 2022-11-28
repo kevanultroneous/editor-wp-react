@@ -10,6 +10,7 @@ import {
   Spinner,
   Badge,
   Image,
+  Alert,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -28,33 +29,18 @@ export default function PostUploading() {
   const { type } = useParams();
 
   const [selectedCategory, setSelectedCategory] = useState([]);
-
   const [selectedSubCategory, setSelectedSubCategory] = useState([]);
-
-  //gallery
-  const [galleryShow, setGalleryShow] = useState(false);
-  const [selectedImage, setSelectedImage] = useState([]);
-  const [galleryDatas, setGalleryDatas] = useState([]);
-  const [selectedGalleryImageData, setSelectedGalleryImageData] = useState([]);
-  const [files, setFiles] = useState([]);
   const [ffile, setFFile] = useState(null);
-
-  const [categoryData, setCategoryData] = useState([]);
   const [mainTitle, setMainTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [category, setCategory] = useState([]);
-  const [subcategory, setSubcategory] = useState([]);
   const [seotitle, setSeoTitle] = useState("");
   const [seodescription, setSeoDescription] = useState("");
   const [seometatags, setSeoMetaTags] = useState("");
   const [url, setUrl] = useState(mainTitle);
   const [publish, setPublish] = useState(0);
   const [content, setContent] = useState("");
-  const [htmlEditor, setHtmlEditor] = useState("");
-
-  useEffect(() => {
-    setHtmlEditor(content);
-  }, [content]);
+  const [homePin, setHomePin] = useState(false);
+  const [paid, setPaid] = useState(false);
 
   //search category
   const [searchCateg, setSearchCateg] = useState([]);
@@ -85,17 +71,18 @@ export default function PostUploading() {
   };
 
   const navigate = useNavigate();
-  // status 0 draft
-  // status 1 publish
-  // parent 0 press release
-  // parent 1 guest post
 
   useEffect(() => {
     if (!(type === "press-release" || type === "guest-post")) {
       navigate("/");
     }
     searchCategories(searchText);
-    // galleryImages();
+    // window.addEventListener("keydown", (e) => {
+    //   if (e.key === "k" && e.ctrlKey === true) {
+    //     alert("do you want to save ?");
+
+    //   }
+    // });
   }, []);
 
   const cleanArray = (ary) => {
@@ -123,12 +110,15 @@ export default function PostUploading() {
   formdata.append("parent", type === "press-release" ? 0 : 1);
 
   const postUpload = () => {
+    // title , content , paid status , home page pin ,featured img
     if (ffile == null) {
-      alert("Featured image i s required !");
+      toast.error("Featured image is required !");
     } else if (mainTitle == "") {
-      alert("Title is required !");
+      toast.error("Title is required !");
     } else if (selectedCategory.length <= 0) {
-      alert("Please select one or more category !");
+      toast.error("Please select one or more category !");
+    } else if (content.length < 100) {
+      toast.error("Content required 100 words !");
     } else {
       axios
         .post(`${defaultUrl}api/post/upload-post`, formdata)
@@ -173,63 +163,6 @@ export default function PostUploading() {
   const editUrl = (v) => {
     setUrl(v.split(" ").join("-"));
   };
-
-  // const galleryImageUpload = () => {
-  //   const formdata = new FormData();
-  //   for (let zf = 0; zf < files.length; zf++) {
-  //     formdata.append("image", files[zf]);
-  //   }
-  //   axios
-  //     .post(`${defaultUrl}api/post/gallery-img-upload`, formdata)
-  //     .then((r) => {
-  //       if (r.data.success) {
-  //         toast.success(r.data.msg);
-  //         galleryImages();
-  //         setGalleryShow(false);
-  //       } else {
-  //         toast.error(r.data.msg);
-  //       }
-  //     })
-  //     .catch((e) => {
-  //       toast.error(e.response.data.msg);
-  //     });
-  // };
-
-  // const galleryImages = () => {
-  //   axios
-  //     .get(`${defaultUrl}api/post/gallery`)
-  //     .then((r) => {
-  //       if (r.data?.success) {
-  //         setGalleryDatas(r.data?.data);
-  //       } else {
-  //         toast.error(r.data?.msg);
-  //       }
-  //     })
-  //     .catch((e) => {
-  //       toast.error(e.response?.data?.msg);
-  //     });
-  // };
-
-  // const handleSelectionImage = (v) => {
-  //   if (selectedGalleryImageData.includes(v)) {
-  //     setSelectedGalleryImageData(
-  //       selectedGalleryImageData.filter((k) => k !== v)
-  //     );
-  //   } else {
-  //     setSelectedGalleryImageData(selectedGalleryImageData.concat(v));
-  //   }
-  // };
-
-  // const fileSelectedHandler = (e) => setFiles(e.target.files);
-
-  // const handleUFE = () => {
-  //   let dataBuffer = "";
-  //   for (let data = 0; data < selectedGalleryImageData.length; data++) {
-  //     dataBuffer += `<figure class="image"><img src="${selectedGalleryImageData[data]}"></figure>`;
-  //   }
-  //   setContent(content + dataBuffer);
-  //   setSelectedGalleryImageData([]);
-  // };
 
   const handleCategorySelection = (event, value, subcates) => {
     if (subcates) {
@@ -277,6 +210,7 @@ export default function PostUploading() {
   return (
     <div>
       <Toaster position="top-right" reverseOrder={false} />
+
       <ModelUpload
         catname={catname}
         changeCatname={(e) => setCatname(e.target.value)}
@@ -285,77 +219,6 @@ export default function PostUploading() {
         handleSave={handleSave}
       />
       <Header />
-
-      {/* <MediaGallery
-        heading={"Media Gallery"}
-        show={galleryShow}
-        body={
-          <Tabs className="mb-3">
-            <Tab eventKey="g-upd" title="Upload Image">
-              <Row className="RowMg">
-                <div>
-                  <Form.Group controlId="formFileSm" className="mb-1">
-                    <input
-                      type="file"
-                      onChange={fileSelectedHandler}
-                      multiple
-                    />
-                  </Form.Group>
-                </div>
-                <div>
-                  <Button onClick={galleryImageUpload}>Upload Now</Button>
-                </div>
-              </Row>
-            </Tab>
-            <Tab eventKey="g-all" title="Gallery">
-              <Row>
-                <Col xl={12}>
-                  {selectedGalleryImageData.length > 0 && (
-                    <Button
-                      variant="success"
-                      size="sm"
-                      className="mb-2"
-                      onClick={handleUFE}
-                    >
-                      Use for editor
-                    </Button>
-                  )}
-                </Col>
-              </Row>
-              <Row className="RowMg">
-                {galleryDatas == null ? (
-                  <h1>No Images</h1>
-                ) : (
-                  galleryDatas?.map((v, i) => (
-                    <Col xl={3}>
-                      <div
-                        className={`MediaGallery  ${
-                          selectedGalleryImageData.includes(
-                            `${defaultUrl}` + v.img.replace("public/", "")
-                          )
-                            ? "SelectedImg"
-                            : ""
-                        }`}
-                        onClick={() =>
-                          handleSelectionImage(
-                            `${defaultUrl}` + v.img.replace("public/", "")
-                          )
-                        }
-                      >
-                        <Image
-                          src={`${defaultUrl}` + v.img.replace("public/", "")}
-                          fluid
-                        />
-                      </div>
-                    </Col>
-                  ))
-                )}
-              </Row>
-            </Tab>
-          </Tabs>
-        }
-        handleClose={() => setGalleryShow(false)}
-      /> */}
 
       <Container fluid>
         <Row className="MainSectionRow">
@@ -373,16 +236,6 @@ export default function PostUploading() {
                   </Button>
                 </h3>
               </div>
-
-              {/* <div>
-                <Button
-                  onClick={() => setGalleryShow(true)}
-                  variant="dark"
-                  className="text-white mt-5 mb-5"
-                >
-                  <FcGallery /> Media Gallery
-                </Button>
-              </div> */}
 
               <Row className="EditorSpace p-0">
                 <Col xl={6} className="EditorSize">
@@ -433,7 +286,35 @@ export default function PostUploading() {
               <div>
                 <h3>Add New Post</h3>
               </div>
-
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Featured Image</strong>
+                </Form.Label>
+                <Form.Control
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    boxShadow: "none",
+                    color: "transparent",
+                    userSelect: "none",
+                  }}
+                  type="file"
+                  onChange={(e) => setFFile(e.target.files[0])}
+                  accept="image/png,image/jpg,image/jpeg,image/svg"
+                />
+                <center className="mt-3">
+                  {ffile != null && (
+                    <>
+                      <Image src={URL.createObjectURL(ffile)} width={100} />
+                      <div>
+                        <Badge bg="danger" onClick={() => setFFile(null)}>
+                          Remove
+                        </Badge>
+                      </div>
+                    </>
+                  )}
+                </center>
+              </div>
               <div className="mt-4">
                 <Form.Label>
                   <strong>Title</strong>
@@ -484,35 +365,6 @@ export default function PostUploading() {
                   />
                 </FloatingLabel>
               </div>
-              <div className="mt-4">
-                <Form.Label>
-                  <strong>Featured Image</strong>
-                </Form.Label>
-                <Form.Control
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    boxShadow: "none",
-                    color: "transparent",
-                    userSelect: "none",
-                  }}
-                  type="file"
-                  onChange={(e) => setFFile(e.target.files[0])}
-                  accept="image/png,image/jpg,image/jpeg,image/svg"
-                />
-                <center className="mt-3">
-                  {ffile != null && (
-                    <>
-                      <Image src={URL.createObjectURL(ffile)} width={100} />
-                      <div>
-                        <Badge bg="danger" onClick={() => setFFile(null)}>
-                          Remove
-                        </Badge>
-                      </div>
-                    </>
-                  )}
-                </center>
-              </div>
 
               <div className="mt-4">
                 <Form.Label>
@@ -552,6 +404,7 @@ export default function PostUploading() {
                   onChange={(e) => alert(e.target.value)}
                   type="date"
                   placeholder="Release Date"
+                  // max={new Date().toLocaleDateString("en-ca")}
                 />
               </div>
               <div className="mt-4">
@@ -679,11 +532,12 @@ export default function PostUploading() {
                   <strong>Paid / Not paid</strong>
                 </Form.Label>
                 <Form.Check
-                  onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
-                  checked={publish}
+                  onChange={(e) => setPaid(e.target.checked)}
+                  checked={paid}
                   type="switch"
                   id="custom-switch"
                   label="Paid"
+                  disabled
                 />
               </div>
               <div className="mt-4">
@@ -691,8 +545,8 @@ export default function PostUploading() {
                   <strong>Pin to Home page</strong>
                 </Form.Label>
                 <Form.Check
-                  onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
-                  checked={publish}
+                  onChange={(e) => setHomePin(e.target.checked)}
+                  checked={homePin}
                   type="switch"
                   id="custom-switch"
                   label="Pin to Home page"

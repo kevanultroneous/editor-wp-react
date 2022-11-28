@@ -25,7 +25,8 @@ const schema = new mongoose.Schema(
     content: {
       type: String,
       required: true,
-      default: "<strong>Some Content is nice !</strong>",
+      default:
+        "<h2>Title</h2><p><strong>Write here !. </strong> your content is important !.</p>",
     },
     featuredImage: {
       type: mongoose.Types.ObjectId,
@@ -82,7 +83,6 @@ const schema = new mongoose.Schema(
     },
     isApproved: {
       type: Boolean,
-      requrired: true,
     },
     isActive: {
       type: Boolean,
@@ -95,3 +95,7 @@ const schema = new mongoose.Schema(
 
 const Post = mongoose.model("posts", schema);
 module.exports = Post;
+
+/*
+
+*/
