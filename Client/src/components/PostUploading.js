@@ -433,17 +433,32 @@ export default function PostUploading() {
               <div>
                 <h3>Add New Post</h3>
               </div>
-              <div className="mt-4">
-                <Form.Label>
-                  <strong>Publish / Draft</strong>
-                </Form.Label>
-                <Form.Check
-                  onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
-                  checked={publish}
-                  type="switch"
-                  id="custom-switch"
-                  label="Publish"
-                />
+              <div className="d-flex">
+                <div className="mt-4">
+                  <Form.Label>
+                    <strong>Publish / Draft</strong>
+                  </Form.Label>
+                  <Form.Check
+                    onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
+                    checked={publish}
+                    type="switch"
+                    id="custom-switch"
+                    label="Publish"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <Form.Label>
+                    <strong>Paid / Not paid</strong>
+                  </Form.Label>
+                  <Form.Check
+                    onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
+                    checked={publish}
+                    type="switch"
+                    id="custom-switch"
+                    label="Paid"
+                  />
+                </div>
               </div>
               <div className="mt-4">
                 <Form.Label>
@@ -469,6 +484,31 @@ export default function PostUploading() {
                   type="text"
                   placeholder="Enter Author Name"
                 />
+              </div>
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Company Name</strong>
+                </Form.Label>
+                <Form.Control
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  type="text"
+                  placeholder="Enter Company Name"
+                />
+              </div>
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Summary</strong>
+                </Form.Label>
+                <FloatingLabel controlId="floatingTextarea2" label="Summary">
+                  <Form.Control
+                    value={seodescription}
+                    onChange={(e) => setSeoDescription(e.target.value)}
+                    as="textarea"
+                    placeholder="Summary"
+                    style={{ height: "100px" }}
+                  />
+                </FloatingLabel>
               </div>
               <div className="mt-4">
                 <Form.Label>
@@ -498,6 +538,47 @@ export default function PostUploading() {
                     </>
                   )}
                 </center>
+              </div>
+
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>SEO Title</strong>
+                </Form.Label>
+                <Form.Control
+                  value={seotitle}
+                  onChange={(e) => setSeoTitle(e.target.value)}
+                  type="text"
+                  placeholder="Enter Page title here"
+                />
+              </div>
+
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>SEO Description</strong>
+                </Form.Label>
+                <FloatingLabel
+                  controlId="floatingTextarea2"
+                  label="SEO Description"
+                >
+                  <Form.Control
+                    value={seodescription}
+                    onChange={(e) => setSeoDescription(e.target.value)}
+                    as="textarea"
+                    placeholder="SEO Description"
+                    style={{ height: "100px" }}
+                  />
+                </FloatingLabel>
+              </div>
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>Release Date</strong>
+                </Form.Label>
+                <Form.Control
+                  value={seotitle}
+                  onChange={(e) => alert(e.target.value)}
+                  type="date"
+                  placeholder="Release Date"
+                />
               </div>
               <div className="mt-4">
                 <Form.Label>
@@ -539,30 +620,24 @@ export default function PostUploading() {
                             </div>
                             {selectedCategory?.includes(k._id) ? (
                               <div className="TagsWrraper">
-                                {k?.childs?.map(
-                                  (v, i) => (
-                                    <>
-                                      <input
-                                        type="radio"
-                                        name={k._id}
-                                        defaultChecked={selectedSubCategory.some(
-                                          (item) =>
-                                            item.p == v.parentCategory &&
-                                            item.s == v._id
-                                        )}
-                                        // checked={}
-                                        onChange={(e) => {
-                                          handleCategorySelection(e, v, true);
-                                        }}
-                                      />
-                                      {v.title}&nbsp;
-                                    </>
-                                  )
-                                  // <div
-                                  //     key={i}
-                                  //     onClick={(e) => handleCategorySelection(e, v, true, k._id)}
-                                  //     className={`TagsCategory ${selectedSubCategory.includes(v._id) ? 'SelectedCategory' : ''}`}>{v.title}</div>
-                                )}
+                                {k?.childs?.map((v, i) => (
+                                  <>
+                                    <input
+                                      type="radio"
+                                      name={k._id}
+                                      defaultChecked={selectedSubCategory.some(
+                                        (item) =>
+                                          item.p == v.parentCategory &&
+                                          item.s == v._id
+                                      )}
+                                      // checked={}
+                                      onChange={(e) => {
+                                        handleCategorySelection(e, v, true);
+                                      }}
+                                    />
+                                    {v.title}&nbsp;
+                                  </>
+                                ))}
                               </div>
                             ) : null}
                           </>
@@ -586,36 +661,6 @@ export default function PostUploading() {
                   )}
                 </div>
               </div>
-              <div className="mt-4">
-                <Form.Label>
-                  <strong>SEO Title</strong>
-                </Form.Label>
-                <Form.Control
-                  value={seotitle}
-                  onChange={(e) => setSeoTitle(e.target.value)}
-                  type="text"
-                  placeholder="Enter Page title here"
-                />
-              </div>
-
-              <div className="mt-4">
-                <Form.Label>
-                  <strong>SEO Description</strong>
-                </Form.Label>
-                <FloatingLabel
-                  controlId="floatingTextarea2"
-                  label="SEO Description"
-                >
-                  <Form.Control
-                    value={seodescription}
-                    onChange={(e) => setSeoDescription(e.target.value)}
-                    as="textarea"
-                    placeholder="SEO Description"
-                    style={{ height: "100px" }}
-                  />
-                </FloatingLabel>
-              </div>
-
               <div className="mt-4">
                 <Form.Label>
                   <strong>Slug URL</strong>
