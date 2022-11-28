@@ -17,7 +17,9 @@ const schema = new mongoose.Schema({
     category: {
         type: Array,
     },
-
+    subcategory: {
+        type: Array,
+    },
     date: {
         type: Date,
         default: new Date()
@@ -50,9 +52,9 @@ const schema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    isDelete: {
+    isActive: {
         type: Boolean,
-        default: false
+        default: true
     }
 }, { timestamps: true })
 

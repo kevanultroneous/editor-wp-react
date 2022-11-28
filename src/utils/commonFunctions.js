@@ -29,10 +29,10 @@ const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
   const whitelist = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg"];
-  console.log(file)
   if (whitelist.includes(file.mimetype)) {
     cb(null, true);
   } else {
+   
     cb(new AppError(401, "Only jpeg, png, jpg and webp files are allowed"));
   }
 };

@@ -3,11 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^18.0.0",
-    "@ckeditor/ckeditor5-essentials": "^20.0.0",
-    "@ckeditor/ckeditor5-react": "^2.1.0",
-    "@ckeditor/ckeditor5-source-editing": "^35.2.1",
-    "@ckeditor/ckeditor5-upload": "^20.0.0",
+    "@ckeditor/ckeditor5-build-classic": "^35.3.0",
+    "@ckeditor/ckeditor5-react": "^5.0.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",

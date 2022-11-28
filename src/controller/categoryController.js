@@ -28,6 +28,7 @@ exports.uploadCategory = catchAsyncError(async (req, res) => {
 })
 
 exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
+    const {type} = req.params
     const category = await ECategory.find({ isActive: true, parentCategory: null }).sort({ createdAt: -1 }).lean()
     var subcategory
     if (category.length > 0) {
@@ -98,21 +99,21 @@ exports.updateCategory = catchAsyncError(async (req, res) => {
 
 exports.searchCategory = catchAsyncError(async (req, res, next) => {
     const { search } = req.body;
-    const results = await ECategory.find({
-        title: {
+    const category = await ECategory.find({
+        isActive: true, parentCategory: null, title: {
             $regex: search,
             $options: "i",
         },
-        isActive: true
-    }).limit(5).sort({ createdAt: -1 }).lean()
-    if (results) {
-        if (results.length === 0) {
-            sendResponse(res, 200, { success: true, data: null, msg: "data not found !", suggestion: true })
-        } else {
-            sendResponse(res, 200, { success: true, data: results, msg: "data availabel !", suggestion: false })
+    }).sort({ createdAt: -1 }).limit(10).lean()
+    var subcategory
+    if (category.length > 0) {
+        for (let k = 0; k < category.length; k++) {
+            subcategory = await ECategory.find({ parentCategory: category[k]._id, isActive: true }).sort({ createdAt: -1 }).lean()
+            category[k].childs = subcategory
         }
+        sendResponse(res, 200, { msg: "Data available !", success: true, data: category })
     } else {
-        sendResponse(res, 500, { success: false, data: null, msg: "Internal server error !", suggestion: false })
+        sendResponse(res, 200, { msg: "Data not availabel !", success: false, data: null })
     }
 })
 
