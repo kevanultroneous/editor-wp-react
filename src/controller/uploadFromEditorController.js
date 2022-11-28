@@ -3,8 +3,8 @@ const path = require('path');
 const fs = require('fs');
 
 const uploadFromEditorController = catchAsyncError(async (req, res) => {
-    var TempFile = req.files.upload;
-    var TempPathfile = TempFile.path;
+    let TempFile = req.files.upload;
+    let TempPathfile = TempFile.path;
     console.log(__dirname.replace('src/controller', 'other/uploads'))
 
     const targetPathUrl = path.join(__dirname, "./uploads/" + TempFile.name);
