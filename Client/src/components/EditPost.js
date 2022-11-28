@@ -187,19 +187,19 @@ export default function EditPost() {
 
   const searchCategories = (search) => {
     setLoader(true);
-    // setTimeout(() => {
-    //   axios
-    //     .post(`${defaultUrl}api/category/search-category`, { search })
-    //     .then((r) => {
-    //       setLoader(false);
-    //       setSearchCateg(r.data?.data);
-    //       setSuggestion(r.data?.suggestion);
-    //     })
-    //     .catch((e) => {
-    //       setLoader(false);
-    //       toast.error(e.response.data.msg);
-    //     });
-    // }, 1000);
+    setTimeout(() => {
+      axios
+        .post(`${defaultUrl}api/category/search-category`, { search })
+        .then((r) => {
+          setLoader(false);
+          setSearchCateg(r.data?.data);
+          setSuggestion(r.data?.suggestion);
+        })
+        .catch((e) => {
+          setLoader(false);
+          toast.error(e.response.data.msg);
+        });
+    }, 1000);
   };
 
   const ckeditorstate = (event, editor) => {

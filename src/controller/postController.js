@@ -188,29 +188,14 @@ exports.deletePost = catchAsyncError(async (req, res) => {
 });
 
 exports.getAllpost = catchAsyncError(async (req, res) => {
-  const { postid } = req.body;
-
-  let getFullpost;
-
-  if (!postid) {
+  const { num } = req.params;
+  if (ObjectId.isValid(num)) {
+    getFullpost = await Post.findOne({ _id: num, isActive: true });
+    return sendResponse(res, 200, { success: true, data: getFullpost });
+  } else {
     getFullpost = await Post.find({ isActive: true })
       .sort({ createdAt: -1 })
       .lean();
-  } else {
-    if (postid && !mongoose.isValidObjectId(postid))
-      return sendResponse(res, 500, {
-        success: false,
-        msg: errorMessages.post.invalidPostID,
-      });
-
-    getFullpost = await Post.findOne({ _id: postid, isActive: true });
-  }
-
-  if (getFullpost)
     return sendResponse(res, 200, { success: true, data: getFullpost });
-
-  return sendResponse(res, 500, {
-    success: false,
-    data: errorMessages.other.InternServErr,
-  });
+  }
 });

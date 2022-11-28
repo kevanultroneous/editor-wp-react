@@ -40,7 +40,7 @@ const PressRelease = () => {
 
   const fetchPosts = () => {
     axios
-      .get(`${defaultUrl}api/post/get-all-post/0`)
+      .get(`${defaultUrl}api/post/get-all-post/all`)
       .then((r) => {
         if (r.data.success) {
           setPostData(r.data.data);

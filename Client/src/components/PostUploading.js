@@ -425,7 +425,7 @@ export default function PostUploading() {
                   <Form.Control
                     value={searchText}
                     onChange={(e) => {
-                      searchCategories(e.target.value);
+                      searchCategories(toString(e.target.value));
                       setSerachText(e.target.value);
                     }}
                     type="text"
