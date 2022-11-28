@@ -64,7 +64,7 @@ export default function EditPost() {
   };
   const fetchParamPost = () => {
     axios
-      .get(`${defaultUrl}api/post/get-post/${postid}`)
+      .get(`${defaultUrl}api/post/get-all-post/${postid}`)
       .then((r) => {
         if (r.data?.success) {
           setAuthor(r.data?.data?.author);
@@ -187,19 +187,19 @@ export default function EditPost() {
 
   const searchCategories = (search) => {
     setLoader(true);
-    setTimeout(() => {
-      axios
-        .post(`${defaultUrl}api/category/search-category`, { search })
-        .then((r) => {
-          setLoader(false);
-          setSearchCateg(r.data?.data);
-          setSuggestion(r.data?.suggestion);
-        })
-        .catch((e) => {
-          setLoader(false);
-          toast.error(e.response.data.msg);
-        });
-    }, 1000);
+    // setTimeout(() => {
+    //   axios
+    //     .post(`${defaultUrl}api/category/search-category`, { search })
+    //     .then((r) => {
+    //       setLoader(false);
+    //       setSearchCateg(r.data?.data);
+    //       setSuggestion(r.data?.suggestion);
+    //     })
+    //     .catch((e) => {
+    //       setLoader(false);
+    //       toast.error(e.response.data.msg);
+    //     });
+    // }, 1000);
   };
 
   const ckeditorstate = (event, editor) => {
