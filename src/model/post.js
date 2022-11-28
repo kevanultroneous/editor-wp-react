@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-// status 0 draft
-// status 1 publish
-// parent 0 press release
-// parent 1 guest post
-
 const schema = new mongoose.Schema(
   {
     title: {
@@ -92,8 +87,8 @@ const schema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       required: true,
-      default: true
-    }
+      default: true,
+    },
   },
   { timestamps: true }
 );
