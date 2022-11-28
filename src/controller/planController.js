@@ -45,12 +45,12 @@ exports.updatePlan = catchAsyncError(async (req, res) => {
     });
   }
 
-if(!planName && !planPrice && !isActive) {
+  if (!planName && !planPrice && !isActive) {
     return sendResponse(res, 400, {
-        msg: "Please Provide all the values",
-        success: false,
-      });
-}
+      msg: "Please Provide all the values",
+      success: false,
+    });
+  }
 
   await Plan.updateOne(
     { _id: planID },
@@ -71,41 +71,41 @@ if(!planName && !planPrice && !isActive) {
   );
 });
 
-exports.deletePlan = catchAsyncError(async(req, res) => {
-    const {planID} = req.body;
-    if (!mongoose.isValidObjectId(planID)) {
-        return sendResponse(res, 400, { msg: "not a valid ID", success: true });
-      }
-      const existingPlan = await Plan.findOne({ _id: planID });
-      if (!existingPlan) {
-        return sendResponse(res, 400, {
-          msg: "plan does not exist",
-          success: false,
+exports.deletePlan = catchAsyncError(async (req, res) => {
+  const { planID } = req.body;
+  if (!mongoose.isValidObjectId(planID)) {
+    return sendResponse(res, 400, { msg: "not a valid ID", success: true });
+  }
+  const existingPlan = await Plan.findOne({ _id: planID });
+  if (!existingPlan) {
+    return sendResponse(res, 400, {
+      msg: "plan does not exist",
+      success: false,
+    });
+  }
+  await Plan.updateOne(
+    { _id: planID },
+    { isActive: false },
+    { new: true },
+    (e) => {
+      if (!e)
+        return sendResponse(res, 200, {
+          msg: "plan deleted",
+          success: true,
         });
-      }
-      await Plan.updateOne(
-        { _id: planID },
-        {isActive: false},
-        { new: true },
-        (e) => {
-          if (!e)
-            return sendResponse(res, 200, {
-              msg: "plan deleted",
-              success: true,
-            });
-    
-          return sendResponse(res, 400, {
-            msg: "plan not deleted",
-            success: false,
-          });
-        }
-      );
-})
 
-exports.getAllPlan = catchAsyncError(async(req, res) => {
-  const allPlans = await Plan.find({isActive: true});
+      return sendResponse(res, 400, {
+        msg: "plan not deleted",
+        success: false,
+      });
+    }
+  );
+});
+
+exports.getAllPlan = catchAsyncError(async (req, res) => {
+  const allPlans = await Plan.find({ isActive: true });
   return sendResponse(res, 200, {
     msg: allPlans,
     success: true,
   });
-})
+});
