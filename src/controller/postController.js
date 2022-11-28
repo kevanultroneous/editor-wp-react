@@ -18,27 +18,7 @@ exports.resizePhotoFimg = (req, res, next) => {
     next();
   }
 };
-// {
-//   title
-//   summary
-//   category
-//   subcategory
-//   content
-//   featuredImage
-//   author
-//   companyName
-//   seoTitle
-//   seoDescription
-//   webUrl
-//   slugUrl
-//   draftStatus
-//   postType
-//   releaseDate
-//   submitDate:
-//   paidStatus:
-//   homePageStatus:
-//   isApproved
-// },
+
 exports.uploadPost = catchAsyncError(async (req, res) => {
   const {
     title,
@@ -56,7 +36,7 @@ exports.uploadPost = catchAsyncError(async (req, res) => {
     postType,
     releaseDate,
     submitDate,
-    paidStatus,
+    // paidStatus,
     homePageStatus,
     isApproved,
   } = req.body;
@@ -79,7 +59,7 @@ exports.uploadPost = catchAsyncError(async (req, res) => {
       postType,
       releaseDate,
       submitDate,
-      paidStatus,
+      // paidStatus,
       homePageStatus,
       isApproved,
     })

@@ -7,7 +7,7 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import DeleteModel from "../common/DeleteModel";
 import { defaultUrl } from "../../utils/default";
-import { MdDone, MdDoneAll, MdDrafts } from "react-icons/md";
+import { MdClose, MdDone, MdDoneAll, MdDrafts } from "react-icons/md";
 
 const PressRelease = () => {
   const navigate = useNavigate();
@@ -92,13 +92,12 @@ const PressRelease = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Cover</th>
+                  <th>Cover/Featured</th>
                   <th>Title</th>
                   <th>URL</th>
                   <th>Status</th>
                   <th>Released Date</th>
                   <th>Approved</th>
-                  {/* <th>Updated Date</th> */}
                   <th colSpan={3}>Action</th>
                 </tr>
               </thead>
@@ -109,24 +108,25 @@ const PressRelease = () => {
                       <td>{i + 1}</td>
                       <td>
                         <Image
-                          src={`${defaultUrl + v.fimg}`}
-                          height={50}
+                          src={`${defaultUrl + v.featuredImage}`}
+                          height={20}
                           width={50}
                         />
                       </td>
                       <td>{v.title}</td>
-                      <td>https://unmediabuzz.com/PressRelease/{v.url}</td>
+                      <td>https://unmediabuzz.com/PressRelease/{v.slugUrl}</td>
                       <td className="text-center">
-                        {v.status === 1 ? (
-                          <MdDoneAll color="green" size={30} />
-                        ) : (
-                          <MdDone color="green" size={30} />
-                        )}
-                        <p>{v.status === 1 ? "Published" : "Drafted"}</p>
+                        <p>{v.draftStatus ? "Published" : "Drafted"}</p>
                       </td>
 
-                      <td>{timestampToDate(v.date)}</td>
-                      <td>{timestampToDate(v.updatedAt)}</td>
+                      <td>{timestampToDate(v.releaseDate)}</td>
+                      <td className={"text-center"}>
+                        {v.isApproved ? (
+                          <MdDone color="green" size={30} />
+                        ) : (
+                          <MdClose color="red" size={30} />
+                        )}
+                      </td>
                       <td>
                         <Link to={`/view-press-release/${v._id}`}>
                           <Button variant="primary" style={{ width: "100%" }}>

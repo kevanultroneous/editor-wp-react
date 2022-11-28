@@ -29,8 +29,7 @@ const schema = new mongoose.Schema(
         "<h2>Title</h2><p><strong>Write here !. </strong> your content is important !.</p>",
     },
     featuredImage: {
-      type: mongoose.Types.ObjectId,
-      ref: "gallery",
+      type: String,
     },
     author: {
       type: String,
@@ -72,11 +71,11 @@ const schema = new mongoose.Schema(
       type: Date,
       default: new Date(),
     },
-    paidStatus: {
-      type: mongoose.Types.ObjectId,
-      ref: "contentplan",
-      required: true,
-    },
+    // paidStatus: {
+    //   type: mongoose.Types.ObjectId,
+    //   ref: "contentplan",
+    //   required: true,
+    // },
     homePageStatus: {
       type: Boolean,
       required: true,

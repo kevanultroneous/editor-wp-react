@@ -41,13 +41,16 @@ export default function PostUploading() {
   const [content, setContent] = useState("");
   const [homePin, setHomePin] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [company, setCompany] = useState("");
+  const [summary, setSummary] = useState("");
+  const [releaseDate, setReleaseDate] = useState("");
+  const [weburl, setWeburl] = useState("");
 
   //search category
   const [searchCateg, setSearchCateg] = useState([]);
   const [searchText, setSerachText] = useState("");
   const [suggestion, setSuggestion] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [subhover, setSubHover] = useState(false);
 
   // category upload
   const [show, setShow] = useState(false);
@@ -73,16 +76,7 @@ export default function PostUploading() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!(type === "press-release" || type === "guest-post")) {
-      navigate("/");
-    }
     searchCategories(searchText);
-    // window.addEventListener("keydown", (e) => {
-    //   if (e.key === "k" && e.ctrlKey === true) {
-    //     alert("do you want to save ?");
-
-    //   }
-    // });
   }, []);
 
   const cleanArray = (ary) => {
@@ -94,20 +88,27 @@ export default function PostUploading() {
   const formdata = new FormData();
   const cleansing = cleanArray(selectedSubCategory);
 
-  formdata.append("image", ffile);
   formdata.append("title", mainTitle);
+  formdata.append("summary", summary);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
   selectedSubCategory.map((v, i) =>
     formdata.append(`subcategory[${i}]`, JSON.stringify(v))
   );
-  formdata.append("author", author);
   formdata.append("content", content);
-  formdata.append("smeta", seometatags);
-  formdata.append("stitle", seotitle);
-  formdata.append("sdesc", seodescription);
-  formdata.append("url", url);
-  formdata.append("status", publish);
-  formdata.append("parent", type === "press-release" ? 0 : 1);
+  formdata.append("image", ffile);
+  formdata.append("author", author);
+  formdata.append("companyName", company);
+  formdata.append("seoTitle", seotitle);
+  formdata.append("seoDescription", seodescription);
+  formdata.append("webUrl", weburl);
+  formdata.append("slugUrl", url);
+  formdata.append("draftStatus", publish);
+  formdata.append("postType", "press");
+  formdata.append("releaseDate", new Date(releaseDate));
+  formdata.append("submitDate", new Date());
+  formdata.append("paidStatus", paid);
+  formdata.append("homePageStatus", homePin);
+  formdata.append("isApproved", false);
 
   const postUpload = () => {
     // title , content , paid status , home page pin ,featured img
@@ -281,6 +282,7 @@ export default function PostUploading() {
               </Row>
             </div>
           </Col>
+
           <Col xl={4} lg={6} md={12} xs={12} className="p-0">
             <div className="Sidebar">
               <div>
@@ -315,6 +317,7 @@ export default function PostUploading() {
                   )}
                 </center>
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Title</strong>
@@ -324,11 +327,13 @@ export default function PostUploading() {
                   onChange={(e) => {
                     setMainTitle(e.target.value);
                     editUrl(e.target.value);
+                    setSeoDescription(e.target.value);
                   }}
                   type="text"
                   placeholder="Enter title here"
                 />
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Author</strong>
@@ -340,25 +345,27 @@ export default function PostUploading() {
                   placeholder="Enter Author Name"
                 />
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Company Name</strong>
                 </Form.Label>
                 <Form.Control
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
                   type="text"
                   placeholder="Enter Company Name"
                 />
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Summary</strong>
                 </Form.Label>
                 <FloatingLabel controlId="floatingTextarea2" label="Summary">
                   <Form.Control
-                    value={seodescription}
-                    onChange={(e) => setSeoDescription(e.target.value)}
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
                     as="textarea"
                     placeholder="Summary"
                     style={{ height: "100px" }}
@@ -395,18 +402,20 @@ export default function PostUploading() {
                   />
                 </FloatingLabel>
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Release Date</strong>
                 </Form.Label>
                 <Form.Control
-                  value={seotitle}
-                  onChange={(e) => alert(e.target.value)}
+                  value={releaseDate}
+                  onChange={(e) => setReleaseDate(e.target.value)}
                   type="date"
                   placeholder="Release Date"
                   // max={new Date().toLocaleDateString("en-ca")}
                 />
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Categories</strong>
@@ -448,7 +457,7 @@ export default function PostUploading() {
                             {selectedCategory?.includes(k._id) ? (
                               <div className="TagsWrraper">
                                 {k?.childs?.map((v, i) => (
-                                  <>
+                                  <div className="ms-3">
                                     <input
                                       type="radio"
                                       name={k._id}
@@ -463,7 +472,7 @@ export default function PostUploading() {
                                       }}
                                     />
                                     {v.title}&nbsp;
-                                  </>
+                                  </div>
                                 ))}
                               </div>
                             ) : null}
@@ -488,6 +497,7 @@ export default function PostUploading() {
                   )}
                 </div>
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Slug URL</strong>
@@ -501,6 +511,7 @@ export default function PostUploading() {
                   onChange={(e) => setUrl(e.target.value)}
                 />
               </div>
+
               <div className="mt-4">
                 <Form.Label>
                   <strong>Web URL</strong>
@@ -510,8 +521,8 @@ export default function PostUploading() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  value={weburl}
+                  onChange={(e) => setWeburl(e.target.value)}
                 />
               </div>
               <div className="mt-4">
