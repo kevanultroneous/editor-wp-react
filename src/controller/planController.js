@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const sendResponse = require("../utils/commonFunctions");
-const Plan = require("../model/plan");
+const Plan = require("../model/planModel");
 const catchAsyncError = require("../utils/catchAsyncError");
 
 exports.createPlan = catchAsyncError(async (req, res) => {

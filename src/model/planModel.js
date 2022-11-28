@@ -7,10 +7,13 @@ const schema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-   planPrice: {
-    type: Number,
-    required: true
-   },
+    planDescription: {
+      type: String,
+    },
+    planPrice: {
+      type: Number,
+      required: true,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -19,5 +22,5 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Plan = mongoose.model("contentplan", schema);
+const Plan = mongoose.model("Plan", schema);
 module.exports = Plan;

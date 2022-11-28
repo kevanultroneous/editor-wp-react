@@ -26,22 +26,20 @@ const errorMessages = {
     empty: `${empty} password.`,
     wrongPwd: "Email or password is incorrect. Please try again.",
   },
-  questions: {
-    empty: "Question details cannot be empty",
-    answerEmpty: `${empty} answer for the question`,
+  post: {
+    uploadError: "Post was not uploaded",
+    postDraft: "Post is in draft",
+    postPublished:"Post is uploaded",
+    inValidParentID: "parent id is not valid !",
+    postUpdated: "Post updated !",
+    postUpdatedError: "Post not updated !",
+    postDeleted: "Post deleted successfully !",
+    postDeleteError: "Post not deleted !",
+    invalidPostID: "post id is not valid !"
   },
   other: {
-    serviceProviderInvalidId: `${empty}the serice provider id`,
-    customerInvalidId: `${empty}the customer id`,
-    customer: "Please add a reveiw for the customer.",
-    questions: `${empty} value for all questions.`,
-    overallRating: `${empty} overall rating.`,
-    totalQuestionsRating: `${empty} total questions rating.`,
-    userblock: `${empty} valid user id`,
-  },
-  review: {
-    reviewExists: "You have already added a review for this customer",
-  },
+    InternServErr: "Internal server error !"
+  }
 };
 
 module.exports = { errorMessages };

@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-// status 0 draft
-// status 1 publish
-// parent 0 press release
-// parent 1 guest post
-
 const schema = new mongoose.Schema(
   {
     title: {
@@ -15,16 +10,20 @@ const schema = new mongoose.Schema(
     summary: {
       type: String,
     },
+    featuredImage: {
+      type: mongoose.Types.ObjectId,
+      ref: "gallery",
+    },
     category: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "categories",
+        ref: "Category",
       },
     ],
-    subcategory: [
+    subCategory: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "categories",
+        ref: "Category",
       },
     ],
     content: {
@@ -32,16 +31,13 @@ const schema = new mongoose.Schema(
       required: true,
       default: "<strong>Some Content is nice !</strong>",
     },
-    featuredImage: {
-      type: mongoose.Types.ObjectId,
-      ref: "gallery",
-    },
     author: {
       type: String,
       default: "Ultroneous",
     },
     companyName: {
       type: String,
+      default: "Ultroneous Technologies",
     },
     seoTitle: {
       type: String,
@@ -51,7 +47,11 @@ const schema = new mongoose.Schema(
       type: String,
       default: "description",
     },
-    webUrl: {
+    seoKeywords: {
+      type: String,
+      default: "keywords",
+    },
+    backlinkUrl: {
       type: String,
       default: "www.ultroneous.com",
     },
@@ -60,8 +60,9 @@ const schema = new mongoose.Schema(
       unique: true,
     },
     draftStatus: {
-      type: Boolean,
-      default: 0,
+      type: String,
+      default: "draft",
+      enum: ["draft", "published"],
     },
     postType: {
       type: String,
@@ -72,28 +73,37 @@ const schema = new mongoose.Schema(
       type: Date,
       default: new Date(),
     },
-    submitDate: {
+    submittedDate: {
       type: Date,
       default: new Date(),
     },
     paidStatus: {
-      type: mongoose.Types.ObjectId,
-      ref: "contentplan",
+      type: Boolean,
       required: true,
+      default: false,
+    },
+    plan: {
+      type: mongoose.Types.ObjectId,
+      ref: "Plan",
+    },
+    totalPaidAmount: {
+      type: String,
+      default: 0,
+      ref: "Plan",
     },
     homePageStatus: {
       type: Boolean,
-      required: true,
+      required: false,
     },
     isApproved: {
       type: Boolean,
-      requrired: true,
+      requrired: false,
     },
     isActive: {
       type: Boolean,
       required: true,
-      default: true
-    }
+      default: false,
+    },
   },
   { timestamps: true }
 );

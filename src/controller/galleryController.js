@@ -1,4 +1,4 @@
-const Gallery = require("../model/gallery");
+const Gallery = require("../model/galleryModel");
 const catchAsyncError = require("../utils/catchAsyncError");
 const { upload, generateOtp, sendResponse } = require("../utils/commonFunctions");
 const sharp = require("sharp");

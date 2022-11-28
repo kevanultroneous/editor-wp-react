@@ -51,7 +51,7 @@ export default function PostUploading() {
   const [mainTitle, setMainTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState([]);
-  const [subcategory, setSubcategory] = useState([]);
+  const [subCategory, setSubcategory] = useState([]);
   const [seotitle, setSeoTitle] = useState("");
   const [seodescription, setSeoDescription] = useState("");
   const [seometatags, setSeoMetaTags] = useState("");
@@ -118,7 +118,7 @@ export default function PostUploading() {
   formdata.append("image", ffile);
   formdata.append("title", mainTitle);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
-  cleansing.map((v, i) => formdata.append(`subcategory[${i}]`, v));
+  cleansing.map((v, i) => formdata.append(`subCategory[${i}]`, v));
   formdata.append("author", author);
   formdata.append("content", content);
   formdata.append("smeta", seometatags);
