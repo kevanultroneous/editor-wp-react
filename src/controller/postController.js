@@ -5,6 +5,7 @@ const catchAsyncError = require("../utils/catchAsyncError");
 const { sendResponse, upload } = require("../utils/commonFunctions");
 
 const Post = require("../model/postModel");
+const Category = require("../model/categoryModel");
 const { errorMessages } = require("../utils/messages");
 const { default: mongoose } = require("mongoose");
 
@@ -70,18 +71,14 @@ exports.addPost = catchAsyncError(async (req, res) => {
     isApproved,
   };
 
-  if (subCategory) {
-    newPost.subCategory = subCategory.map((subCate) => subCate.sub_category);
-  }
-
   let post = await Post.create(newPost);
 
   if (post) {
     return sendResponse(res, 200, {
       msg:
         draftStatus !== "draft"
-          ? errorMessages.post.postPublished
-          : errorMessages.post.postDraft,
+          ? errorMessages.post.Published
+          : errorMessages.post.Draft,
       success: true,
       data: subCategory,
     });
@@ -118,8 +115,6 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     isActive,
   } = req.body;
 
-  console.log("updating post");
-
   if (!ObjectId.isValid(postid)) {
     sendResponse(res, 500, {
       msg: errorMessages.post.invalidPostID,
@@ -127,7 +122,7 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     });
   }
 
-  const postTobeupdated = {
+  const changesTobeUpdated = {
     summary,
     category,
     subCategory,
@@ -150,27 +145,37 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     isActive,
   };
 
-  if (subCategory) {
-    postTobeupdated.subCategory = subCategory.map(
-      (subCate) => subCate.sub_category
-    );
+  if (req.sendfile) changesTobeUpdated.featuredImage = req.sendfile;
+
+  if (category || subCategory) {
+    const postTobeupdated = await Post.findOne({ _id: postid });
+
+    changesTobeUpdated.category = category
+      ? postTobeupdated.category[0]
+        ? [...postTobeupdated.category, category]
+        : category
+      : postTobeupdated.category;
+
+    changesTobeUpdated.subCategory = subCategory
+      ? postTobeupdated.subCategory[0]
+        ? [...postTobeupdated.subCategory, subCategory]
+        : subCategory
+      : postTobeupdated.subCategory;
   }
 
-  if (req.sendfile) postTobeupdated.featuredImage = req.sendfile;
-
-  const updatedPost = await Post.findByIdAndUpdate(postid, postTobeupdated, {
+  const updatedPost = await Post.findByIdAndUpdate(postid, changesTobeUpdated, {
     new: true,
   });
 
   if (updatedPost) {
     sendResponse(res, 200, {
-      msg: errorMessages.post.postUpdated,
+      msg: errorMessages.post.UpdateSucess,
       success: true,
       data: updatedPost,
     });
   } else {
     sendResponse(res, 500, {
-      msg: errorMessages.post.postUpdatedError,
+      msg: errorMessages.post.UpdateError,
       success: false,
     });
   }
@@ -181,7 +186,10 @@ exports.deletePost = catchAsyncError(async (req, res) => {
 
   console.log(req.body);
   if (!ObjectId.isValid(postid)) {
-    return sendResponse(res, 500, { msg: "id is not valid !", success: false });
+    return sendResponse(res, 500, {
+      msg: errorMessages.post.invalidID,
+      success: false,
+    });
   }
 
   const softDeletePost = await Post.findByIdAndUpdate(postid, {
@@ -191,13 +199,13 @@ exports.deletePost = catchAsyncError(async (req, res) => {
   // make it same as add post
   if (softDeletePost) {
     sendResponse(res, 200, {
-      msg: errorMessages.post.postDeleted,
+      msg: errorMessages.post.Deleted,
       success: true,
       data: softDeletePost,
     });
   }
   sendResponse(res, 500, {
-    msg: errorMessages.post.postDeleteError,
+    msg: errorMessages.post.DeleteError,
     success: false,
   });
 });
@@ -207,6 +215,7 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
   const { postid, page, limit } = req.body;
   console.log(postid);
   let getFullpost;
+  let categoryPopulateString = "title parentCategory";
 
   if (!postid) {
     const pageOptions = {
@@ -225,11 +234,20 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
         success: false,
         msg: errorMessages.post.invalidPostID,
       });
-    getFullpost = await Post.findOne({ _id: postid, isActive: true });
+    getFullpost = await Post.findOne({ _id: postid, isActive: true })
+      .populate({
+        path: "category",
+        select: categoryPopulateString,
+      })
+      .populate({
+        path: "subCategory",
+        select: categoryPopulateString,
+      });
+
     if (!getFullpost)
       return sendResponse(res, 404, {
         success: true,
-        data: errorMessages.post.postNotFound,
+        data: errorMessages.post.NotFound,
       });
   }
 
@@ -237,11 +255,11 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
     return sendResponse(res, 200, { success: true, data: getFullpost });
 });
 
-// front-end
 exports.getPRList = catchAsyncError(async (req, res) => {
   const { postid, page, limit } = req.body;
 
   let getFullpost;
+  let categoryPopulateString = "title parentCategory";
 
   if (!postid) {
     const pageOptions = {
@@ -251,10 +269,17 @@ exports.getPRList = catchAsyncError(async (req, res) => {
 
     getFullpost = await Post.find({
       isActive: true,
-      paidStatus: true,
       draftStatus: "published",
       isApproved: true,
     })
+      .populate({
+        path: "category",
+        select: categoryPopulateString,
+      })
+      .populate({
+        path: "subCategory",
+        select: categoryPopulateString,
+      })
       .sort({ releaseDate: -1 })
       .skip(pageOptions.skipVal)
       .limit(pageOptions.limitVal)
@@ -263,10 +288,18 @@ exports.getPRList = catchAsyncError(async (req, res) => {
     if (postid && !mongoose.isValidObjectId(postid))
       return sendResponse(res, 500, {
         success: false,
-        msg: errorMessages.post.invalidPostID,
+        msg: errorMessages.post.invalidID,
       });
 
-    getFullpost = await Post.findOne({ _id: postid, isActive: true });
+    getFullpost = await Post.findOne({ _id: postid, isActive: true })
+      .populate({
+        path: "category",
+        select: categoryPopulateString,
+      })
+      .populate({
+        path: "subCategory",
+        select: categoryPopulateString,
+      });
   }
 
   if (getFullpost)

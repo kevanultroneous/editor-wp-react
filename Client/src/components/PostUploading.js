@@ -92,6 +92,7 @@ export default function PostUploading() {
   formdata.append("summary", summary);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
   selectedSubCategory.map((v, i) => formdata.append(`subCategory[${i}]`, v));
+
   formdata.append("content", content);
   formdata.append("image", ffile);
   formdata.append("author", author);
@@ -119,6 +120,7 @@ export default function PostUploading() {
     } else if (content.length < 100) {
       toast.error("Content required 100 words !");
     } else {
+      console.log(selectedSubCategory);
       axios
         .post(`${defaultUrl}api/post/create-post`, formdata)
         .then((r) => {

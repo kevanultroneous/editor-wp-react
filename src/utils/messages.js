@@ -28,15 +28,21 @@ const errorMessages = {
   },
   post: {
     uploadError: "Post was not uploaded",
-    postDraft: "Post is in draft",
-    postPublished:"Post is uploaded",
+    Draft: "Post is in draft",
+    Published:"Post is uploaded",
     inValidParentID: "parent id is not valid !",
-    postUpdated: "Post updated !",
-    postUpdatedError: "Post not updated !",
-    postDeleted: "Post deleted successfully !",
-    postDeleteError: "Post not deleted !",
-    invalidPostID: "post id is not valid !",
-    postNotFound: "post not found !"
+    UpdateSucess: "Post updated !",
+    UpdateError: "Post not updated !",
+    Deleted: "Post deleted successfully !",
+    DeleteError: "Post not deleted !",
+    invalidID: "post id is not valid !",
+    NotFound: "post not found !"
+  },
+  category: {
+    uploaded: "Category uploaded!",
+    uploadError: "Category not uploaded !",
+    invalid: "Enter valid category title ! ,length must be greater than 3 and lessthan 30 words !"
+
   },
   other: {
     InternServErr: "Internal server error !"
