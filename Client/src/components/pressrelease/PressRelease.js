@@ -98,6 +98,7 @@ const PressRelease = () => {
                   <th>Status</th>
                   <th>Released Date</th>
                   <th>Approved</th>
+                  <th>Deleted</th>
                   <th colSpan={3}>Action</th>
                 </tr>
               </thead>
@@ -127,6 +128,7 @@ const PressRelease = () => {
                           <MdClose color="red" size={30} />
                         )}
                       </td>
+                      <td>{v.isActive ? "No" : "Yes"}</td>
                       <td>
                         <Link to={`/view-press-release/${v._id}`}>
                           <Button variant="primary" style={{ width: "100%" }}>
@@ -145,17 +147,19 @@ const PressRelease = () => {
                           Edit
                         </Button>
                       </td>
-                      <td>
-                        <Button
-                          onClick={() => {
-                            handleDelete(v._id, v.title);
-                          }}
-                          variant="danger"
-                          style={{ width: "100%" }}
-                        >
-                          Delete
-                        </Button>
-                      </td>
+                      {v.isActive ? (
+                        <td>
+                          <Button
+                            onClick={() => {
+                              handleDelete(v._id, v.title);
+                            }}
+                            variant="danger"
+                            style={{ width: "100%" }}
+                          >
+                            Delete
+                          </Button>
+                        </td>
+                      ) : null}
                     </tr>
                   ))
                 ) : (

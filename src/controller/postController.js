@@ -13,8 +13,10 @@ exports.uploadImagesForFeatured = upload.single("image");
 
 exports.resizePhotoFimg = (req, res, next) => {
   if (req.file) {
-    let newfile = `public/featured/${new Date() + req.file.originalname}.jpeg`;
-
+    let newfile = `public/other/featured/${
+      new Date() + req.file.originalname
+    }.jpeg`;
+    console.log(req.file);
     sharp(req.file.buffer).jpeg({ quality: 100 }).toFile(newfile);
     req.sendfile = newfile.replace("public/", "");
     next();
@@ -190,7 +192,7 @@ exports.deletePost = catchAsyncError(async (req, res) => {
 // admin
 exports.getAllpost = catchAsyncError(async (req, res) => {
   const { postid, page, limit } = req.body;
-
+  console.log(postid);
   let getFullpost;
 
   if (!postid) {
@@ -199,7 +201,7 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
       limitVal: parseInt(limit) || 30,
     };
 
-    getFullpost = await Post.find({})
+    getFullpost = await Post.find({ isActive: true })
       .sort({ createdAt: -1 })
       .skip(pageOptions.skipVal)
       .limit(pageOptions.limitVal)

@@ -97,7 +97,7 @@ const schema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       required: true,
-      default: false,
+      default: true,
     },
   },
   { timestamps: true }
