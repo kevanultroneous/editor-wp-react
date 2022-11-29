@@ -49,6 +49,8 @@ export default function EditPost() {
   const [dummyImg, setDummyImg] = useState("");
   const [selectedSubCategoryC, setSelectedSubCategoryC] = useState([]);
   const [load, setLoad] = useState(true);
+  const [seokeywords, setSeokeywords] = useState("");
+
   //search category
   const [searchCateg, setSearchCateg] = useState([]);
   const [searchText, setSerachText] = useState("");
@@ -123,7 +125,6 @@ export default function EditPost() {
   };
 
   const formdata = new FormData();
-  const cleansing = cleanArray(selectedSubCategory);
 
   formdata.append("title", mainTitle);
   formdata.append("summary", summary);
@@ -137,7 +138,7 @@ export default function EditPost() {
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
   formdata.append("seoDescription", seodescription);
-  formdata.append("webUrl", weburl);
+  formdata.append("backlinkUrl", weburl);
   formdata.append("slugUrl", url);
   formdata.append("draftStatus", publish);
   formdata.append("postType", "press");
@@ -146,6 +147,7 @@ export default function EditPost() {
   formdata.append("paidStatus", paid);
   formdata.append("homePageStatus", homePin);
   formdata.append("isApproved", approved);
+  formdata.append("seoKeywords", seokeywords);
   formdata.append("parentid", postid);
 
   const postUpload = () => {
@@ -466,6 +468,24 @@ export default function EditPost() {
                     onChange={(e) => setSeoDescription(e.target.value)}
                     as="textarea"
                     placeholder="SEO Description"
+                    style={{ height: "100px" }}
+                  />
+                </FloatingLabel>
+              </div>
+
+              <div className="mt-4">
+                <Form.Label>
+                  <strong>SEO Keywords</strong>
+                </Form.Label>
+                <FloatingLabel
+                  controlId="floatingTextarea2"
+                  label="SEO Keywords"
+                >
+                  <Form.Control
+                    value={seokeywords}
+                    onChange={(e) => setSeokeywords(e.target.value)}
+                    as="textarea"
+                    placeholder="SEO Keywords"
                     style={{ height: "100px" }}
                   />
                 </FloatingLabel>

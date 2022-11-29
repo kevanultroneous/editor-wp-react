@@ -96,7 +96,7 @@ export default function Categories() {
         axios
           .post(`${defaultUrl}api/category/upload-category`, {
             title: catname,
-            type: switches ? "press" : "blog",
+            postType: switches ? "press" : "blog",
           })
           .then((r) => {
             if (r.data.success) {
@@ -145,7 +145,7 @@ export default function Categories() {
       .post(`${defaultUrl}api/category/update-category`, {
         catid: currentCatId,
         newtitle: newcatname,
-        type: switches ? "press" : "blog",
+        postType: switches ? "press" : "blog",
       })
       .then((r) => {
         if (r.data.success) {

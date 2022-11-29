@@ -5,7 +5,7 @@ const { sendResponse } = require("../utils/commonFunctions");
 let ObjectId = require("mongoose").Types.ObjectId;
 
 exports.uploadCategory = catchAsyncError(async (req, res) => {
-  const { title, type, data, parentid, upddata, multiple } = req.body;
+  const { title, postType, data, multiple } = req.body;
   if (multiple) {
     if (await Category.create(data)) {
       sendResponse(res, 200, { msg: "Category uploaded !", success: true });
@@ -21,10 +21,10 @@ exports.uploadCategory = catchAsyncError(async (req, res) => {
         msg: "Enter valid category title ! ,length must be greater than 3 and lessthan 30 words !",
         success: false,
       });
-    } else if (!(type === "press" || type === "blog")) {
+    } else if (!(postType === "press" || postType === "blog")) {
       sendResponse(res, 400, { msg: "type is not valid !", success: false });
     } else {
-      if (await Category.create({ title, type })) {
+      if (await Category.create({ title, postType })) {
         sendResponse(res, 200, { msg: "Category uploaded !", success: true });
       } else {
         sendResponse(res, 500, {
@@ -37,7 +37,6 @@ exports.uploadCategory = catchAsyncError(async (req, res) => {
 });
 
 exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
-  const { type } = req.params;
   const category = await Category.find({ isActive: true, parentCategory: null })
     .sort({ createdAt: -1 })
     .lean();
@@ -100,7 +99,7 @@ exports.deleteCategory = catchAsyncError(async (req, res) => {
 });
 
 exports.updateCategory = catchAsyncError(async (req, res) => {
-  const { catid, newtitle, type } = req.body;
+  const { catid, newtitle, postType } = req.body;
   if (
     !newtitle ||
     newtitle === "null" ||
@@ -111,7 +110,7 @@ exports.updateCategory = catchAsyncError(async (req, res) => {
       success: false,
     });
   }
-  if (!(type === "press" || type === "blog")) {
+  if (!(postType === "press" || postType === "blog")) {
     sendResponse(res, 400, { msg: "type is not valid !", success: false });
   }
   if (!catid || !ObjectId.isValid(catid)) {
@@ -119,7 +118,7 @@ exports.updateCategory = catchAsyncError(async (req, res) => {
   } else {
     const updatecatname = await Category.findOneAndUpdate(
       { _id: catid },
-      { title: newtitle, type: type }
+      { title: newtitle, postType: type }
     ).clone();
     if (updatecatname) {
       sendResponse(res, 200, {
