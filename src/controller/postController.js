@@ -164,6 +164,7 @@ exports.updatePost = catchAsyncError(async (req, res) => {
 exports.deletePost = catchAsyncError(async (req, res) => {
   const { postid } = req.body;
 
+  console.log(req.body);
   if (!ObjectId.isValid(postid)) {
     return sendResponse(res, 500, { msg: "id is not valid !", success: false });
   }
@@ -186,15 +187,74 @@ exports.deletePost = catchAsyncError(async (req, res) => {
   });
 });
 
+// admin
 exports.getAllpost = catchAsyncError(async (req, res) => {
-  const { num } = req.params;
-  if (ObjectId.isValid(num)) {
-    getFullpost = await Post.findOne({ _id: num, isActive: true });
-    return sendResponse(res, 200, { success: true, data: getFullpost });
-  } else {
-    getFullpost = await Post.find({ isActive: true })
+  const { postid, page, limit } = req.body;
+
+  let getFullpost;
+
+  if (!postid) {
+    const pageOptions = {
+      skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+      limitVal: parseInt(limit) || 30,
+    };
+
+    getFullpost = await Post.find({})
       .sort({ createdAt: -1 })
+      .skip(pageOptions.skipVal)
+      .limit(pageOptions.limitVal)
       .lean();
-    return sendResponse(res, 200, { success: true, data: getFullpost });
+  } else {
+    if (postid && !mongoose.isValidObjectId(postid))
+      return sendResponse(res, 500, {
+        success: false,
+        msg: errorMessages.post.invalidPostID,
+      });
+
+    getFullpost = await Post.findOne({ _id: postid, isActive: true });
   }
+
+  if (getFullpost)
+    return sendResponse(res, 200, { success: true, data: getFullpost });
+});
+
+// front-end
+exports.getPRList = catchAsyncError(async (req, res) => {
+  const { postid, page, limit } = req.body;
+
+  let getFullpost;
+
+  if (!postid) {
+    const pageOptions = {
+      skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+      limitVal: parseInt(limit) || 30,
+    };
+
+    getFullpost = await Post.find({
+      isActive: true,
+      paidStatus: true,
+      draftStatus: "published",
+      releaseDate: { $ne: { $gt: new Date() } },
+    })
+      .sort({ releaseDate: -1 })
+      .skip(pageOptions.skipVal)
+      .limit(pageOptions.limitVal)
+      .lean();
+  } else {
+    if (postid && !mongoose.isValidObjectId(postid))
+      return sendResponse(res, 500, {
+        success: false,
+        msg: errorMessages.post.invalidPostID,
+      });
+
+    getFullpost = await Post.findOne({ _id: postid, isActive: true });
+  }
+
+  if (getFullpost)
+    return sendResponse(res, 200, { success: true, data: getFullpost });
+
+  return sendResponse(res, 500, {
+    success: false,
+    data: errorMessages.other.InternServErr,
+  });
 });

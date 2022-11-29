@@ -40,7 +40,7 @@ const PressRelease = () => {
 
   const fetchPosts = () => {
     axios
-      .get(`${defaultUrl}api/post/get-all-post/all`)
+      .get(`${defaultUrl}api/post/get-all-post`)
       .then((r) => {
         if (r.data.success) {
           setPostData(r.data.data);
@@ -147,7 +147,9 @@ const PressRelease = () => {
                       </td>
                       <td>
                         <Button
-                          onClick={() => handleDelete(v._id, v.title)}
+                          onClick={() => {
+                            handleDelete(v._id, v.title);
+                          }}
                           variant="danger"
                           style={{ width: "100%" }}
                         >
