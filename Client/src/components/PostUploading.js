@@ -325,7 +325,7 @@ export default function PostUploading() {
                   onChange={(e) => {
                     setMainTitle(e.target.value);
                     editUrl(e.target.value);
-                    setSeoDescription(e.target.value);
+                    setSeoTitle(e.target.value.split(" ").join("-"));
                   }}
                   type="text"
                   placeholder="Enter title here"
@@ -363,7 +363,10 @@ export default function PostUploading() {
                 <FloatingLabel controlId="floatingTextarea2" label="Summary">
                   <Form.Control
                     value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
+                    onChange={(e) => {
+                      setSummary(e.target.value);
+                      setSeoDescription(e.target.value.split(" ").join("-"));
+                    }}
                     as="textarea"
                     placeholder="Summary"
                     style={{ height: "100px" }}
