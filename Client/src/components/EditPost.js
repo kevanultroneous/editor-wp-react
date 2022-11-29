@@ -194,7 +194,7 @@ export default function EditPost() {
     setLoader(true);
     setTimeout(() => {
       axios
-        .post(`${defaultUrl}api/category/search-category`, { search })
+        .get(`${defaultUrl}api/category/search-category`, { search })
         .then((r) => {
           setLoader(false);
           setSearchCateg(r.data?.data);

@@ -144,7 +144,9 @@ export default function PostUploading() {
     setLoader(true);
     setTimeout(() => {
       axios
-        .post(`${defaultUrl}api/category/search-category`, { search })
+        .get(`${defaultUrl}api/category/search-category`, {
+          search,
+        })
         .then((r) => {
           setLoader(false);
           setSearchCateg(r.data?.data);
@@ -444,7 +446,7 @@ export default function PostUploading() {
                   <Form.Control
                     value={searchText}
                     onChange={(e) => {
-                      searchCategories(toString(e.target.value));
+                      searchCategories(e.target.value);
                       setSerachText(e.target.value);
                     }}
                     type="text"
