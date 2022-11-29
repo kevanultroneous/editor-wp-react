@@ -28,6 +28,6 @@ postRouter.post("/delete-post", postController.deletePost);
 postRouter.post("/get-all-post", postController.getAllpost);
 
 // front end pr list/ pr detail
-postRouter.get("/get-pr-list", postController.getPRList);
+postRouter.post("/get-pr-list", postController.getPRList);
 
 module.exports = postRouter;
