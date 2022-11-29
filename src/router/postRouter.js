@@ -25,17 +25,9 @@ postRouter.post(
 postRouter.post("/delete-post", postController.deletePost);
 
 // //get all post
-postRouter.get("/get-all-post/:num", postController.getAllpost);
+postRouter.get("/get-all-post", postController.getAllpost);
 
-// //delete post
-// postRouter.get("/get-post/:postid", postController.getSinglePost);
-
-// postRouter.post(
-//   "/gallery-img-upload",
-//   galleryController.uploadImagesForGallery,
-//   galleryController.resizePhoto,
-//   galleryController.createGalleryPost
-// );
-// postRouter.get("/gallery", galleryController.fetchAllgalleryImage);
+// front end pr list/ pr detail
+postRouter.get("/get-pr-list", postController.getPRList);
 
 module.exports = postRouter;
