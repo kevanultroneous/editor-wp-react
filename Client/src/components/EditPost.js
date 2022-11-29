@@ -47,7 +47,6 @@ export default function EditPost() {
   const [approved, setApproved] = useState(false);
   const [weburl, setWeburl] = useState("");
   const [dummyImg, setDummyImg] = useState("");
-  const [selectedSubCategoryC, setSelectedSubCategoryC] = useState([]);
   const [load, setLoad] = useState(true);
   const [seokeywords, setSeokeywords] = useState("");
 
@@ -118,20 +117,12 @@ export default function EditPost() {
 
   const navigate = useNavigate();
 
-  const cleanArray = (ary) => {
-    const newarry = [];
-    ary.map((v) => newarry.push(v.s));
-    return newarry;
-  };
-
   const formdata = new FormData();
 
   formdata.append("title", mainTitle);
   formdata.append("summary", summary);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
-  selectedSubCategoryC.map((v, i) =>
-    formdata.append(`subCategory[${i}]`, JSON.stringify(v))
-  );
+  selectedSubCategory.map((v, i) => formdata.append(`subCategory[${i}]`, v));
   formdata.append("content", content);
   formdata.append("image", ffile);
   formdata.append("author", author);
@@ -148,7 +139,7 @@ export default function EditPost() {
   formdata.append("homePageStatus", homePin);
   formdata.append("isApproved", approved);
   formdata.append("seoKeywords", seokeywords);
-  formdata.append("parentid", postid);
+  formdata.append("postid", postid);
 
   const postUpload = () => {
     if (mainTitle == "") {
@@ -177,18 +168,10 @@ export default function EditPost() {
     }
   };
 
-  const JsonToObject = (arry) => {
-    let newbucket = [];
-    arry.map((v) => newbucket.push(JSON.parse(v)));
-    return newbucket;
-  };
   useEffect(() => {
     searchCategories(searchText);
     fetchParamPost();
   }, []);
-  useEffect(() => {
-    setSelectedSubCategoryC(JsonToObject(selectedSubCategory));
-  }, [selectedSubCategory]);
 
   const searchCategories = (search) => {
     setLoader(true);
@@ -214,45 +197,42 @@ export default function EditPost() {
   const editUrl = (v) => {
     setUrl(v.split(" ").join("-"));
   };
-  console.log(selectedSubCategoryC);
+  const alreadyfound = (ary1, ary2) => {
+    let output = 0;
+    for (let t = 0; t < ary1.length; t++) {
+      if (ary2.includes(ary1[t]._id)) {
+        output = ary1[t]._id;
+      }
+    }
+    return output;
+  };
 
-  const handleCategorySelection = (event, value, subcates) => {
+  const handleCategorySelection = (event, value, subcates, buckets) => {
     if (subcates) {
-      let newarry = [...selectedSubCategoryC];
-      if (
-        selectedSubCategoryC.some(
-          (item) => item.parent_category == value.parentCategory
-        )
-      ) {
-        let updating = newarry.filter(
-          (i) => i.parent_category !== value.parentCategory
-        );
-
-        updating.push({
-          parent_category: value.parentCategory,
-          sub_category: value._id,
-        });
-        setSelectedSubCategoryC(updating);
+      let checking = alreadyfound(buckets.childs, selectedSubCategory);
+      let copysubcategory = [...selectedSubCategory];
+      if (checking !== 0) {
+        let x = copysubcategory.filter((i) => i !== checking);
+        x.push(value._id);
+        setSelectedSubCategory(x);
       } else {
-        let pushingArray = [...selectedSubCategoryC];
-        if (event.target.checked) {
-          pushingArray.push({
-            parent_category: value.parentCategory,
-            sub_category: value._id,
-          });
-          setSelectedSubCategoryC(pushingArray);
-        }
+        setSelectedSubCategory(selectedSubCategory.concat(value._id));
       }
     } else {
       if (event.target.checked) {
         setSelectedCategory(selectedCategory.concat(value._id));
       } else {
         setSelectedCategory(selectedCategory.filter((i) => i !== value._id));
-        if (selectedSubCategoryC.some((i) => i.parent_category == value._id)) {
-          setSelectedSubCategoryC(
-            selectedSubCategoryC.filter((i) => i.parent_category !== value._id)
-          );
+        let findedvalue = 0;
+        for (let i = 0; i < value.childs.length; i++) {
+          if (selectedSubCategory.includes(value.childs[i]._id)) {
+            findedvalue = value.childs[i]._id;
+            break;
+          }
         }
+        setSelectedSubCategory(
+          selectedSubCategory.filter((i) => i !== findedvalue)
+        );
       }
     }
   };
@@ -551,15 +531,11 @@ export default function EditPost() {
                                     <input
                                       type="radio"
                                       name={k._id}
-                                      defaultChecked={selectedSubCategoryC.some(
-                                        (item) =>
-                                          item.parent_category ==
-                                            v.parentCategory &&
-                                          item.sub_category == v._id
+                                      defaultChecked={selectedSubCategory.includes(
+                                        v._id
                                       )}
-                                      // checked={}
                                       onChange={(e) => {
-                                        handleCategorySelection(e, v, true);
+                                        handleCategorySelection(e, v, true, k);
                                       }}
                                     />
                                     {v.title}&nbsp;

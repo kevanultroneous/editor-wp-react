@@ -92,7 +92,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
 
 exports.updatePost = catchAsyncError(async (req, res) => {
   const {
-    parentid,
+    postid,
     title,
     summary,
     category,
@@ -117,7 +117,7 @@ exports.updatePost = catchAsyncError(async (req, res) => {
 
   if (!ObjectId.isValid(postid)) {
     sendResponse(res, 500, {
-      msg: errorMessages.post.invalidPostID,
+      msg: errorMessages.post.invalidID,
       success: false,
     });
   }
@@ -144,6 +144,8 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     isApproved,
     isActive,
   };
+
+  console.log(category, subCategory);
 
   if (req.sendfile) changesTobeUpdated.featuredImage = req.sendfile;
 
@@ -234,15 +236,7 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
         success: false,
         msg: errorMessages.post.invalidPostID,
       });
-    getFullpost = await Post.findOne({ _id: postid, isActive: true })
-      .populate({
-        path: "category",
-        select: categoryPopulateString,
-      })
-      .populate({
-        path: "subCategory",
-        select: categoryPopulateString,
-      });
+    getFullpost = await Post.findOne({ _id: postid, isActive: true });
 
     if (!getFullpost)
       return sendResponse(res, 404, {
@@ -272,14 +266,6 @@ exports.getPRList = catchAsyncError(async (req, res) => {
       draftStatus: "published",
       isApproved: true,
     })
-      .populate({
-        path: "category",
-        select: categoryPopulateString,
-      })
-      .populate({
-        path: "subCategory",
-        select: categoryPopulateString,
-      })
       .sort({ releaseDate: -1 })
       .skip(pageOptions.skipVal)
       .limit(pageOptions.limitVal)
@@ -291,15 +277,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
         msg: errorMessages.post.invalidID,
       });
 
-    getFullpost = await Post.findOne({ _id: postid, isActive: true })
-      .populate({
-        path: "category",
-        select: categoryPopulateString,
-      })
-      .populate({
-        path: "subCategory",
-        select: categoryPopulateString,
-      });
+    getFullpost = await Post.findOne({ _id: postid, isActive: true });
   }
 
   if (getFullpost)
