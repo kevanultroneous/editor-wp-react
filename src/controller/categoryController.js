@@ -137,6 +137,7 @@ exports.updateCategory = catchAsyncError(async (req, res) => {
 
 exports.searchCategory = catchAsyncError(async (req, res, next) => {
   const { search } = req.body;
+
   const category = await Category.find({
     isActive: true,
     parentCategory: null,
