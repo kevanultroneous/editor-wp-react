@@ -111,6 +111,7 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     paidStatus,
     homePageStatus,
     isApproved,
+    isActive
   } = req.body;
 
   console.log("updating post");
@@ -142,11 +143,12 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     paidStatus,
     homePageStatus,
     isApproved,
+    isActive
   };
 
   if (req.sendfile) postTobeupdated.featuredImage = req.sendfile;
 
-  const updatedPost = await Post.findByIdAndUpdate(postid, postTobeupdated);
+  const updatedPost = await Post.findByIdAndUpdate(postid, postTobeupdated, {new: true});
 
   if (updatedPost) {
     sendResponse(res, 200, {
@@ -236,7 +238,7 @@ exports.getPRList = catchAsyncError(async(req, res) => {
       limitVal: parseInt(limit) || 30,
     };
 
-    getFullpost = await Post.find({ isActive: true ,paidStatus: true, draftStatus: "published", releaseDate : { $ne: {$gt: new Date()} }})
+    getFullpost = await Post.find({ isActive: true ,paidStatus: true, draftStatus: "published", isApproved: true})
       .sort({ releaseDate: -1 })
       .skip(pageOptions.skipVal)
       .limit(pageOptions.limitVal)
