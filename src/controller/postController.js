@@ -154,17 +154,18 @@ exports.updatePost = catchAsyncError(async (req, res) => {
 
     changesTobeUpdated.category = category
       ? postTobeupdated.category[0]
-        ? [...postTobeupdated.category, category]
+        ? [...postTobeupdated.category, ...category]
         : category
       : postTobeupdated.category;
 
     changesTobeUpdated.subCategory = subCategory
       ? postTobeupdated.subCategory[0]
-        ? [...postTobeupdated.subCategory, subCategory]
+        ? [...postTobeupdated.subCategory, ...subCategory]
         : subCategory
       : postTobeupdated.subCategory;
   }
 
+  console.log(changesTobeUpdated);
   const updatedPost = await Post.findByIdAndUpdate(postid, changesTobeUpdated, {
     new: true,
   });
@@ -214,12 +215,11 @@ exports.deletePost = catchAsyncError(async (req, res) => {
 
 // admin
 exports.getAllpost = catchAsyncError(async (req, res) => {
-  const { postid, page, limit } = req.body;
-  console.log(postid);
-  let getFullpost;
-  let categoryPopulateString = "title parentCategory";
+  const { postid, url, page, limit } = req.body;
 
-  if (!postid) {
+  let getFullpost;
+
+  if (!postid && !url) {
     const pageOptions = {
       skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
       limitVal: parseInt(limit) || 30,
@@ -236,7 +236,18 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
         success: false,
         msg: errorMessages.post.invalidPostID,
       });
-    getFullpost = await Post.findOne({ _id: postid, isActive: true });
+
+    let query = !url
+      ? {
+          _id: postid,
+          isActive: true,
+        }
+      : {
+          slugUrl: url,
+          isActive: true,
+        };
+
+    getFullpost = await Post.findOne(query);
 
     if (!getFullpost)
       return sendResponse(res, 404, {
@@ -250,10 +261,9 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
 });
 
 exports.getPRList = catchAsyncError(async (req, res) => {
-  const { postid, page, limit } = req.body;
+  const { postid, url, page, limit } = req.body;
 
   let getFullpost;
-  let categoryPopulateString = "title parentCategory";
 
   if (!postid) {
     const pageOptions = {
@@ -277,7 +287,17 @@ exports.getPRList = catchAsyncError(async (req, res) => {
         msg: errorMessages.post.invalidID,
       });
 
-    getFullpost = await Post.findOne({ _id: postid, isActive: true });
+    let query = !url
+      ? {
+          _id: postid,
+          isActive: true,
+        }
+      : {
+          slugUrl: url,
+          isActive: true,
+        };
+
+    getFullpost = await Post.findOne(query);
   }
 
   if (getFullpost)

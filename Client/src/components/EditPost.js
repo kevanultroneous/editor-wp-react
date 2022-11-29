@@ -76,7 +76,7 @@ export default function EditPost() {
           setSummary(r.data?.data?.summary);
           setContent(r.data?.data?.content);
           setUrl(r.data?.data?.slugUrl);
-          setWeburl(r.data?.data?.webUrl);
+          setWeburl(r.data?.data?.backlinkUrl);
           setPublish(r.data?.data?.draftStatus);
           setSelectedCategory(r.data?.data?.category);
           setSelectedSubCategory(r.data?.data?.subCategory);
@@ -85,6 +85,7 @@ export default function EditPost() {
           setHomePin(r.data?.data?.homePageStatus);
           setDummyImg(defaultUrl + r.data?.data?.featuredImage);
           setApproved(r.data?.data?.isApproved);
+          setSeokeywords(r.data?.data?.seoKeywords);
           setLoad(false);
         }
       })
