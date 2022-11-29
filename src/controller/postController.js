@@ -71,7 +71,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
   };
 
   if (subCategory) {
-    newPost.subCategory = subCategory.map((subCate) => subCate.subCategory);
+    newPost.subCategory = subCategory.map((subCate) => subCate.sub_category);
   }
 
   let post = await Post.create(newPost);
@@ -149,6 +149,12 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     isApproved,
     isActive,
   };
+
+  if (subCategory) {
+    postTobeupdated.subCategory = subCategory.map(
+      (subCate) => subCate.sub_category
+    );
+  }
 
   if (req.sendfile) postTobeupdated.featuredImage = req.sendfile;
 

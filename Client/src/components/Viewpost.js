@@ -10,6 +10,7 @@ export default function ViewPost() {
   const { postid, gpostid } = useParams();
   const [postData, setPostData] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     fetchParamPost();
   }, []);

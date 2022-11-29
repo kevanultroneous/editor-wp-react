@@ -91,9 +91,7 @@ export default function PostUploading() {
   formdata.append("title", mainTitle);
   formdata.append("summary", summary);
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
-  selectedSubCategory.map((v, i) =>
-    formdata.append(`subCategory[${i}]`, JSON.stringify(v))
-  );
+  selectedSubCategory.map((v, i) => formdata.append(`subCategory[${i}]`, v));
   formdata.append("content", content);
   formdata.append("image", ffile);
   formdata.append("author", author);
@@ -167,43 +165,42 @@ export default function PostUploading() {
     setUrl(v.split(" ").join("-"));
   };
 
-  const handleCategorySelection = (event, value, subcates) => {
-    if (subcates) {
-      let newarry = [...selectedSubCategory];
-      if (
-        selectedSubCategory.some(
-          (item) => item.parent_category == value.parentCategory
-        )
-      ) {
-        let updating = newarry.filter(
-          (i) => i.parent_category !== value.parentCategory
-        );
+  const alreadyfound = (ary1, ary2) => {
+    let output = 0;
+    for (let t = 0; t < ary1.length; t++) {
+      if (ary2.includes(ary1[t]._id)) {
+        output = ary1[t]._id;
+      }
+    }
+    return output;
+  };
 
-        updating.push({
-          parent_category: value.parentCategory,
-          sub_category: value._id,
-        });
-        setSelectedSubCategory(updating);
+  const handleCategorySelection = (event, value, subcates, buckets) => {
+    if (subcates) {
+      let checking = alreadyfound(buckets.childs, selectedSubCategory);
+      let copysubcategory = [...selectedSubCategory];
+      if (checking !== 0) {
+        let x = copysubcategory.filter((i) => i !== checking);
+        x.push(value._id);
+        setSelectedSubCategory(x);
       } else {
-        let pushingArray = [...selectedSubCategory];
-        if (event.target.checked) {
-          pushingArray.push({
-            parent_category: value.parentCategory,
-            sub_category: value._id,
-          });
-          setSelectedSubCategory(pushingArray);
-        }
+        setSelectedSubCategory(selectedSubCategory.concat(value._id));
       }
     } else {
       if (event.target.checked) {
         setSelectedCategory(selectedCategory.concat(value._id));
       } else {
         setSelectedCategory(selectedCategory.filter((i) => i !== value._id));
-        if (selectedSubCategory.some((i) => i.parent_category == value._id)) {
-          setSelectedSubCategory(
-            selectedSubCategory.filter((i) => i.parent_category !== value._id)
-          );
+        let findedvalue = 0;
+        for (let i = 0; i < value.childs.length; i++) {
+          if (selectedSubCategory.includes(value.childs[i]._id)) {
+            findedvalue = value.childs[i]._id;
+            break;
+          }
         }
+        setSelectedSubCategory(
+          selectedSubCategory.filter((i) => i !== findedvalue)
+        );
       }
     }
   };
@@ -482,15 +479,11 @@ export default function PostUploading() {
                                     <input
                                       type="radio"
                                       name={k._id}
-                                      defaultChecked={selectedSubCategory.some(
-                                        (item) =>
-                                          item.parent_category ==
-                                            v.parentCategory &&
-                                          item.sub_category == v._id
+                                      defaultChecked={selectedSubCategory.includes(
+                                        v._id
                                       )}
-                                      // checked={}
                                       onChange={(e) => {
-                                        handleCategorySelection(e, v, true);
+                                        handleCategorySelection(e, v, true, k);
                                       }}
                                     />
                                     {v.title}&nbsp;
