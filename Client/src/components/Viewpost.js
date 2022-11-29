@@ -16,7 +16,7 @@ export default function ViewPost() {
 
   const fetchParamPost = () => {
     axios
-      .get(`${defaultUrl}api/post/get-all-post`, { postid: postid })
+      .post(`${defaultUrl}api/post/get-all-post`, { postid: postid })
       .then((r) => {
         if (r.data.success) {
           if (r.data?.data === null) {

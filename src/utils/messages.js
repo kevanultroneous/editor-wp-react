@@ -35,7 +35,8 @@ const errorMessages = {
     postUpdatedError: "Post not updated !",
     postDeleted: "Post deleted successfully !",
     postDeleteError: "Post not deleted !",
-    invalidPostID: "post id is not valid !"
+    invalidPostID: "post id is not valid !",
+    postNotFound: "post not found !"
   },
   other: {
     InternServErr: "Internal server error !"

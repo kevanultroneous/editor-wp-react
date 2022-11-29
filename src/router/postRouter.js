@@ -25,7 +25,7 @@ postRouter.post(
 postRouter.post("/delete-post", postController.deletePost);
 
 // //get all post
-postRouter.get("/get-all-post", postController.getAllpost);
+postRouter.post("/get-all-post", postController.getAllpost);
 
 // front end pr list/ pr detail
 postRouter.get("/get-pr-list", postController.getPRList);

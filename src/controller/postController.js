@@ -117,9 +117,11 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     isApproved,
   } = req.body;
 
-  if (!ObjectId.isValid(parentid)) {
+  console.log("updating post");
+
+  if (!ObjectId.isValid(postid)) {
     sendResponse(res, 500, {
-      msg: errorMessages.post.inValidParentID,
+      msg: errorMessages.post.invalidPostID,
       success: false,
     });
   }
@@ -212,8 +214,12 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
         success: false,
         msg: errorMessages.post.invalidPostID,
       });
-
     getFullpost = await Post.findOne({ _id: postid, isActive: true });
+    if (!getFullpost)
+      return sendResponse(res, 404, {
+        success: true,
+        data: errorMessages.post.postNotFound,
+      });
   }
 
   if (getFullpost)

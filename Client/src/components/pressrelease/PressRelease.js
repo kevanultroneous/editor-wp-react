@@ -40,7 +40,7 @@ const PressRelease = () => {
 
   const fetchPosts = () => {
     axios
-      .get(`${defaultUrl}api/post/get-all-post`)
+      .post(`${defaultUrl}api/post/get-all-post`)
       .then((r) => {
         if (r.data.success) {
           setPostData(r.data.data);
@@ -98,7 +98,6 @@ const PressRelease = () => {
                   <th>Status</th>
                   <th>Released Date</th>
                   <th>Approved</th>
-                  <th>Deleted</th>
                   <th colSpan={3}>Action</th>
                 </tr>
               </thead>
@@ -128,7 +127,6 @@ const PressRelease = () => {
                           <MdClose color="red" size={30} />
                         )}
                       </td>
-                      <td>{v.isActive ? "No" : "Yes"}</td>
                       <td>
                         <Link to={`/view-press-release/${v._id}`}>
                           <Button variant="primary" style={{ width: "100%" }}>
