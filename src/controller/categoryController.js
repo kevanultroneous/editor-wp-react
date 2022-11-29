@@ -8,7 +8,7 @@ exports.uploadCategory = catchAsyncError(async (req, res) => {
   const { title, type, data, parentid, upddata, multiple } = req.body;
   if (multiple) {
     if (await Category.create(data)) {
-      sendResponse(res, 200, { msg: "Category uploaded !", success: true });
+      sendResponse(res, 200, { msg: "Category uploaded!", success: true });
     } else {
       sendResponse(res, 500, {
         msg: "Category not uploaded !",
@@ -36,38 +36,78 @@ exports.uploadCategory = catchAsyncError(async (req, res) => {
   }
 });
 
+// exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
+//   const { type } = req.params;
+
+//   const category = await Category.find({ isActive: true, parentCategory: null })
+//     .sort({ createdAt: -1 })
+//     .lean();
+
+//   let subCategory;
+//   if (category.length > 0) {
+//     for (let k = 0; k < category.length; k++) {
+//       subCategory = await Category.find({
+//         parentCategory: category[k]._id,
+//         isActive: true,
+//       })
+//         .sort({ createdAt: -1 })
+//         .lean();
+//       category[k].childs = subCategory;
+//     }
+//     sendResponse(res, 200, {
+//       msg: "Data available !",
+//       success: true,
+//       data: category,
+//     });
+//   } else {
+//     sendResponse(res, 200, {
+//       msg: "Data not availabel !",
+//       success: false,
+//       data: null,
+//     });
+//   }
+// });
+
 exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
-  const { type } = req.params;
-  const category = await Category.find({ isActive: true, parentCategory: null })
-    .sort({ createdAt: -1 })
-    .lean();
-  let subCategory;
-  if (category.length > 0) {
-    for (let k = 0; k < category.length; k++) {
-      subCategory = await Category.find({
-        parentCategory: category[k]._id,
-        isActive: true,
-      })
-        .sort({ createdAt: -1 })
-        .lean();
-      category[k].childs = subCategory;
-    }
-    sendResponse(res, 200, {
-      msg: "Data available !",
-      success: true,
-      data: category,
-    });
-  } else {
-    sendResponse(res, 200, {
-      msg: "Data not availabel !",
-      success: false,
-      data: null,
-    });
+
+  const selectedFields = {
+    title: 1,
+    parentCategory: 1,
+    postType: 1,
+    isActive: 1
   }
+
+  const allCategory = await Category.aggregate([
+    {
+      $match: {
+        isActive: true,
+        parentCategory: null,
+      },
+    },
+    {
+      $project: selectedFields
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "_id",
+        foreignField: "parentCategory",
+        pipeline: [{$project: selectedFields}, {$sort: {"createdAt": -1}}],
+        as: "childs",
+      },
+    },
+    {$sort: {"createdAt": -1}}
+  ]);
+
+  return sendResponse(res, 200, {
+    data: allCategory,
+    status: 200
+  });
 });
 
 exports.getSubcategories = catchAsyncError(async (req, res) => {
   const id = req.params["id"];
+  
   try {
     const singlecategory = await Category.find({ parentCategory: id })
       .select("subCategory")

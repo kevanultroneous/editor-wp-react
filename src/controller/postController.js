@@ -148,17 +148,18 @@ exports.updatePost = catchAsyncError(async (req, res) => {
 
     changesTobeUpdated.category = category
       ? postTobeupdated.category[0]
-        ? [...postTobeupdated.category, category]
+        ? [...postTobeupdated.category, ...category]
         : category
       : postTobeupdated.category;
 
     changesTobeUpdated.subCategory = subCategory
       ? postTobeupdated.subCategory[0]
-        ? [...postTobeupdated.subCategory, subCategory]
+        ? [...postTobeupdated.subCategory, ...subCategory]
         : subCategory
       : postTobeupdated.subCategory;
   }
 
+  console.log(changesTobeUpdated);
   const updatedPost = await Post.findByIdAndUpdate(postid, changesTobeUpdated, {
     new: true,
   });
@@ -181,7 +182,10 @@ exports.deletePost = catchAsyncError(async (req, res) => {
   const { postid } = req.body;
 
   if (!ObjectId.isValid(postid)) {
-    return sendResponse(res, 500, { msg: errorMessages.post.invalidID, success: false });
+    return sendResponse(res, 500, {
+      msg: errorMessages.post.invalidID,
+      success: false,
+    });
   }
 
   const softDeletePost = await Post.findByIdAndUpdate(postid, {
@@ -203,12 +207,11 @@ exports.deletePost = catchAsyncError(async (req, res) => {
 });
 
 exports.getAllpost = catchAsyncError(async (req, res) => {
-  const { postid, page, limit } = req.body;
+  const { postid, url, page, limit } = req.body;
 
   let getFullpost;
-  let categoryPopulateString = "title parentCategory";
 
-  if (!postid) {
+  if (!postid && !url) {
     const pageOptions = {
       skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
       limitVal: parseInt(limit) || 30,
@@ -225,15 +228,12 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
         success: false,
         msg: errorMessages.post.invalidPostID,
       });
-    getFullpost = await Post.findOne({ _id: postid, isActive: true })
-      .populate({
-        path: "category",
-        select: categoryPopulateString,
-      })
-      .populate({
-        path: "subCategory",
-        select: categoryPopulateString,
-      });
+
+    getFullpost = await Post.findOne({
+      _id: postid,
+      slugUrl: url,
+      isActive: true,
+    });
 
     if (!getFullpost)
       return sendResponse(res, 404, {
@@ -252,10 +252,9 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
 });
 
 exports.getPRList = catchAsyncError(async (req, res) => {
-  const { postid, page, limit } = req.body;
+  const { postid, url, page, limit } = req.body;
 
   let getFullpost;
-  let categoryPopulateString = "title parentCategory";
 
   if (!postid) {
     const pageOptions = {
@@ -268,14 +267,6 @@ exports.getPRList = catchAsyncError(async (req, res) => {
       draftStatus: "published",
       isApproved: true,
     })
-      .populate({
-        path: "category",
-        select: categoryPopulateString,
-      })
-      .populate({
-        path: "subCategory",
-        select: categoryPopulateString,
-      })
       .sort({ releaseDate: -1 })
       .skip(pageOptions.skipVal)
       .limit(pageOptions.limitVal)
@@ -287,15 +278,11 @@ exports.getPRList = catchAsyncError(async (req, res) => {
         msg: errorMessages.post.invalidID,
       });
 
-    getFullpost = await Post.findOne({ _id: postid, isActive: true })
-      .populate({
-        path: "category",
-        select: categoryPopulateString,
-      })
-      .populate({
-        path: "subCategory",
-        select: categoryPopulateString,
-      });
+    getFullpost = await Post.findOne({
+      _id: postid,
+      slugUrl: url,
+      isActive: true,
+    });
   }
 
   if (getFullpost)
