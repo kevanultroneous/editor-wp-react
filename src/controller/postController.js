@@ -1,13 +1,15 @@
 const sharp = require("sharp");
 let ObjectId = require("mongoose").Types.ObjectId;
+const { default: mongoose } = require("mongoose");
 
-const catchAsyncError = require("../utils/catchAsyncError");
 const { sendResponse, upload } = require("../utils/commonFunctions");
+const catchAsyncError = require("../utils/catchAsyncError");
+const { errorMessages } = require("../utils/messages");
+const {aggreFilters} = require("../utils/filterJson");
 
 const Post = require("../model/postModel");
 const Category = require("../model/categoryModel");
-const { errorMessages } = require("../utils/messages");
-const { default: mongoose } = require("mongoose");
+
 
 // add in common functions => check kyc
 exports.uploadImagesForFeatured = upload.single("image");
@@ -308,3 +310,29 @@ exports.getPRList = catchAsyncError(async (req, res) => {
     data: errorMessages.other.InternServErr,
   });
 });
+
+//home page
+exports.getTopBuzz = catchAsyncError(async (req, res) => {
+  const topBuzzFilter = {
+   ...aggreFilters.homePage.filters,
+   homePageStatus: true,
+  }
+  
+  const getTopBuzzPR = await Post.find(topBuzzFilter)
+  .sort(aggreFilters.homePage.sorting)
+  .limit(aggreFilters.homePage.limits)
+
+  return sendResponse(res, 200, {data: getTopBuzzPR, status: 200})
+})
+
+exports.getRecentPR = catchAsyncError(async (req, res) => {
+  const recentPRFilters = {
+    ...aggreFilters.homePage.filters,
+  }
+
+  const getRecentPRData = await Post.find(recentPRFilters)
+  .sort(aggreFilters.homePage.sorting)
+  .limit(aggreFilters.homePage.limits)
+
+  return sendResponse(res, 200, {data: getRecentPRData, status: 200})
+})
