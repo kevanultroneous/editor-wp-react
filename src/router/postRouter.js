@@ -13,7 +13,7 @@ postRouter.post(
   postController.addPost
 );
 
-// //update post
+//update post
 postRouter.post(
   "/update-post",
   postController.uploadImagesForFeatured,
@@ -21,13 +21,18 @@ postRouter.post(
   postController.updatePost
 );
 
-// //delete post
+//delete post
 postRouter.post("/delete-post", postController.deletePost);
 
-// //get all post
+//get all post
 postRouter.post("/get-all-post", postController.getAllpost);
 
 // front end pr list/ pr detail
 postRouter.post("/get-pr-list", postController.getPRList);
+
+// home page prs
+postRouter.get("/get-top-buzz", postController.getTopBuzz);
+postRouter.get("/get-recent-pr", postController.getRecentPR);
+
 
 module.exports = postRouter;
