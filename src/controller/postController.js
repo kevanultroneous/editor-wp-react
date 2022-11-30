@@ -267,7 +267,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
 
   let getFullpost;
 
-  if (!postid) {
+  if (!postid && !url) {
     const pageOptions = {
       skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
       limitVal: parseInt(limit) || 30,
