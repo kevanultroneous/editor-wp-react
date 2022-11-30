@@ -39,8 +39,9 @@ const errorMessages = {
     NotFound: "post not found !"
   },
   category: {
-    uploaded: "Category uploaded!",
-    uploadError: "Category not uploaded !",
+    created: "Category created!",
+    inComplete: "Please provide valid details",
+    inValidParentID: "parent id is not valid !",
     invalid: "Enter valid category title ! ,length must be greater than 3 and lessthan 30 words !"
 
   },

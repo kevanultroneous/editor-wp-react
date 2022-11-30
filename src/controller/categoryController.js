@@ -1,98 +1,63 @@
 const { default: mongoose } = require("mongoose");
-const Category = require("../model/categoryModel");
-const catchAsyncError = require("../utils/catchAsyncError");
-const { sendResponse } = require("../utils/commonFunctions");
 let ObjectId = require("mongoose").Types.ObjectId;
 
-exports.uploadCategory = catchAsyncError(async (req, res) => {
-  const { title, postType, data, multiple } = req.body;
-  if (multiple) {
-    if (await Category.create(data)) {
-      sendResponse(res, 200, { msg: "Category uploaded!", success: true });
-    } else {
-      sendResponse(res, 500, {
-        msg: "Category not uploaded !",
-        success: false,
-      });
+const Category = require("../model/categoryModel");
+
+const catchAsyncError = require("../utils/catchAsyncError");
+const { sendResponse } = require("../utils/commonFunctions");
+const { aggreFilters } = require("../utils/filterJson");
+const { errorMessages } = require("../utils/messages");
+
+exports.createCategory = catchAsyncError(async (req, res) => {
+  const { title, postType, parentCategory, } = req.body;
+
+  let newCategory;
+
+  if(!title || !postType ) return sendResponse(res, 400, {msg: errorMessages.category.inComplete, status: 400})
+
+  if(!parentCategory){
+
+    newCategory = {
+      title,
+      postType,
+      parentCategory: null
     }
-  } else {
-    if (!title || title === "null" || title.length < 3) {
-      sendResponse(res, 400, {
-        msg: "Enter valid category title ! ,length must be greater than 3 and lessthan 30 words !",
-        success: false,
-      });
-    } else if (!(postType === "press" || postType === "blog")) {
-      sendResponse(res, 400, { msg: "type is not valid !", success: false });
-    } else {
-      if (await Category.create({ title, postType })) {
-        sendResponse(res, 200, { msg: "Category uploaded !", success: true });
-      } else {
-        sendResponse(res, 500, {
-          msg: "Category not uploaded !",
-          success: false,
-        });
-      }
+
+  }else {
+
+    if(!mongoose.isValidObjectId(parentCategory)) return sendResponse(res, 400, {msg: errorMessages.category.inValidParentID, status: 400})
+
+    let checkExistingCategory = await Category.exists({_id: parentCategory});
+    console.log(checkExistingCategory);
+    if(!checkExistingCategory) return sendResponse(res, 400, {msg: errorMessages.category.inValidParentID, status: 400})
+
+    newCategory = {
+      title,
+      postType,
+      parentCategory
     }
   }
+
+  newCategory = await Category.create(newCategory);
+  return sendResponse(res, 200, {msg: errorMessages.category.created, data: newCategory})
+  
 });
 
-// exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
-//   const { type } = req.params;
-
-//   const category = await Category.find({ isActive: true, parentCategory: null })
-//     .sort({ createdAt: -1 })
-//     .lean();
-
-//   let subCategory;
-//   if (category.length > 0) {
-//     for (let k = 0; k < category.length; k++) {
-//       subCategory = await Category.find({
-//         parentCategory: category[k]._id,
-//         isActive: true,
-//       })
-//         .sort({ createdAt: -1 })
-//         .lean();
-//       category[k].childs = subCategory;
-//     }
-//     sendResponse(res, 200, {
-//       msg: "Data available !",
-//       success: true,
-//       data: category,
-//     });
-//   } else {
-//     sendResponse(res, 200, {
-//       msg: "Data not availabel !",
-//       success: false,
-//       data: null,
-//     });
-//   }
-// });
-
 exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
-  const selectedFields = {
-    title: 1,
-    parentCategory: 1,
-    postType: 1,
-    isActive: 1,
-  };
-
   const allCategory = await Category.aggregate([
     {
-      $match: {
-        isActive: true,
-        parentCategory: null,
-      },
+      $match: aggreFilters.category.filters,
     },
     {
-      $project: selectedFields,
+      $project: aggreFilters.category.project,
     },
     {
       $lookup: {
-        from: "categories",
-        localField: "_id",
-        foreignField: "parentCategory",
-        pipeline: [{ $project: selectedFields }, { $sort: { createdAt: -1 } }],
-        as: "childs",
+        ...aggreFilters.category.subCategories,
+        pipeline: [
+          { $project: aggreFilters.category.project },
+          { $sort: { createdAt: -1 } },
+        ],
       },
     },
     { $sort: { createdAt: -1 } },
@@ -177,38 +142,29 @@ exports.updateCategory = catchAsyncError(async (req, res) => {
 exports.searchCategory = catchAsyncError(async (req, res, next) => {
   const { search } = req.body;
 
-  const category = await Category.find({
-    isActive: true,
-    parentCategory: null,
-    title: {
-      $regex: toString(search),
-      $options: "i",
+  const category = await Category.aggregate([
+    {
+      $match: {
+        ...aggreFilters.category.filters,
+        title: new RegExp(search, "i"),
+      },
     },
+    { $project: aggreFilters.category.project },
+    { $sort: { createdAt: -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        ...aggreFilters.category.subCategories,
+        pipeline: [
+          { $project: aggreFilters.category.project },
+          { $sort: { createdAt: -1 } },
+        ],
+      },
+    },
+  ]);
+
+  sendResponse(res, 200, {
+    data: category,
+    status: 200
   })
-    .sort({ createdAt: -1 })
-    .limit(10)
-    .lean();
-  let subCategory;
-  if (category.length > 0) {
-    for (let k = 0; k < category.length; k++) {
-      subCategory = await Category.find({
-        parentCategory: category[k]._id,
-        isActive: true,
-      })
-        .sort({ createdAt: -1 })
-        .lean();
-      category[k].childs = subCategory;
-    }
-    sendResponse(res, 200, {
-      msg: "Data available !",
-      success: true,
-      data: category,
-    });
-  } else {
-    sendResponse(res, 200, {
-      msg: "Data not availabel !",
-      success: false,
-      data: null,
-    });
-  }
 });
