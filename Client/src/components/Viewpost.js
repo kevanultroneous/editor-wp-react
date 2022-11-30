@@ -6,6 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import { defaultUrl } from "../utils/default";
 import Header from "./common/Header";
+
 export default function ViewPost() {
   const { postid, gpostid } = useParams();
   const [postData, setPostData] = useState([]);
