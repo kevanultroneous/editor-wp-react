@@ -599,8 +599,10 @@ export default function EditPost() {
                   <strong>Publish / Draft</strong>
                 </Form.Label>
                 <Form.Check
-                  onChange={(e) => setPublish(e.target.checked ? 1 : 0)}
-                  checked={publish}
+                  onChange={(e) =>
+                    setPublish(e.target.checked ? "published" : "draft")
+                  }
+                  checked={publish == "published" ? true : false}
                   type="switch"
                   id="custom-switch"
                   label="Publish"
