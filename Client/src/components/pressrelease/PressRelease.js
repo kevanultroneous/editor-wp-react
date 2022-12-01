@@ -109,14 +109,18 @@ const PressRelease = () => {
                       <td>
                         <Image
                           src={`${defaultUrl + v.featuredImage}`}
-                          height={20}
-                          width={50}
+                          height={70}
+                          width={"100%"}
                         />
                       </td>
                       <td>{v.title}</td>
                       <td>https://unmediabuzz.com/PressRelease/{v.slugUrl}</td>
                       <td className="text-center">
-                        <p>{v.draftStatus ? "Published" : "Drafted"}</p>
+                        <p>
+                          {v.draftStatus == "published"
+                            ? "Published"
+                            : "Drafted"}
+                        </p>
                       </td>
 
                       <td>{timestampToDate(v.releaseDate)}</td>
