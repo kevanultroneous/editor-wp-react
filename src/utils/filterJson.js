@@ -25,8 +25,9 @@ const aggreFilters = {
       from: "categories",
       localField: "_id",
       foreignField: "parentCategory",
-      as: "childs",
+      as: "subcategories",
     },
+    postTypes: ["blog", "press"]
   },
 };
 

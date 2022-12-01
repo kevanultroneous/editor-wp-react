@@ -13,7 +13,10 @@ exports.createCategory = catchAsyncError(async (req, res) => {
 
   let newCategory;
 
-  if(!title || !postType ) return sendResponse(res, 400, {msg: errorMessages.category.inComplete, status: 400})
+  if(!title || !postType ) return sendResponse(res, 400, {msg: errorMessages.category.inComplete, status: 400});
+
+  const alreadyCategory = await Category.exists({title: title})
+  if(alreadyCategory) return sendResponse(res, 400, {msg: errorMessages.category.categoryExists, status: 400})
 
   if(!parentCategory){
 
@@ -70,73 +73,71 @@ exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
 });
 
 exports.getSubcategories = catchAsyncError(async (req, res) => {
-  const id = req.params["id"];
+  const {parentId} = req.body;
+  let category;
 
-  try {
-    const singlecategory = await Category.find({ parentCategory: id })
-      .select("subCategory")
-      .lean();
-    if (!singlecategory) {
-      sendResponse(res, 200, { success: true, data: null });
-    } else {
-      sendResponse(res, 200, { success: true, data: singlecategory });
-    }
-  } catch (e) {
-    sendResponse(res, 500, { success: false, data: null });
-  }
+  if(!mongoose.isValidObjectId(parentId)) return sendResponse(res, 400, {msg: errorMessages.category.inValidParentID, status: 400});
+
+  category = await Category.aggregate([
+    {
+      $match: {
+        ...aggreFilters.category.filters,
+        _id: mongoose.Types.ObjectId(parentId)
+      }
+    },
+    { $project: aggreFilters.category.project },
+    { $sort: { createdAt: -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        ...aggreFilters.category.subCategories,
+        pipeline: [
+          { $project: aggreFilters.category.project },
+          { $sort: { createdAt: -1 } },
+        ],
+      },
+    },
+  ]);
+
+  sendResponse(res, 200, {
+    data: category,
+    status: 200
+  })
+
 });
 
 exports.deleteCategory = catchAsyncError(async (req, res) => {
-  const { catid } = req.body;
-  if (!catid || !ObjectId.isValid(catid)) {
-    sendResponse(res, 400, { success: false, msg: "catid is not valid !" });
-  } else {
-    const deletecat = await Category.updateOne(
-      { _id: catid },
-      { isActive: false }
-    );
-    if (deletecat) {
-      sendResponse(res, 200, { success: true, msg: "category deleted !" });
-    } else {
-      sendResponse(res, 500, { success: false, msg: "category not deleted !" });
-    }
-  }
+  const { categoryId } = req.body;
+
+  let category;
+  let update= {isActive: false}
+
+  if(!mongoose.isValidObjectId(categoryId)) return sendResponse(res, 400, {msg: errorMessages.category.inValidParentID, status: 400});
+
+  category = await Category.findByIdAndUpdate(categoryId, update, {new: true})
+  return sendResponse(res, 200, {msg: errorMessages.category.deleted, data: category, status: 200})
+
 });
 
 exports.updateCategory = catchAsyncError(async (req, res) => {
-  const { catid, newtitle, postType } = req.body;
-  if (
-    !newtitle ||
-    newtitle === "null" ||
-    (newtitle.length <= 3 && !newtitle.length >= 30)
-  ) {
-    sendResponse(res, 400, {
-      msg: "Enter valid new category title , length must be greater than 3 and lessthan 30 words !",
-      success: false,
-    });
+  const { categoryId, title, postType, isActive } = req.body;
+
+  let categoryUpdated;
+
+  if (!mongoose.isValidObjectId(categoryId)) return sendResponse(res, 400, {msg: errorMessages.category.inValidCategoryID, status: 400});
+  
+  const checkExistingCategory = await Category.exists({_id: categoryId});
+  if(!checkExistingCategory) return sendResponse(res, 400, {msg: errorMessages.category.doesntExist, status: 400})
+
+  categoryUpdated = {
+    title, 
+    postType,
+    isActive
   }
-  if (!(postType === "press" || postType === "blog")) {
-    sendResponse(res, 400, { msg: "type is not valid !", success: false });
-  }
-  if (!catid || !ObjectId.isValid(catid)) {
-    sendResponse(res, 400, { success: false, msg: "catid is not valid !" });
-  } else {
-    const updatecatname = await Category.findOneAndUpdate(
-      { _id: catid },
-      { title: newtitle, postType: type }
-    ).clone();
-    if (updatecatname) {
-      sendResponse(res, 200, {
-        success: true,
-        msg: "category edited successfully !",
-      });
-    } else {
-      sendResponse(res, 500, {
-        success: false,
-        msg: "category edited failed !",
-      });
-    }
-  }
+
+  categoryUpdated = await Category.findOneAndUpdate({_id: categoryId}, categoryUpdated, {new: true})
+
+  return sendResponse(res, 200, {msg: errorMessages.category.updated, data: categoryUpdated, staus: 200})
 });
 
 exports.searchCategory = catchAsyncError(async (req, res, next) => {
