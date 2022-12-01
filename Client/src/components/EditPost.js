@@ -86,6 +86,8 @@ export default function EditPost() {
           setDummyImg(defaultUrl + r.data?.data?.featuredImage);
           setApproved(r.data?.data?.isApproved);
           setSeokeywords(r.data?.data?.seoKeywords);
+          setPaid(r.data?.data?.paidStatus);
+          setPaidPrice(r.data?.data?.totalPaidAmount);
           setLoad(false);
         }
       })
@@ -528,7 +530,7 @@ export default function EditPost() {
                             </div>
                             {selectedCategory?.includes(k._id) ? (
                               <div className="TagsWrraper">
-                                {k?.childs?.map((v, i) => (
+                                {k?.subcategories?.map((v, i) => (
                                   <div className="ms-3">
                                     <input
                                       type="radio"
