@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const {aggreFilters} = require("../utils/filterJson");
 
 const schema = new mongoose.Schema(
   {
@@ -67,7 +68,7 @@ const schema = new mongoose.Schema(
     postType: {
       type: String,
       default: "press",
-      enum: ["blog", "press"],
+      enum: aggreFilters.category.postTypes,
     },
     releaseDate: {
       type: Date,
