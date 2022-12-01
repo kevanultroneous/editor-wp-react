@@ -207,37 +207,38 @@ exports.searchCategory = catchAsyncError(async (req, res, next) => {
   //   },
   // ]
   const { search } = req.body;
-  const results = await Category.find({
+  const category = await Category.find({
+    isActive: true,
+    parentCategory: null,
     title: {
       $regex: search,
       $options: "i",
     },
   })
-    // .limit(10)
     .sort({ createdAt: -1 })
+    .limit(10)
     .lean();
-  if (results) {
-    if (results.length === 0) {
-      return res.status(200).send({
-        success: true,
-        data: null,
-        msg: "data not found !",
-        suggestion: true,
-      });
-    } else {
-      return res.status(200).send({
-        success: true,
-        data: results,
-        msg: "data availabel !",
-        suggestion: false,
-      });
+  let subcategory;
+  if (category.length > 0) {
+    for (let k = 0; k < category.length; k++) {
+      subcategory = await Category.find({
+        parentCategory: category[k]._id,
+        isActive: true,
+      })
+        .sort({ createdAt: -1 })
+        .lean();
+      category[k].childs = subcategory;
     }
+    sendResponse(res, 200, {
+      msg: "Data available !",
+      success: true,
+      data: category,
+    });
   } else {
-    return res.status(500).send({
+    sendResponse(res, 200, {
+      msg: "Data not availabel !",
       success: false,
       data: null,
-      msg: "Internal server error !",
-      suggestion: false,
     });
   }
 });
