@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const {aggreFilters} = require("../utils/filterJson");
+const { aggreFilters } = require("../utils/filterJson");
 
 const schema = new mongoose.Schema(
   {
@@ -78,11 +78,11 @@ const schema = new mongoose.Schema(
       type: Date,
       default: new Date(),
     },
-    // paidStatus: {
-    //   type: Boolean,
-    //   required: true,
-    //   default: false,
-    // },
+    paidStatus: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     plan: {
       type: mongoose.Types.ObjectId,
       ref: "Plan",

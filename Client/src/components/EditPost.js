@@ -49,7 +49,7 @@ export default function EditPost() {
   const [dummyImg, setDummyImg] = useState("");
   const [load, setLoad] = useState(true);
   const [seokeywords, setSeokeywords] = useState("");
-
+  const [paidprice, setPaidPrice] = useState("");
   //search category
   const [searchCateg, setSearchCateg] = useState([]);
   const [searchText, setSerachText] = useState("");
@@ -137,6 +137,7 @@ export default function EditPost() {
   formdata.append("releaseDate", new Date(releaseDate));
   formdata.append("submitDate", new Date());
   formdata.append("paidStatus", paid);
+  formdata.append("totalPaidAmount", paidprice);
   formdata.append("homePageStatus", homePin);
   formdata.append("isApproved", approved);
   formdata.append("seoKeywords", seokeywords);
@@ -178,7 +179,7 @@ export default function EditPost() {
     setLoader(true);
     setTimeout(() => {
       axios
-        .get(`${defaultUrl}api/category/search-category`, { search })
+        .post(`${defaultUrl}api/category/search-category`, { search })
         .then((r) => {
           setLoader(false);
           setSearchCateg(r.data?.data);
@@ -619,8 +620,17 @@ export default function EditPost() {
                   type="switch"
                   id="custom-switch"
                   label="Paid"
-                  disabled
                 />
+                {paid ? (
+                  <Form.Control
+                    placeholder="Total Paid amount"
+                    id="basic-url"
+                    aria-describedby="basic-addon3"
+                    value={paidprice}
+                    className="mt-3"
+                    onChange={(e) => setPaidPrice(e.target.value)}
+                  />
+                ) : null}
               </div>
               <div className="mt-4">
                 <Form.Label>

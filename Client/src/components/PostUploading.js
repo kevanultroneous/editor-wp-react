@@ -46,6 +46,7 @@ export default function PostUploading() {
   const [releaseDate, setReleaseDate] = useState("");
   const [weburl, setWeburl] = useState("");
   const [seokeywords, setSeokeywords] = useState("");
+  const [paidprice, setPaidPrice] = useState("");
   //search category
   const [searchCateg, setSearchCateg] = useState([]);
   const [searchText, setSerachText] = useState("");
@@ -107,6 +108,7 @@ export default function PostUploading() {
   formdata.append("releaseDate", new Date(releaseDate));
   formdata.append("submitDate", new Date());
   formdata.append("paidStatus", paid);
+  formdata.append("totalPaidAmount", paidprice);
   formdata.append("homePageStatus", homePin);
   formdata.append("isApproved", false);
 
@@ -148,7 +150,7 @@ export default function PostUploading() {
     setLoader(true);
     setTimeout(() => {
       axios
-        .get(`${defaultUrl}api/category/search-category`, {
+        .post(`${defaultUrl}api/category/search-category`, {
           search,
         })
         .then((r) => {
@@ -569,8 +571,17 @@ export default function PostUploading() {
                   type="switch"
                   id="custom-switch"
                   label="Paid"
-                  disabled
                 />
+                {paid ? (
+                  <Form.Control
+                    placeholder="Total Paid amount"
+                    id="basic-url"
+                    aria-describedby="basic-addon3"
+                    value={paidprice}
+                    className="mt-3"
+                    onChange={(e) => setPaidPrice(e.target.value)}
+                  />
+                ) : null}
               </div>
               <div className="mt-4">
                 <Form.Label>
