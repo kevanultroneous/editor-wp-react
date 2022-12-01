@@ -1,13 +1,15 @@
 const { check, validationResult, body } = require("express-validator");
+
 const AppError = require("./appError");
 const { errorMessages } = require("./messages");
+const {aggreFilters} = require("./filterJson");
 
 const sendErrorResponse = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(422).json({
-      status: "error",
+      status: 400,
       message: errors.errors.map((el) => el.msg)[0],
     });
   }
@@ -99,3 +101,23 @@ exports.validateNewConfirmPassword = [
     sendErrorResponse(req, res, next);
   },
 ];
+
+exports.validateCategory = [
+  body("title")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage(errorMessages.category.invalidTitle)
+    .isLength({ min: 3, max: 30 })
+    .withMessage(errorMessages.category.invalidTitleLength),
+    body("postType")
+    .trim()
+    .not()
+    .isEmpty()
+    .isIn(aggreFilters.category.postTypes)
+    .withMessage(errorMessages.category.invalidPostType),
+  (req, res, next) => {
+    sendErrorResponse(req, res, next);
+  },
+];
+
