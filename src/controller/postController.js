@@ -148,23 +148,6 @@ exports.updatePost = catchAsyncError(async (req, res) => {
 
   if (req.sendfile) changesTobeUpdated.featuredImage = req.sendfile;
 
-  if (category || subCategory) {
-    const postTobeupdated = await Post.findOne({ _id: postid });
-
-    // changesTobeUpdated.category = category
-    //   ? postTobeupdated.category[0]
-    //     ? [...postTobeupdated.category, ...category]
-    //     : category
-    //   : postTobeupdated.category;
-
-    // changesTobeUpdated.subCategory = subCategory
-    //   ? postTobeupdated.subCategory[0]
-    //     ? [...postTobeupdated.subCategory, subCategory]
-    //     : subCategory
-    //   : postTobeupdated.subCategory;
-  }
-
-  console.log(changesTobeUpdated);
   const updatedPost = await Post.findByIdAndUpdate(postid, changesTobeUpdated, {
     new: true,
   });
