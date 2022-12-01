@@ -530,7 +530,7 @@ export default function EditPost() {
                             </div>
                             {selectedCategory?.includes(k._id) ? (
                               <div className="TagsWrraper">
-                                {k?.subcategories?.map((v, i) => (
+                                {k?.childs?.map((v, i) => (
                                   <div className="ms-3">
                                     <input
                                       type="radio"
