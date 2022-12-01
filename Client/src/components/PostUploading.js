@@ -113,8 +113,12 @@ export default function PostUploading() {
   const postUpload = () => {
     if (ffile == null) {
       toast.error("Featured image is required !");
+    } else if (releaseDate == "") {
+      toast.error("Date is required !");
     } else if (mainTitle == "") {
       toast.error("Title is required !");
+    } else if (mainTitle.length > 80) {
+      toast.error("Title length is less than 80 words !");
     } else if (selectedCategory.length <= 0) {
       toast.error("Please select one or more category !");
     } else if (content.length < 100) {

@@ -5,11 +5,10 @@ const { default: mongoose } = require("mongoose");
 const { sendResponse, upload } = require("../utils/commonFunctions");
 const catchAsyncError = require("../utils/catchAsyncError");
 const { errorMessages } = require("../utils/messages");
-const {aggreFilters} = require("../utils/filterJson");
+const { aggreFilters } = require("../utils/filterJson");
 
 const Post = require("../model/postModel");
 const Category = require("../model/categoryModel");
-
 
 // add in common functions => check kyc
 exports.uploadImagesForFeatured = upload.single("image");
@@ -149,6 +148,23 @@ exports.updatePost = catchAsyncError(async (req, res) => {
 
   if (req.sendfile) changesTobeUpdated.featuredImage = req.sendfile;
 
+  if (category || subCategory) {
+    const postTobeupdated = await Post.findOne({ _id: postid });
+
+    // changesTobeUpdated.category = category
+    //   ? postTobeupdated.category[0]
+    //     ? [...postTobeupdated.category, ...category]
+    //     : category
+    //   : postTobeupdated.category;
+
+    // changesTobeUpdated.subCategory = subCategory
+    //   ? postTobeupdated.subCategory[0]
+    //     ? [...postTobeupdated.subCategory, subCategory]
+    //     : subCategory
+    //   : postTobeupdated.subCategory;
+  }
+
+  console.log(changesTobeUpdated);
   const updatedPost = await Post.findByIdAndUpdate(postid, changesTobeUpdated, {
     new: true,
   });
@@ -295,25 +311,25 @@ exports.getPRList = catchAsyncError(async (req, res) => {
 //home page
 exports.getTopBuzz = catchAsyncError(async (req, res) => {
   const topBuzzFilter = {
-   ...aggreFilters.homePage.filters,
-   homePageStatus: true,
-  }
-  
-  const getTopBuzzPR = await Post.find(topBuzzFilter)
-  .sort(aggreFilters.homePage.sorting)
-  .limit(aggreFilters.homePage.limits)
+    ...aggreFilters.homePage.filters,
+    homePageStatus: true,
+  };
 
-  return sendResponse(res, 200, {data: getTopBuzzPR, status: 200})
-})
+  const getTopBuzzPR = await Post.find(topBuzzFilter)
+    .sort(aggreFilters.homePage.sorting)
+    .limit(aggreFilters.homePage.limits);
+
+  return sendResponse(res, 200, { data: getTopBuzzPR, status: 200 });
+});
 
 exports.getRecentPR = catchAsyncError(async (req, res) => {
   const recentPRFilters = {
     ...aggreFilters.homePage.filters,
-  }
+  };
 
   const getRecentPRData = await Post.find(recentPRFilters)
-  .sort(aggreFilters.homePage.sorting)
-  .limit(aggreFilters.homePage.limits)
+    .sort(aggreFilters.homePage.sorting)
+    .limit(aggreFilters.homePage.limits);
 
-  return sendResponse(res, 200, {data: getRecentPRData, status: 200})
-})
+  return sendResponse(res, 200, { data: getRecentPRData, status: 200 });
+});
