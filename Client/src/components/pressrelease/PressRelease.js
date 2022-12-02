@@ -1,4 +1,12 @@
-import { Button, Col, Container, Image, Row, Table } from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  Col,
+  Container,
+  Image,
+  Row,
+  Table,
+} from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import Header from "../common/Header";
 import "./style.css";
@@ -6,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import DeleteModel from "../common/DeleteModel";
-import { defaultUrl } from "../../utils/default";
+import { defaultUrl, frontendurl } from "../../utils/default";
 import { MdClose, MdDone, MdDoneAll, MdDrafts } from "react-icons/md";
 
 const PressRelease = () => {
@@ -109,12 +117,27 @@ const PressRelease = () => {
                       <td>
                         <Image
                           src={`${defaultUrl + v.featuredImage}`}
-                          height={70}
-                          width={"100%"}
+                          height={30}
+                          width={"70%"}
                         />
                       </td>
-                      <td>{v.title}</td>
-                      <td>https://unmediabuzz.com/PressRelease/{v.slugUrl}</td>
+                      <td>
+                        {v.paidStatus && (
+                          <Badge bg="success" pill>
+                            Purchased {v.totalPaidAmount}
+                          </Badge>
+                        )}
+                        <br />
+                        {v.title}
+                      </td>
+                      <td>
+                        <a
+                          href={`${frontendurl}press-release/${v.slugUrl}`}
+                          target={"_blank"}
+                        >
+                          visit
+                        </a>
+                      </td>
                       <td className="text-center">
                         <p>
                           {v.draftStatus == "published"
