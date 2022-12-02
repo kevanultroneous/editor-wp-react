@@ -5,7 +5,6 @@ const aggreFilters = {
       draftStatus: "published",
       isActive: true,
       postType: "press",
-      releaseDate: { $lte: new Date() },
     },
     sorting: { submittedDate: 1 },
     limits: 7,
@@ -27,7 +26,17 @@ const aggreFilters = {
       foreignField: "parentCategory",
       as: "subcategories",
     },
-    postTypes: ["blog", "press"]
+    postTypes: ["blog", "press"],
+  },
+  prList: {
+    pagination: {
+      limits: 30,
+    },
+  },
+  prDetail: {
+    interested: {
+      limits: 2,
+    },
   },
 };
 

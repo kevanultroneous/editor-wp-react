@@ -44,8 +44,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
     draftStatus,
     postType,
     releaseDate,
-    submitDate,
-    // paidStatus,
+    paidStatus,
     homePageStatus,
     isApproved,
   } = req.body;
@@ -67,7 +66,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
     draftStatus,
     postType,
     releaseDate,
-    // paidStatus,
+    paidStatus,
     homePageStatus,
     isApproved,
   };
@@ -295,6 +294,7 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
   const topBuzzFilter = {
     ...aggreFilters.homePage.filters,
     homePageStatus: true,
+    releaseDate: { $lte: new Date() },
   };
 
   const getTopBuzzPR = await Post.find(topBuzzFilter)
@@ -307,6 +307,7 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
 exports.getRecentPR = catchAsyncError(async (req, res) => {
   const recentPRFilters = {
     ...aggreFilters.homePage.filters,
+    releaseDate: { $lte: new Date() },
   };
 
   const getRecentPRData = await Post.find(recentPRFilters)
@@ -314,4 +315,129 @@ exports.getRecentPR = catchAsyncError(async (req, res) => {
     .limit(aggreFilters.homePage.limits);
 
   return sendResponse(res, 200, { data: getRecentPRData, status: 200 });
+});
+
+exports.globalSearch = catchAsyncError(async (req, res) => {
+  const { searchTerm, page, limit } = req.body;
+
+  const searchMatch = {
+    $match: {
+      ...aggreFilters.homePage.filters,
+      title: new RegExp(searchTerm, "i"),
+    },
+  };
+
+  const pageOptions = {
+    skipVal:
+      (parseInt(page) - 1 || 0) *
+      (parseInt(limit) || aggreFilters.prList.pagination.limits),
+    limitVal: parseInt(limit) || aggreFilters.prList.pagination.limits,
+  };
+
+  let searchedPosts;
+  searchedPosts = await Post.aggregate([
+    {
+      $facet: {
+        mainDoc: [
+          searchMatch,
+          { $skip: pageOptions.skipVal },
+          { $limit: pageOptions.limitVal },
+        ],
+        totalCount: [searchMatch, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ]);
+
+  return sendResponse(res, 200, { data: searchedPosts, status: 200 });
+});
+
+exports.internalSearch = catchAsyncError(async (req, res) => {
+  const { searchTerm, page, limit } = req.body;
+
+  const pageOptions = {
+    skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+    limitVal: parseInt(limit) || 30,
+  };
+
+  const searchMatch = {
+    $match: {
+      ...aggreFilters.homePage.filters,
+      $or: [
+        { title: new RegExp(searchTerm, "i") },
+        { summary: new RegExp(searchTerm, "i") },
+      ],
+    },
+  };
+
+  let searchedPosts;
+  searchedPosts = await Post.aggregate([
+    {
+      $facet: {
+        mainDoc: [
+          searchMatch,
+          { $skip: pageOptions.skipVal },
+          { $limit: pageOptions.limitVal },
+        ],
+        totalCount: [searchMatch, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ]);
+
+  return sendResponse(res, 200, { data: searchedPosts, status: 200 });
+});
+
+exports.interestedPosts = catchAsyncError(async (req, res) => {
+  const { postId } = req.body;
+
+  let interestedPostList;
+
+  const sortLimit = [
+    { $sort: { createdAt: -1 } },
+    { $limit: aggreFilters.prDetail.interested.limits },
+  ];
+
+  const fetchedPost = await Post.findOne({ _id: postId });
+  let interestedPostCategory = fetchedPost.category[0];
+
+  if (interestedPostCategory) {
+    interestedPostList = await Post.aggregate([
+      {
+        $match: {
+          ...aggreFilters.homePage.filters,
+          category: interestedPostCategory,
+        },
+      },
+      ...sortLimit,
+    ]);
+  }
+
+  if (interestedPostList.length < 2 || interestedPostCategory.length < 1) {
+    console.log("recent");
+    interestedPostList = await Post.aggregate([
+      {
+        $match: {
+          ...aggreFilters.homePage.filters,
+          _id: { $ne: ObjectId(postId) },
+          releaseDate: { $lte: new Date() },
+        },
+      },
+      ...sortLimit,
+    ]);
+  }
+
+  return sendResponse(res, 200, { data: interestedPostList });
 });
