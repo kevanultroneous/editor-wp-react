@@ -26,11 +26,18 @@ const aggreFilters = {
       foreignField: "parentCategory",
       as: "subcategories",
     },
-    postTypes: ["blog", "press"]
+    postTypes: ["blog", "press"],
+  },
+  prList: {
+    pagination: {
+      limits: 30,
+    },
   },
   prDetail: {
-    limits: 2
-  }
+    interested: {
+      limits: 2,
+    },
+  },
 };
 
 module.exports = { aggreFilters };
