@@ -207,7 +207,7 @@ export default function PostUploading() {
 
   const handleCategorySelection = (event, value, subcates, buckets) => {
     if (subcates) {
-      let checking = alreadyfound(buckets.childs, selectedSubCategory);
+      let checking = alreadyfound(buckets.subcategories, selectedSubCategory);
       let copysubcategory = [...selectedSubCategory];
       if (checking !== 0) {
         let x = copysubcategory.filter((i) => i !== checking);
@@ -222,9 +222,9 @@ export default function PostUploading() {
       } else {
         setSelectedCategory(selectedCategory.filter((i) => i !== value._id));
         let findedvalue = 0;
-        for (let i = 0; i < value.childs.length; i++) {
-          if (selectedSubCategory.includes(value.childs[i]._id)) {
-            findedvalue = value.childs[i]._id;
+        for (let i = 0; i < value.subcategories.length; i++) {
+          if (selectedSubCategory.includes(value.subcategories[i]._id)) {
+            findedvalue = value.subcategories[i]._id;
             break;
           }
         }
@@ -505,7 +505,7 @@ export default function PostUploading() {
                             </div>
                             {selectedCategory?.includes(k._id) ? (
                               <div className="TagsWrraper">
-                                {k?.childs?.map((v, i) => (
+                                {k?.subcategories?.map((v, i) => (
                                   <div className="ms-3">
                                     <input
                                       type="radio"

@@ -184,68 +184,31 @@ exports.updateCategory = catchAsyncError(async (req, res) => {
 });
 
 exports.searchCategory = catchAsyncError(async (req, res, next) => {
-  // const { search } = req.body;
-
-  // const category = await Category.aggregate([
-  //   {
-  //     $match: {
-  //       ...aggreFilters.category.filters,
-  //       title: new RegExp(search, "i"),
-  //     },
-  //   },
-  //   { $project: aggreFilters.category.project },
-  //   { $sort: { createdAt: -1 } },
-  //   { $limit: 10 },
-  //   {
-  //     $lookup: {
-  //       ...aggreFilters.category.subCategories,
-  //       pipeline: [
-  //         { $project: aggreFilters.category.project },
-  //         { $sort: { createdAt: -1 } },
-  //       ],
-  //     },
-  //   },
-  // ]
   const { search } = req.body;
-  const category = await Category.find({
-    isActive: true,
-    parentCategory: null,
-    title: {
-      $regex: search,
-      $options: "i",
-    },
-  })
-    .sort({ createdAt: -1 })
-    .limit(10)
-    .lean();
-  let subcategory;
-  if (category.length > 0) {
-    for (let k = 0; k < category.length; k++) {
-      subcategory = await Category.find({
-        parentCategory: category[k]._id,
-        isActive: true,
-      })
-        .sort({ createdAt: -1 })
-        .lean();
-      category[k].childs = subcategory;
-    }
-    sendResponse(res, 200, {
-      msg: "Data available !",
-      success: true,
-      data: category,
-    });
-  } else {
-    sendResponse(res, 200, {
-      msg: "Data not availabel !",
-      success: false,
-      data: null,
-    });
-  }
-});
 
-// sendResponse(res, 200, {
-//   data: category,
-//   status: 200
-// })
-// }
-// );
+  const category = await Category.aggregate([
+    {
+      $match: {
+        ...aggreFilters.category.filters,
+        title: new RegExp(search, "i"),
+      },
+    },
+    { $project: aggreFilters.category.project },
+    { $sort: { createdAt: -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        ...aggreFilters.category.subCategories,
+        pipeline: [
+          { $project: aggreFilters.category.project },
+          { $sort: { createdAt: -1 } },
+        ],
+      },
+    },
+  ]);
+
+  sendResponse(res, 200, {
+    data: category,
+    status: 200,
+  });
+});
