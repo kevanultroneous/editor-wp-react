@@ -5,7 +5,6 @@ const aggreFilters = {
       draftStatus: "published",
       isActive: true,
       postType: "press",
-      releaseDate: { $lte: new Date() },
     },
     sorting: { submittedDate: 1 },
     limits: 7,

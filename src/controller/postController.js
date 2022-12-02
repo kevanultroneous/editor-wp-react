@@ -44,8 +44,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
     draftStatus,
     postType,
     releaseDate,
-    submitDate,
-    // paidStatus,
+    paidStatus,
     homePageStatus,
     isApproved,
   } = req.body;
@@ -67,7 +66,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
     draftStatus,
     postType,
     releaseDate,
-    // paidStatus,
+    paidStatus,
     homePageStatus,
     isApproved,
   };
@@ -296,6 +295,7 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
   const topBuzzFilter = {
     ...aggreFilters.homePage.filters,
     homePageStatus: true,
+    releaseDate: { $lte: new Date() },
   };
 
   const getTopBuzzPR = await Post.find(topBuzzFilter)
@@ -308,6 +308,7 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
 exports.getRecentPR = catchAsyncError(async (req, res) => {
   const recentPRFilters = {
     ...aggreFilters.homePage.filters,
+    releaseDate: { $lte: new Date() },
   };
 
   const getRecentPRData = await Post.find(recentPRFilters)
@@ -316,3 +317,25 @@ exports.getRecentPR = catchAsyncError(async (req, res) => {
 
   return sendResponse(res, 200, { data: getRecentPRData, status: 200 });
 });
+
+exports.globalSearch = catchAsyncError(async(req, res) => {
+  const {searchTerm} = req.body;
+  
+  const searchMatch = {$match: {
+    ...aggreFilters.homePage.filters,
+    title: new RegExp(searchTerm, 'i')
+  }}
+
+  let searchedPosts;
+  searchedPosts = await Post.aggregate([
+    {$facet: {
+      mainDoc: [searchMatch],
+      totalCount: [
+        searchMatch,
+      {$count: "total"}]
+     }},
+     {$addFields: {totalCount: {$ifNull: [{$arrayElemAt: ["$totalCount.total", 0]}, 0]}}}
+  ])
+
+  return sendResponse(res, 200, {data: searchedPosts, status: 200})
+})

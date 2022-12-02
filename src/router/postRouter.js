@@ -34,5 +34,7 @@ postRouter.post("/get-pr-list", postController.getPRList);
 postRouter.get("/get-top-buzz", postController.getTopBuzz);
 postRouter.get("/get-recent-pr", postController.getRecentPR);
 
+postRouter.post("/search-pr-title", postController.globalSearch);
+
 
 module.exports = postRouter;
