@@ -55,15 +55,29 @@ export default function EditPost() {
   const [searchText, setSerachText] = useState("");
   const [suggestion, setSuggestion] = useState(false);
   const [loader, setLoader] = useState(false);
-  const timestampToDate = (ts) => {
+  const timestampToDate = (timestamp) => {
+    // 2018-06-12T19:30
     return (
-      new Date(ts).getFullYear() +
+      new Date(timestamp).getFullYear() +
       "-" +
-      new Date(ts).getMonth() +
+      (new Date(timestamp).getMonth() + 1 < 10
+        ? "0" + new Date(timestamp).getMonth() + 1
+        : new Date(timestamp).getMonth() + 1) +
       "-" +
-      new Date(ts).getDate()
+      (new Date(timestamp).getDate() < 10
+        ? "0" + new Date(timestamp).getDate()
+        : new Date(timestamp).getDate()) +
+      "T" +
+      (new Date(timestamp).getHours() < 10
+        ? "0" + new Date(timestamp).getHours()
+        : new Date(timestamp).getHours()) +
+      ":" +
+      (new Date(timestamp).getMinutes() < 10
+        ? "0" + new Date(timestamp).getMinutes()
+        : new Date(timestamp).getMinutes())
     );
   };
+
   const fetchParamPost = () => {
     axios
       .post(`${defaultUrl}api/post/get-all-post`, { postid: postid })
@@ -477,16 +491,14 @@ export default function EditPost() {
 
               <div className="mt-4">
                 <Form.Label>
-                  <strong>
-                    Update Release Date {timestampToDate(releaseDate)}
-                  </strong>
+                  <strong>Update Release Date</strong>
                 </Form.Label>
                 <Form.Control
-                  value={releaseDate}
+                  value={timestampToDate(releaseDate)}
                   onChange={(e) => setReleaseDate(e.target.value)}
-                  type="date"
+                  type="datetime-local"
                   placeholder="Release Date"
-                  // max={new Date().toLocaleDateString("en-ca")}
+                  min={timestampToDate(releaseDate)}
                 />
               </div>
 

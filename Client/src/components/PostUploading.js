@@ -86,6 +86,28 @@ export default function PostUploading() {
     return newarry;
   };
 
+  const pauseCalender = () => {
+    return (
+      new Date().getFullYear() +
+      "-" +
+      (new Date().getMonth() + 1 < 10
+        ? "0" + new Date().getMonth() + 1
+        : new Date().getMonth() + 1) +
+      "-" +
+      (new Date().getDate() < 10
+        ? "0" + new Date().getDate()
+        : new Date().getDate()) +
+      "T" +
+      (new Date().getHours() < 10
+        ? "0" + new Date().getHours()
+        : new Date().getHours()) +
+      ":" +
+      (new Date().getMinutes() < 10
+        ? "0" + new Date().getMinutes()
+        : new Date().getMinutes())
+    );
+  };
+
   const formdata = new FormData();
   const cleansing = cleanArray(selectedSubCategory);
 
@@ -436,8 +458,9 @@ export default function PostUploading() {
                 <Form.Control
                   value={releaseDate}
                   onChange={(e) => setReleaseDate(e.target.value)}
-                  type="date"
+                  type="datetime-local"
                   placeholder="Release Date"
+                  min={pauseCalender()}
                   // max={new Date().toLocaleDateString("en-ca")}
                 />
               </div>
