@@ -18,7 +18,7 @@ exports.resizePhotoFimg = (req, res, next) => {
     let newfile = `public/other/featured/${
       new Date() + req.file.originalname
     }.jpeg`;
-    console.log(req.file);
+
     sharp(req.file.buffer).jpeg({ quality: 100 }).toFile(newfile);
     req.sendfile = newfile.replace("public/", "");
     next();
@@ -169,7 +169,6 @@ exports.updatePost = catchAsyncError(async (req, res) => {
 exports.deletePost = catchAsyncError(async (req, res) => {
   const { postid } = req.body;
 
-  console.log(req.body);
   if (!ObjectId.isValid(postid)) {
     return sendResponse(res, 500, {
       msg: errorMessages.post.invalidID,
