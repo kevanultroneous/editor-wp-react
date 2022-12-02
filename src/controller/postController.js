@@ -339,3 +339,39 @@ exports.globalSearch = catchAsyncError(async(req, res) => {
 
   return sendResponse(res, 200, {data: searchedPosts, status: 200})
 })
+
+exports.interestedPosts = catchAsyncError(async (req, res) => {
+  const {postId} = req.body;
+
+  let interestedPostList;
+
+  const sortLimit =  [{$sort: {"createdAt": -1}}, {$limit: aggreFilters.prDetail.limits}]
+
+  const fetchedPost = await Post.findOne({_id: postId});
+  let interestedPostCategory = fetchedPost.category[0];
+
+  if(interestedPostCategory) {
+    interestedPostList = await Post.aggregate([
+      {$match: {
+        ...aggreFilters.homePage.filters,
+        category: interestedPostCategory,
+      }},
+      ...sortLimit
+    ])
+  }
+
+  if(interestedPostList.length < 2 || interestedPostCategory.length < 1){
+    console.log("recent");
+    interestedPostList = await Post.aggregate([
+      {$match: {
+        ...aggreFilters.homePage.filters,
+        _id: {$ne: ObjectId(postId)},
+        releaseDate: { $lte: new Date() },
+      }},
+      ...sortLimit
+    ])
+  }
+
+
+  return sendResponse(res, 200, {data: interestedPostList});
+})

@@ -28,6 +28,9 @@ const aggreFilters = {
     },
     postTypes: ["blog", "press"]
   },
+  prDetail: {
+    limits: 2
+  }
 };
 
 module.exports = { aggreFilters };
