@@ -73,6 +73,7 @@ exports.getCategoryWithSubcategory = catchAsyncError(async (req, res) => {
       $lookup: {
         ...aggreFilters.category.subCategories,
         pipeline: [
+          { $match: { isActive: true } },
           { $project: aggreFilters.category.project },
           { $sort: { createdAt: -1 } },
         ],

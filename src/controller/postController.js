@@ -251,15 +251,18 @@ exports.getPRList = catchAsyncError(async (req, res) => {
       limitVal: parseInt(limit) || 30,
     };
 
-    let allPostMatch = {$match: {
-      ...aggreFilters.homePage.filters,
-    }}
+    let allPostMatch = {
+      $match: {
+        ...aggreFilters.homePage.filters,
+      },
+    };
 
     getFullpost = await Post.aggregate([
       {
         $facet: {
           mainDoc: [
             allPostMatch,
+            { $sort: { createdAt: -1 } },
             { $skip: pageOptions.skipVal },
             { $limit: pageOptions.limitVal },
           ],
@@ -273,7 +276,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
           },
         },
       },
-    ])
+    ]);
   } else {
     if (postid && !mongoose.isValidObjectId(postid))
       return sendResponse(res, 500, {
@@ -457,19 +460,24 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
 });
 
 exports.categoryPrList = catchAsyncError(async (req, res) => {
-  const {categoryID, page, limit} = req.body;
+  const { categoryID, page, limit } = req.body;
 
-  if(!mongoose.isValidObjectId(categoryID)) return sendResponse(res, 400, {msg: errorMessages.category.inValidCategoryID});
+  if (!mongoose.isValidObjectId(categoryID))
+    return sendResponse(res, 400, {
+      msg: errorMessages.category.inValidCategoryID,
+    });
 
   const pageOptions = {
     skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
     limitVal: parseInt(limit) || 30,
   };
 
-  const categoryMatch = {$match: {
-    ...aggreFilters.homePage.filters,
-    category: ObjectId(categoryID)
-  }}
+  const categoryMatch = {
+    $match: {
+      ...aggreFilters.homePage.filters,
+      category: ObjectId(categoryID),
+    },
+  };
 
   const categoryPosts = await Post.aggregate([
     {
@@ -489,7 +497,7 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
         },
       },
     },
-  ])
+  ]);
 
   return sendResponse(res, 200, { data: categoryPosts, status: 200 });
-})
+});
