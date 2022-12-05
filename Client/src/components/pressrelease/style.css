@@ -1,7 +1,16 @@
 .AddActionSpace {
-    padding: 2rem 1rem;
+  padding: 2rem 1rem;
 }
 
 .TableSpace {
-    padding: 1rem 1rem;
+  padding: 1rem 1rem;
+  margin-bottom: 4rem;
+}
+
+.pagination-fix {
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  background-color: #fff;
+  left: -18px;
 }

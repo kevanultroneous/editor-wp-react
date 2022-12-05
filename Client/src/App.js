@@ -9,6 +9,7 @@ import Categories from "./components/categories/Categories";
 import EditPost from "./components/EditPost";
 import PostUploading from "./components/PostUploading";
 import "./app.css";
+import "./rc-paginate.css";
 import ViewPost from "./components/Viewpost";
 import Contact from "./components/contactComponet/contact";
 import Premium from "./components/Premium";
