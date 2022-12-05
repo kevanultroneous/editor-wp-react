@@ -6,7 +6,7 @@ const aggreFilters = {
       isActive: true,
       postType: "press",
     },
-    sorting: { submittedDate: 1 },
+    sorting: { submittedDate: -1 },
     limits: 7,
   },
   category: {

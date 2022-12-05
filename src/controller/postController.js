@@ -254,6 +254,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
     let allPostMatch = {
       $match: {
         ...aggreFilters.homePage.filters,
+        releaseDate: {$lte: new Date()}
       },
     };
 
@@ -262,7 +263,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
         $facet: {
           mainDoc: [
             allPostMatch,
-            { $sort: { createdAt: -1 } },
+            { $sort: aggreFilters.homePage.sorting },
             { $skip: pageOptions.skipVal },
             { $limit: pageOptions.limitVal },
           ],
