@@ -279,7 +279,7 @@ export default function Categories() {
                           <tr key={i}>
                             <td className="text-center">{i + 1}</td>
                             <td>{v.title}</td>
-                            <td className="text-center">{v.type}</td>
+                            <td className="text-center">{v.postType}</td>
                             <td>
                               <Button
                                 variant="info"
@@ -290,7 +290,7 @@ export default function Categories() {
                                   setCurrentCatname(v.title);
                                   setNewCatname(v.title);
                                   setSwitches(
-                                    v.type === "press" ? true : false
+                                    v.postType === "press" ? true : false
                                   );
                                 }}
                               >
