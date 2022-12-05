@@ -205,11 +205,27 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
       limitVal: parseInt(limit) || 30,
     };
 
-    getFullpost = await Post.find({ isActive: true })
-      .sort({ createdAt: -1 })
-      .skip(pageOptions.skipVal)
-      .limit(pageOptions.limitVal)
-      .lean();
+    getFullpost = await Post.aggregate([
+        {
+          $facet: {
+            mainDoc: [
+              {$match: { isActive: true }},
+              { $sort: { createdAt: -1 } },
+              { $skip: pageOptions.skipVal },
+              { $limit: pageOptions.limitVal },
+            ],
+            totalCount: [{$match: { isActive: true }}, { $count: "total" }],
+          },
+        },
+        {
+          $addFields: {
+            totalCount: {
+              $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+            },
+          },
+        },
+      ]);
+
   } else {
     if (postid && !mongoose.isValidObjectId(postid))
       return sendResponse(res, 500, {
