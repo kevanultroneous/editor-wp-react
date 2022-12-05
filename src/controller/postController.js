@@ -251,15 +251,29 @@ exports.getPRList = catchAsyncError(async (req, res) => {
       limitVal: parseInt(limit) || 30,
     };
 
-    getFullpost = await Post.find({
-      isActive: true,
-      draftStatus: "published",
-      isApproved: true,
-    })
-      .sort({ releaseDate: -1 })
-      .skip(pageOptions.skipVal)
-      .limit(pageOptions.limitVal)
-      .lean();
+    let allPostMatch = {$match: {
+      ...aggreFilters.homePage.filters,
+    }}
+
+    getFullpost = await Post.aggregate([
+      {
+        $facet: {
+          mainDoc: [
+            allPostMatch,
+            { $skip: pageOptions.skipVal },
+            { $limit: pageOptions.limitVal },
+          ],
+          totalCount: [allPostMatch, { $count: "total" }],
+        },
+      },
+      {
+        $addFields: {
+          totalCount: {
+            $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+          },
+        },
+      },
+    ])
   } else {
     if (postid && !mongoose.isValidObjectId(postid))
       return sendResponse(res, 500, {
@@ -441,3 +455,41 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
 
   return sendResponse(res, 200, { data: interestedPostList });
 });
+
+exports.categoryPrList = catchAsyncError(async (req, res) => {
+  const {categoryID, page, limit} = req.body;
+
+  if(!mongoose.isValidObjectId(categoryID)) return sendResponse(res, 400, {msg: errorMessages.category.inValidCategoryID});
+
+  const pageOptions = {
+    skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+    limitVal: parseInt(limit) || 30,
+  };
+
+  const categoryMatch = {$match: {
+    ...aggreFilters.homePage.filters,
+    category: ObjectId(categoryID)
+  }}
+
+  const categoryPosts = await Post.aggregate([
+    {
+      $facet: {
+        mainDoc: [
+          categoryMatch,
+          { $skip: pageOptions.skipVal },
+          { $limit: pageOptions.limitVal },
+        ],
+        totalCount: [categoryMatch, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ])
+
+  return sendResponse(res, 200, { data: categoryPosts, status: 200 });
+})
