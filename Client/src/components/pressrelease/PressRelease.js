@@ -151,11 +151,13 @@ const PressRelease = () => {
                       </td>
                       <td>
                         {v.paidStatus && (
-                          <Badge bg="success" pill>
-                            Purchased {v.totalPaidAmount}
-                          </Badge>
+                          <>
+                            <Badge bg="success" pill>
+                              Purchased {v.totalPaidAmount}
+                            </Badge>
+                            <br />
+                          </>
                         )}
-                        <br />
                         {v.title}
                       </td>
                       <td>
