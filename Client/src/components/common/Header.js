@@ -30,10 +30,9 @@ export default function Header() {
             <Nav.Link onClick={() => navigation("/categories")}>
               Categories
             </Nav.Link>
-            <Nav.Link onClick={() => navigation("/premium")}>
+            {/* <Nav.Link onClick={() => navigation("/premium")}>
               Premium Plans
-            </Nav.Link>
-            <Nav.Link>Logout</Nav.Link>
+            </Nav.Link> */}
           </Nav>
         </Navbar.Collapse>
       </Container>
