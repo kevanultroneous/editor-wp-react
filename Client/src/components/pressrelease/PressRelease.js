@@ -62,7 +62,7 @@ const PressRelease = () => {
     return (
       new Date(ts).getDate() +
       "-" +
-      new Date(ts).getMonth() +
+      (new Date(ts).getMonth() + 1) +
       "-" +
       new Date(ts).getFullYear()
     );

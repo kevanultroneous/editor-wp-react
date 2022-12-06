@@ -206,26 +206,25 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
     };
 
     getFullpost = await Post.aggregate([
-        {
-          $facet: {
-            mainDoc: [
-              {$match: { isActive: true }},
-              { $sort: { createdAt: -1 } },
-              { $skip: pageOptions.skipVal },
-              { $limit: pageOptions.limitVal },
-            ],
-            totalCount: [{$match: { isActive: true }}, { $count: "total" }],
+      {
+        $facet: {
+          mainDoc: [
+            { $match: { isActive: true } },
+            { $sort: { createdAt: -1 } },
+            { $skip: pageOptions.skipVal },
+            { $limit: pageOptions.limitVal },
+          ],
+          totalCount: [{ $match: { isActive: true } }, { $count: "total" }],
+        },
+      },
+      {
+        $addFields: {
+          totalCount: {
+            $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
           },
         },
-        {
-          $addFields: {
-            totalCount: {
-              $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
-            },
-          },
-        },
-      ]);
-
+      },
+    ]);
   } else {
     if (postid && !mongoose.isValidObjectId(postid))
       return sendResponse(res, 500, {
@@ -270,7 +269,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
     let allPostMatch = {
       $match: {
         ...aggreFilters.homePage.filters,
-        releaseDate: {$lte: new Date()}
+        releaseDate: { $lte: new Date() },
       },
     };
 
