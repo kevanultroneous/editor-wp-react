@@ -57,20 +57,11 @@ export default function Categories() {
       if (parentid === "" || parentid === null) {
         alert("select the category !");
       } else {
-        // subCategories.map((v) => {
-        //   newrequestdata.push({
-        //     title: v,
-        //     parentCategory: parentid,
-        //     type: switches == true ? "press" : "blog",
-        //   });
-        // });
         axios
           .post(`${defaultUrl}api/category/create-category`, {
             parentCategory: parentid,
             title: catname,
             postType: switches == true ? "press" : "blog",
-            // upddata: subCategories,
-            // multiple: true,
           })
           .then((r) => {
             if (r.data.success) {
@@ -145,14 +136,11 @@ export default function Categories() {
         postType: switches ? "press" : "blog",
       })
       .then((r) => {
-        console.log(r);
-        if (r.status == 200) {
-          toast.success(r.data.msg);
-          fetchCategory();
-          setCurrentCatId("");
-          setCurrentCatname("");
-          handleCloseUpd();
-        }
+        toast.success("Category updated !");
+        fetchCategory();
+        setCurrentCatId("");
+        setCurrentCatname("");
+        handleCloseUpd();
       })
       .catch((e) => toast.error(e.response.data.msg));
   };
