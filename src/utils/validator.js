@@ -2,7 +2,7 @@ const { check, validationResult, body } = require("express-validator");
 
 const AppError = require("./appError");
 const { errorMessages } = require("./messages");
-const {aggreFilters} = require("./filterJson");
+const { aggreFilters } = require("./filterJson");
 
 const sendErrorResponse = (req, res, next) => {
   const errors = validationResult(req);
@@ -110,7 +110,7 @@ exports.validateCategory = [
     .withMessage(errorMessages.category.invalidTitle)
     .isLength({ min: 3, max: 30 })
     .withMessage(errorMessages.category.invalidTitleLength),
-    body("postType")
+  body("postType")
     .trim()
     .not()
     .isEmpty()
@@ -121,3 +121,23 @@ exports.validateCategory = [
   },
 ];
 
+exports.validateContactUS = [
+  body("name").not().isEmpty().withMessage(errorMessages.name.empty),
+  body("email")
+    .not()
+    .isEmpty()
+    .withMessage(errorMessages.email.empty)
+    .isEmail()
+    .withMessage(errorMessages.email.invalid),
+  body("postType")
+    .trim()
+    .not()
+    .isEmpty()
+    .isIn(aggreFilters.category.postTypes)
+    .withMessage(errorMessages.category.invalidPostType),
+  body("topic").not().isEmpty().withMessage(errorMessages.topic.empty),
+  body("message")
+    .not()
+    .isEmpty()
+    .withMessage(errorMessages.contactMessage.empty),
+];
