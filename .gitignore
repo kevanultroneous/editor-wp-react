@@ -2,3 +2,5 @@
 /uploads
 /images
 /public
+
+/.env

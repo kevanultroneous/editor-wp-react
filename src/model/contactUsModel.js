@@ -14,7 +14,6 @@ const schema = new mongoose.Schema(
     email: {
         type: String,
         required: [true, errorMessages.email.empty],
-        unique: true,
       },
     postType: {
       type: String,

@@ -1,15 +1,21 @@
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const sharp = require("sharp");
 const AppError = require("./appError");
-// const jwtToken = (id) => {
-//   return jwt.sign({ id: id }, process.env.JWT_SECRET_KEY, {
-//     expiresIn: process.env.JWT_EXPIRES_IN,
-//   });
-// };
 
-const sendResponse = (res, statusCode, jsondata) => {
-  return res.status(statusCode).json(jsondata);
+const jwtToken = (id) => {
+  return jwt.sign({ id: id }, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const sendResponse = (res, statusCode, jsondata, sendToken) => {
+  let token = "";
+  if (sendToken === true) {
+    token = jwtToken(jsondata.data._id);
+  }
+  console.log(jsondata);
+  return res.status(statusCode).json({token ,...jsondata});
 };
 
 const generateOtp = () => {
