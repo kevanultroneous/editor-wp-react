@@ -255,6 +255,51 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
     return sendResponse(res, 200, { success: true, data: getFullpost });
 });
 
+exports.searchAdminPosts = catchAsyncError(async (req, res) => {
+  const { searchTerm, page, limit } = req.body;
+
+  let getFullpost;
+
+  const pageOptions = {
+    skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+    limitVal: parseInt(limit) || 30,
+  };
+
+  const searchMatch = {
+    isActive: true,
+    $or: [
+      { title: new RegExp(searchTerm, "i") },
+      { summary: new RegExp(searchTerm, "i") },
+    ],
+  };
+
+  getFullpost = await Post.aggregate([
+    {
+      $facet: {
+        mainDoc: [
+          {
+            $match: searchMatch,
+          },
+          { $sort: { createdAt: -1 } },
+          { $skip: pageOptions.skipVal },
+          { $limit: pageOptions.limitVal },
+        ],
+        totalCount: [{$match: searchMatch}, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ]);
+
+  if (getFullpost)
+    return sendResponse(res, 200, { success: true, data: getFullpost });
+});
+
 exports.getPRList = catchAsyncError(async (req, res) => {
   const { postid, url, page, limit } = req.body;
 
@@ -306,8 +351,8 @@ exports.getPRList = catchAsyncError(async (req, res) => {
         };
 
     getFullpost = await Post.aggregate([
-      {$match: query},
-      ...addCategoryName()
+      { $match: query },
+      ...addCategoryName(),
     ]);
     getFullpost = getFullpost[0];
   }
@@ -326,6 +371,7 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
   const topBuzzFilter = {
     ...aggreFilters.homePage.filters,
     homePageStatus: true,
+    paidStatus: true,
     releaseDate: { $lte: new Date() },
   };
 
@@ -339,6 +385,7 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
 exports.getRecentPR = catchAsyncError(async (req, res) => {
   const recentPRFilters = {
     ...aggreFilters.homePage.filters,
+    homePageStatus: true,
     releaseDate: { $lte: new Date() },
   };
 
@@ -370,10 +417,7 @@ exports.globalSearch = catchAsyncError(async (req, res) => {
   searchedPosts = await Post.aggregate([
     {
       $facet: {
-        mainDoc: [
-          searchMatch,
-          ...PRFullSorting(pageOptions)
-        ],
+        mainDoc: [searchMatch, ...PRFullSorting(pageOptions)],
         totalCount: [searchMatch, { $count: "total" }],
       },
     },
@@ -411,10 +455,7 @@ exports.internalSearch = catchAsyncError(async (req, res) => {
   searchedPosts = await Post.aggregate([
     {
       $facet: {
-        mainDoc: [
-          searchMatch,
-          ...PRFullSorting(pageOptions)
-        ],
+        mainDoc: [searchMatch, ...PRFullSorting(pageOptions)],
         totalCount: [searchMatch, { $count: "total" }],
       },
     },
@@ -475,21 +516,22 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
 exports.categoryPrList = catchAsyncError(async (req, res) => {
   const { categoryID, page, limit } = req.body;
 
-  // if (!mongoose.isValidObjectId(categoryID))
-  //   return sendResponse(res, 400, {
-  //     msg: errorMessages.category.inValidCategoryID,
-  //   });
-  console.log(categoryID);
+
 
   const pageOptions = {
     skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
     limitVal: parseInt(limit) || 30,
   };
 
-  const postMatch = await Category.findOne({ title: categoryID });
+  let postMatch = await Category.find({
+    title: new RegExp(categoryID, "i"),
+  });
+  postMatch = postMatch[0];
+  
+  console.log(postMatch);
   const categoryMatch = {
     $match: {
-      ...aggreFilters.homePage.filters,
+      // ...aggreFilters.homePage.filters,
       $or: [
         { category: ObjectId(postMatch._id) },
         { subCategory: ObjectId(postMatch._id) },
@@ -500,10 +542,7 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
   const categoryPosts = await Post.aggregate([
     {
       $facet: {
-        mainDoc: [
-          categoryMatch,
-          ...PRFullSorting(pageOptions)
-        ],
+        mainDoc: [categoryMatch, ...PRFullSorting(pageOptions)],
         totalCount: [categoryMatch, { $count: "total" }],
       },
     },
@@ -574,11 +613,10 @@ function PRFullSorting(pageOptions) {
   ];
 }
 
-function addCategoryName(){
+function addCategoryName() {
   return [
     {
       $addFields: {
-       
         categoryID: { $arrayElemAt: ["$category", 0] },
         subCategoryID: { $arrayElemAt: ["$subCategory", 0] },
       },
