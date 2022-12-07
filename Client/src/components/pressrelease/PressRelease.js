@@ -153,7 +153,7 @@ const PressRelease = () => {
                         {v.paidStatus && (
                           <>
                             <Badge bg="success" pill>
-                              Purchased {v.totalPaidAmount}
+                              Buzzed
                             </Badge>
                             <br />
                           </>
