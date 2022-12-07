@@ -544,8 +544,8 @@ export default function PostUploading() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  value={url.replace(/,/g, "")}
+                  onChange={(e) => setUrl(e.target.value.replace(/,/g, ""))}
                 />
               </div>
 
