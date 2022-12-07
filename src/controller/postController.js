@@ -371,7 +371,6 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
   const topBuzzFilter = {
     ...aggreFilters.homePage.filters,
     homePageStatus: true,
-    paidStatus: true,
     releaseDate: { $lte: new Date() },
   };
 
@@ -385,7 +384,6 @@ exports.getTopBuzz = catchAsyncError(async (req, res) => {
 exports.getRecentPR = catchAsyncError(async (req, res) => {
   const recentPRFilters = {
     ...aggreFilters.homePage.filters,
-    homePageStatus: true,
     releaseDate: { $lte: new Date() },
   };
 
@@ -531,7 +529,7 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
   console.log(postMatch);
   const categoryMatch = {
     $match: {
-      // ...aggreFilters.homePage.filters,
+      ...aggreFilters.homePage.filters,
       $or: [
         { category: ObjectId(postMatch._id) },
         { subCategory: ObjectId(postMatch._id) },
