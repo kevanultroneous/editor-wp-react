@@ -276,12 +276,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
     getFullpost = await Post.aggregate([
       {
         $facet: {
-          mainDoc: [
-            allPostMatch,
-            { $sort: aggreFilters.homePage.sorting },
-            { $skip: pageOptions.skipVal },
-            { $limit: pageOptions.limitVal },
-          ],
+          mainDoc: [allPostMatch, ...PRFullSorting(pageOptions)],
           totalCount: [allPostMatch, { $count: "total" }],
         },
       },
@@ -302,7 +297,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
 
     let query = !url
       ? {
-          _id: postid,
+          _id: ObjectId(postid),
           isActive: true,
         }
       : {
@@ -310,7 +305,11 @@ exports.getPRList = catchAsyncError(async (req, res) => {
           isActive: true,
         };
 
-    getFullpost = await Post.findOne(query);
+    getFullpost = await Post.aggregate([
+      {$match: query},
+      ...addCategoryName()
+    ]);
+    getFullpost = getFullpost[0];
   }
 
   if (getFullpost)
@@ -373,8 +372,7 @@ exports.globalSearch = catchAsyncError(async (req, res) => {
       $facet: {
         mainDoc: [
           searchMatch,
-          { $skip: pageOptions.skipVal },
-          { $limit: pageOptions.limitVal },
+          ...PRFullSorting(pageOptions)
         ],
         totalCount: [searchMatch, { $count: "total" }],
       },
@@ -415,8 +413,7 @@ exports.internalSearch = catchAsyncError(async (req, res) => {
       $facet: {
         mainDoc: [
           searchMatch,
-          { $skip: pageOptions.skipVal },
-          { $limit: pageOptions.limitVal },
+          ...PRFullSorting(pageOptions)
         ],
         totalCount: [searchMatch, { $count: "total" }],
       },
@@ -505,8 +502,7 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
       $facet: {
         mainDoc: [
           categoryMatch,
-          { $skip: pageOptions.skipVal },
-          { $limit: pageOptions.limitVal },
+          ...PRFullSorting(pageOptions)
         ],
         totalCount: [categoryMatch, { $count: "total" }],
       },
@@ -522,3 +518,104 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
 
   return sendResponse(res, 200, { data: categoryPosts, status: 200 });
 });
+
+function PRFullSorting(pageOptions) {
+  return [
+    {
+      $addFields: {
+        date: {
+          $dateToString: {
+            date: "$releaseDate",
+            format: "%Y-%m-%d",
+          },
+        },
+        categoryID: { $arrayElemAt: ["$category", 0] },
+        subCategoryID: { $arrayElemAt: ["$subCategory", 0] },
+      },
+    },
+    { $sort: { date: -1, paidStatus: -1, ...aggreFilters.homePage.sorting } },
+    { $skip: pageOptions.skipVal },
+    { $limit: pageOptions.limitVal },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryID",
+        foreignField: "_id",
+        as: "catgoryName",
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "subCategoryID",
+        foreignField: "_id",
+        as: "subCatgoryName",
+      },
+    },
+    {
+      $addFields: {
+        selectedCategory: {
+          $arrayElemAt: [{ $ifNull: ["$catgoryName.title", ""] }, 0],
+        },
+        selectedSubCategory: {
+          $arrayElemAt: [{ $ifNull: ["$subCatgoryName.title", ""] }, 0],
+        },
+      },
+    },
+    {
+      $project: {
+        catgoryName: 0,
+        subCatgoryName: 0,
+        categoryID: 0,
+        subCategoryID: 0,
+        date: 0,
+      },
+    },
+  ];
+}
+
+function addCategoryName(){
+  return [
+    {
+      $addFields: {
+       
+        categoryID: { $arrayElemAt: ["$category", 0] },
+        subCategoryID: { $arrayElemAt: ["$subCategory", 0] },
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryID",
+        foreignField: "_id",
+        as: "catgoryName",
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "subCategoryID",
+        foreignField: "_id",
+        as: "subCatgoryName",
+      },
+    },
+    {
+      $addFields: {
+        selectedCategory: {
+          $arrayElemAt: [{ $ifNull: ["$catgoryName.title", ""] }, 0],
+        },
+        selectedSubCategory: {
+          $arrayElemAt: [{ $ifNull: ["$subCatgoryName.title", ""] }, 0],
+        },
+      },
+    },
+    {
+      $project: {
+        catgoryName: 0,
+        subCatgoryName: 0,
+        categoryID: 0,
+        subCategoryID: 0,
+      },
+    },
+  ];
+}
