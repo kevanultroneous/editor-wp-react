@@ -78,6 +78,11 @@ export default function PostUploading() {
 
   useEffect(() => {
     searchCategories(searchText);
+    window.onkeydown = (e) => {
+      if (e.ctrlKey && e.altKey) {
+        postUpload();
+      }
+    };
   }, []);
 
   const cleanArray = (ary) => {
