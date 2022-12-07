@@ -11,7 +11,7 @@ const errorMessages = {
     empty: `${empty} name.`,
   },
   email: {
-    invalid: `${empty}valid email`,
+    invalid: `${empty} valid email`,
     empty: `${empty} email.`,
   },
   contact: {

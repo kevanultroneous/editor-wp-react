@@ -140,4 +140,7 @@ exports.validateContactUS = [
     .not()
     .isEmpty()
     .withMessage(errorMessages.contactMessage.empty),
+    (req, res, next) => {
+      sendErrorResponse(req, res, next);
+    },
 ];
