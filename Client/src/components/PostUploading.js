@@ -108,7 +108,10 @@ export default function PostUploading() {
   selectedSubCategory.map((v, i) => formdata.append(`subCategory[${i}]`, v));
 
   formdata.append("content", content);
-  formdata.append("image", ffile);
+  if (!(ffile == null)) {
+    formdata.append("image", ffile);
+  }
+
   formdata.append("author", author);
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
@@ -130,8 +133,8 @@ export default function PostUploading() {
       toast.error("Date is required !");
     } else if (mainTitle === "") {
       toast.error("Title is required !");
-    } else if (mainTitle.length > 80) {
-      toast.error("Title length is less than 80 words !");
+    } else if (mainTitle.length >= 200) {
+      toast.error("Title should be less than 200 characters !");
     } else if (selectedCategory.length <= 0) {
       toast.error("Please select one or more category !");
     } else if (content.length < 100) {
@@ -180,12 +183,14 @@ export default function PostUploading() {
     const data = editor.getData();
     setContent(data);
   };
+  // ] { } | \ ” % ~ # < > . , " " “” /
   const editUrl = (v) => {
     setUrl(
       v
-        .replace(/[.,\s]/g, "")
         .split(" ")
         .join("-")
+        .replace(/[.,#<>~“”{}|%"\s]/g, "")
+        .toLowerCase()
     );
   };
 
@@ -348,7 +353,7 @@ export default function PostUploading() {
                   onChange={(e) => {
                     setMainTitle(e.target.value);
                     editUrl(e.target.value);
-                    setSeoTitle(e.target.value.split(" ").join("-"));
+                    setSeoTitle(e.target.value);
                   }}
                   type="text"
                   placeholder="Enter title here"
@@ -388,7 +393,7 @@ export default function PostUploading() {
                     value={summary}
                     onChange={(e) => {
                       setSummary(e.target.value);
-                      setSeoDescription(e.target.value.split(" ").join("-"));
+                      setSeoDescription(e.target.value);
                     }}
                     as="textarea"
                     placeholder="Summary"
@@ -547,9 +552,19 @@ export default function PostUploading() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url.replace(/[.,\s]/g, "")}
+                  value={url
+                    .split(" ")
+                    .join("-")
+                    .replace(/[.,#<>~/“”{}|%"\s]/g, "")
+                    .toLowerCase()}
                   onChange={(e) =>
-                    setUrl(e.target.value.replace(/[.,\s]/g, ""))
+                    setUrl(
+                      e.target.value
+                        .split(" ")
+                        .join("-")
+                        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
+                        .toLowerCase()
+                    )
                   }
                 />
               </div>

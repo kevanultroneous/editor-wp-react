@@ -94,7 +94,11 @@ export default function EditPost() {
           setCompany(r.data?.data?.companyName);
           setReleaseDate(r.data?.data?.releaseDate);
           setHomePin(r.data?.data?.homePageStatus);
-          setDummyImg(defaultUrl + r.data?.data?.featuredImage);
+          setDummyImg(
+            r.data?.data?.featuredImage
+              ? defaultUrl + r.data?.data?.featuredImage
+              : null
+          );
           setApproved(r.data?.data?.isApproved);
           setSeokeywords(r.data?.data?.seoKeywords);
           setPaid(r.data?.data?.paidStatus);
@@ -210,9 +214,10 @@ export default function EditPost() {
   const editUrl = (v) => {
     setUrl(
       v
-        .replace(/[.,\s]/g, "")
         .split(" ")
         .join("-")
+        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
+        .toLowerCase()
     );
   };
   const alreadyfound = (ary1, ary2) => {
@@ -376,10 +381,16 @@ export default function EditPost() {
                     </>
                   ) : (
                     <>
-                      <Image src={dummyImg} width={100} />
-                      <div>
-                        <Badge bg="info">Current Featured Image</Badge>
-                      </div>
+                      {dummyImg != null && (
+                        <>
+                          <Image src={dummyImg} width={100} />
+                          <div>
+                            <Badge bg="info">
+                              Current Featured Image {dummyImg}
+                            </Badge>
+                          </div>
+                        </>
+                      )}
                     </>
                   )}
                 </center>
@@ -591,9 +602,19 @@ export default function EditPost() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url.replace(/[.,\s]/g, "")}
+                  value={url
+                    .split(" ")
+                    .join("-")
+                    .replace(/[.,#<>~/“”{}|%"\s]/g, "")
+                    .toLowerCase()}
                   onChange={(e) =>
-                    setUrl(e.target.value.replace(/[.,\s]/g, ""))
+                    setUrl(
+                      e.target.value
+                        .split(" ")
+                        .join("-")
+                        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
+                        .toLowerCase()
+                    )
                   }
                 />
               </div>

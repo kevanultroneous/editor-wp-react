@@ -143,11 +143,13 @@ const PressRelease = () => {
                     <tr key={i}>
                       <td>{i + 1}</td>
                       <td>
-                        <Image
-                          src={`${defaultUrl + v.featuredImage}`}
-                          height={80}
-                          width={"100px"}
-                        />
+                        {v.featuredImage ? (
+                          <Image
+                            src={`${defaultUrl + v.featuredImage}`}
+                            height={80}
+                            width={"100px"}
+                          />
+                        ) : null}
                       </td>
                       <td>
                         {v.paidStatus && (
