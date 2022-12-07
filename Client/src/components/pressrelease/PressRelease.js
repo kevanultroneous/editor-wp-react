@@ -125,7 +125,7 @@ const PressRelease = () => {
         <Row className="TableSpace">
           <Col xl={12}>
             <Table striped bordered hover variant="dark">
-              <thead>
+              <thead style={{ position: "sticky", top: "0" }}>
                 <tr>
                   <th>#</th>
                   <th>Cover/Featured</th>
@@ -145,8 +145,8 @@ const PressRelease = () => {
                       <td>
                         <Image
                           src={`${defaultUrl + v.featuredImage}`}
-                          height={30}
-                          width={"70%"}
+                          height={80}
+                          width={"100px"}
                         />
                       </td>
                       <td>

@@ -13,6 +13,7 @@ import "./rc-paginate.css";
 import ViewPost from "./components/Viewpost";
 import Contact from "./components/contactComponet/contact";
 import Premium from "./components/Premium";
+import Inquires from "./components/inquires";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
       <Route path="/edit-post/:type/:postid" element={<EditPost />} />
       <Route path="/upload-post/:type" element={<PostUploading />} />
       <Route path="/view-press-release/:postid" element={<ViewPost />} />
+      <Route path="/inquires" element={<Inquires />} />
       {/* <Route path='/guest-post' element={<GuestPost />} /> */}
       {/* <Route path='/view-guest-post/:gpostid' element={<ViewPost />} /> */}
       <Route path="*" element={<h1>404</h1>} />

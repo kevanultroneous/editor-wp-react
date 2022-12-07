@@ -8,9 +8,10 @@
 }
 
 .pagination-fix {
+  background-color: #323232;
   padding: 1rem;
   position: fixed;
   bottom: 0;
-  background-color: #fff;
-  left: -18px;
+  left: -5px;
+  color: #fff;
 }
