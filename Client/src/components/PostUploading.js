@@ -10,7 +10,6 @@ import {
   Spinner,
   Badge,
   Image,
-  Alert,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -35,7 +34,6 @@ export default function PostUploading() {
   const [author, setAuthor] = useState("");
   const [seotitle, setSeoTitle] = useState("");
   const [seodescription, setSeoDescription] = useState("");
-  const [seometatags, setSeoMetaTags] = useState("");
   const [url, setUrl] = useState(mainTitle);
   const [publish, setPublish] = useState(0);
   const [content, setContent] = useState("");
@@ -57,7 +55,7 @@ export default function PostUploading() {
   const [show, setShow] = useState(false);
   const [catname, setCatname] = useState("");
   const handleClose = () => setShow(false);
-  const handleSave = (catname = catname) => {
+  const handleSave = (catname) => {
     axios
       .post(`${defaultUrl}api/category/upload-category`, {
         title: catname,
@@ -78,13 +76,7 @@ export default function PostUploading() {
 
   useEffect(() => {
     searchCategories(searchText);
-  }, []);
-
-  const cleanArray = (ary) => {
-    const newarry = [];
-    ary.map((v) => newarry.push(v.s));
-    return newarry;
-  };
+  }, [searchText]);
 
   const pauseCalender = () => {
     return (
@@ -109,7 +101,6 @@ export default function PostUploading() {
   };
 
   const formdata = new FormData();
-  const cleansing = cleanArray(selectedSubCategory);
 
   formdata.append("title", mainTitle);
   formdata.append("summary", summary);
@@ -135,11 +126,9 @@ export default function PostUploading() {
   formdata.append("isApproved", false);
 
   const postUpload = () => {
-    if (ffile == null) {
-      toast.error("Featured image is required !");
-    } else if (releaseDate == "") {
+    if (releaseDate === "") {
       toast.error("Date is required !");
-    } else if (mainTitle == "") {
+    } else if (mainTitle === "") {
       toast.error("Title is required !");
     } else if (mainTitle.length > 80) {
       toast.error("Title length is less than 80 words !");
@@ -354,7 +343,9 @@ export default function PostUploading() {
                   onChange={(e) => {
                     setMainTitle(e.target.value);
                     editUrl(e.target.value);
-                    setSeoTitle(e.target.value.split(" ").join("-"));
+                    setSeoTitle(
+                      e.target.value.replace(/,/g, "").split(" ").join("-")
+                    );
                   }}
                   type="text"
                   placeholder="Enter title here"

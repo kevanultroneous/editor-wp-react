@@ -1,13 +1,4 @@
-import {
-  Button,
-  Col,
-  Container,
-  Row,
-  Table,
-  Modal,
-  InputGroup,
-  Form,
-} from "react-bootstrap";
+import { Button, Col, Container, Row, Table } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import Header from "../common/Header";
 import "./style.css";
@@ -52,7 +43,6 @@ export default function Categories() {
 
   const handleSave = () => {
     let parentid = currentCatId;
-    let newrequestdata = [];
     if (switches2) {
       if (parentid === "" || parentid === null) {
         alert("select the category !");
@@ -61,7 +51,7 @@ export default function Categories() {
           .post(`${defaultUrl}api/category/create-category`, {
             parentCategory: parentid,
             title: catname,
-            postType: switches == true ? "press" : "blog",
+            postType: switches === true ? "press" : "blog",
           })
           .then((r) => {
             if (r.data.success) {
@@ -86,7 +76,7 @@ export default function Categories() {
             postType: switches ? "press" : "blog",
           })
           .then((r) => {
-            if (r.status == 200) {
+            if (r.status === 200) {
               toast.success(r.data.msg);
               handleClose();
               fetchCategory();
@@ -105,7 +95,7 @@ export default function Categories() {
     axios
       .get(`${defaultUrl}api/category/all-category`)
       .then((r) => {
-        if (r.data.status == 200) {
+        if (r.data.status === 200) {
           console.log(r.data);
           setCategoryData(r.data.data);
         }
@@ -117,7 +107,7 @@ export default function Categories() {
     axios
       .post(`${defaultUrl}api/category/delete-category`, { categoryId: catid })
       .then((r) => {
-        if (r.data.status == 200) {
+        if (r.data.status === 200) {
           toast.success(r.data.msg);
           setSmShow(false);
           setCurrentCatId("");

@@ -10,12 +10,12 @@ import {
 import React, { useEffect, useState } from "react";
 import Header from "../common/Header";
 import "./style.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import DeleteModel from "../common/DeleteModel";
 import { defaultUrl, frontendurl } from "../../utils/default";
-import { MdClose, MdDone, MdDoneAll, MdDrafts } from "react-icons/md";
+import { MdClose, MdDone } from "react-icons/md";
 import Pagination from "rc-pagination";
 import { FcLeft, FcRight } from "react-icons/fc";
 function useQuery() {
@@ -164,13 +164,14 @@ const PressRelease = () => {
                         <a
                           href={`${frontendurl}press-release/${v.slugUrl}`}
                           target={"_blank"}
+                          rel="visit"
                         >
                           visit
                         </a>
                       </td>
                       <td className="text-center">
                         <p>
-                          {v.draftStatus == "published"
+                          {v.draftStatus === "published"
                             ? "Published"
                             : "Drafted"}
                         </p>

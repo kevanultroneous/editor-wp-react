@@ -8,13 +8,9 @@ import { defaultUrl } from "../utils/default";
 import Header from "./common/Header";
 
 export default function ViewPost() {
-  const { postid, gpostid } = useParams();
+  const { postid } = useParams();
   const [postData, setPostData] = useState([]);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchParamPost();
-  }, []);
 
   const fetchParamPost = () => {
     axios
@@ -32,6 +28,9 @@ export default function ViewPost() {
         toast.error(e.response.data.msg);
       });
   };
+  useEffect(() => {
+    fetchParamPost();
+  }, []);
 
   return (
     <div>

@@ -10,7 +10,6 @@ import {
   Spinner,
   Badge,
   Image,
-  Alert,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -35,7 +34,6 @@ export default function EditPost() {
   const [author, setAuthor] = useState("");
   const [seotitle, setSeoTitle] = useState("");
   const [seodescription, setSeoDescription] = useState("");
-  const [seometatags, setSeoMetaTags] = useState("");
   const [url, setUrl] = useState(mainTitle);
   const [publish, setPublish] = useState(0);
   const [content, setContent] = useState("");
@@ -47,7 +45,6 @@ export default function EditPost() {
   const [approved, setApproved] = useState(false);
   const [weburl, setWeburl] = useState("");
   const [dummyImg, setDummyImg] = useState("");
-  const [load, setLoad] = useState(true);
   const [seokeywords, setSeokeywords] = useState("");
   const [paidprice, setPaidPrice] = useState("");
   //search category
@@ -102,12 +99,10 @@ export default function EditPost() {
           setSeokeywords(r.data?.data?.seoKeywords);
           setPaid(r.data?.data?.paidStatus);
           setPaidPrice(r.data?.data?.totalPaidAmount);
-          setLoad(false);
         }
       })
       .catch((e) => {
         toast.error(e.response.data.msg);
-        setLoad(false);
       });
   };
 
@@ -115,7 +110,7 @@ export default function EditPost() {
   const [show, setShow] = useState(false);
   const [catname, setCatname] = useState("");
   const handleClose = () => setShow(false);
-  const handleSave = (catname = catname) => {
+  const handleSave = (catname) => {
     axios
       .post(`${defaultUrl}api/category/upload-category`, {
         title: catname,
@@ -160,7 +155,7 @@ export default function EditPost() {
   formdata.append("postid", postid);
 
   const postUpload = () => {
-    if (mainTitle == "") {
+    if (mainTitle === "") {
       toast.error("Title is required !");
     } else if (selectedCategory.length <= 0) {
       toast.error("Please select one or more category !");
@@ -617,7 +612,7 @@ export default function EditPost() {
                   onChange={(e) =>
                     setPublish(e.target.checked ? "published" : "draft")
                   }
-                  checked={publish == "published" ? true : false}
+                  checked={publish === "published" ? true : false}
                   type="switch"
                   id="custom-switch"
                   label="Publish"

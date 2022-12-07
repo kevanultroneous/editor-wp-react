@@ -1,17 +1,14 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Route, Routes } from "react-router-dom";
-import Login from "./components/login/Login";
 import Home from "./components/home/Home";
 import PressRelease from "./components/pressrelease/PressRelease";
-import GuestPost from "./components/guestpost/GuestPost";
 import Categories from "./components/categories/Categories";
 import EditPost from "./components/EditPost";
 import PostUploading from "./components/PostUploading";
 import "./app.css";
 import "./rc-paginate.css";
 import ViewPost from "./components/Viewpost";
-import Contact from "./components/contactComponet/contact";
 import Premium from "./components/Premium";
 import Inquires from "./components/inquires";
 
@@ -27,8 +24,6 @@ export default function App() {
       <Route path="/upload-post/:type" element={<PostUploading />} />
       <Route path="/view-press-release/:postid" element={<ViewPost />} />
       <Route path="/inquires" element={<Inquires />} />
-      {/* <Route path='/guest-post' element={<GuestPost />} /> */}
-      {/* <Route path='/view-guest-post/:gpostid' element={<ViewPost />} /> */}
       <Route path="*" element={<h1>404</h1>} />
     </Routes>
   );
