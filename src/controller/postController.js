@@ -206,26 +206,25 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
     };
 
     getFullpost = await Post.aggregate([
-        {
-          $facet: {
-            mainDoc: [
-              {$match: { isActive: true }},
-              { $sort: { createdAt: -1 } },
-              { $skip: pageOptions.skipVal },
-              { $limit: pageOptions.limitVal },
-            ],
-            totalCount: [{$match: { isActive: true }}, { $count: "total" }],
+      {
+        $facet: {
+          mainDoc: [
+            { $match: { isActive: true } },
+            { $sort: { createdAt: -1 } },
+            { $skip: pageOptions.skipVal },
+            { $limit: pageOptions.limitVal },
+          ],
+          totalCount: [{ $match: { isActive: true } }, { $count: "total" }],
+        },
+      },
+      {
+        $addFields: {
+          totalCount: {
+            $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
           },
         },
-        {
-          $addFields: {
-            totalCount: {
-              $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
-            },
-          },
-        },
-      ]);
-
+      },
+    ]);
   } else {
     if (postid && !mongoose.isValidObjectId(postid))
       return sendResponse(res, 500, {
@@ -270,7 +269,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
     let allPostMatch = {
       $match: {
         ...aggreFilters.homePage.filters,
-        releaseDate: {$lte: new Date()}
+        releaseDate: { $lte: new Date() },
       },
     };
 
@@ -479,20 +478,25 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
 exports.categoryPrList = catchAsyncError(async (req, res) => {
   const { categoryID, page, limit } = req.body;
 
-  if (!mongoose.isValidObjectId(categoryID))
-    return sendResponse(res, 400, {
-      msg: errorMessages.category.inValidCategoryID,
-    });
+  // if (!mongoose.isValidObjectId(categoryID))
+  //   return sendResponse(res, 400, {
+  //     msg: errorMessages.category.inValidCategoryID,
+  //   });
+  console.log(categoryID);
 
   const pageOptions = {
     skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
     limitVal: parseInt(limit) || 30,
   };
 
+  const postMatch = await Category.findOne({ title: categoryID });
   const categoryMatch = {
     $match: {
       ...aggreFilters.homePage.filters,
-      category: ObjectId(categoryID),
+      $or: [
+        { category: ObjectId(postMatch._id) },
+        { subCategory: ObjectId(postMatch._id) },
+      ],
     },
   };
 

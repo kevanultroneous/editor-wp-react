@@ -10,15 +10,23 @@ import {
 import React, { useEffect, useState } from "react";
 import Header from "../common/Header";
 import "./style.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import DeleteModel from "../common/DeleteModel";
 import { defaultUrl, frontendurl } from "../../utils/default";
 import { MdClose, MdDone, MdDoneAll, MdDrafts } from "react-icons/md";
+import Pagination from "rc-pagination";
+import { FcLeft, FcRight } from "react-icons/fc";
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
 
 const PressRelease = () => {
   const navigate = useNavigate();
+  let query = useQuery();
   const [postData, setPostData] = useState([]);
   const [deleteShow, setDeleteShow] = useState(false);
   const [currentPost, setCurrentPost] = useState("");
@@ -32,11 +40,29 @@ const PressRelease = () => {
     setCurrentPost(title);
   };
 
+  const PrevNextArrow = (current, type, originalElement) => {
+    if (type === "prev") {
+      return (
+        <button>
+          <FcLeft size={20} />
+        </button>
+      );
+    }
+    if (type === "next") {
+      return (
+        <button>
+          <FcRight size={20} />
+        </button>
+      );
+    }
+    return originalElement;
+  };
+
   const timestampToDate = (ts) => {
     return (
       new Date(ts).getDate() +
       "-" +
-      new Date(ts).getMonth() +
+      (new Date(ts).getMonth() + 1) +
       "-" +
       new Date(ts).getFullYear()
     );
@@ -44,11 +70,14 @@ const PressRelease = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [query]);
 
   const fetchPosts = () => {
     axios
-      .post(`${defaultUrl}api/post/get-all-post`)
+      .post(`${defaultUrl}api/post/get-all-post`, {
+        page: query.get("page"),
+        limit: 30,
+      })
       .then((r) => {
         if (r.data.success) {
           setPostData(r.data.data);
@@ -56,7 +85,6 @@ const PressRelease = () => {
       })
       .catch((e) => toast.error(e.response.data.msg));
   };
-
   const deletePosts = () => {
     axios
       .post(`${defaultUrl}api/post/delete-post`, { postid: currentPostId })
@@ -111,7 +139,7 @@ const PressRelease = () => {
               </thead>
               <tbody>
                 {postData != null ? (
-                  postData.map((v, i) => (
+                  postData[0]?.mainDoc.map((v, i) => (
                     <tr key={i}>
                       <td>{i + 1}</td>
                       <td>
@@ -123,11 +151,13 @@ const PressRelease = () => {
                       </td>
                       <td>
                         {v.paidStatus && (
-                          <Badge bg="success" pill>
-                            Purchased {v.totalPaidAmount}
-                          </Badge>
+                          <>
+                            <Badge bg="success" pill>
+                              Purchased {v.totalPaidAmount}
+                            </Badge>
+                            <br />
+                          </>
                         )}
-                        <br />
                         {v.title}
                       </td>
                       <td>
@@ -154,13 +184,13 @@ const PressRelease = () => {
                           <MdClose color="red" size={30} />
                         )}
                       </td>
-                      <td>
+                      {/* <td>
                         <Link to={`/view-press-release/${v._id}`}>
                           <Button variant="primary" style={{ width: "100%" }}>
                             View
                           </Button>
                         </Link>
-                      </td>
+                      </td> */}
                       <td>
                         <Button
                           variant="info"
@@ -193,7 +223,27 @@ const PressRelease = () => {
               </tbody>
             </Table>
           </Col>
+          <Col xl={12} className={"pagination-fix"}>
+            <Pagination
+              showTitle={false}
+              onChange={(v) => {
+                navigate({
+                  pathname: "/press-release",
+                  search: `?page=${v}`,
+                });
+              }}
+              current={parseInt(query.get("page")) || 1}
+              pageSize={30}
+              total={postData[0]?.totalCount}
+              className="pagination-data"
+              showTotal={(total, range) =>
+                `Showing ${range[0]}-${range[1]} of ${postData[0]?.totalCount}`
+              }
+              itemRender={PrevNextArrow}
+            />
+          </Col>
         </Row>
+        {console.log()}
       </Container>
     </>
   );
