@@ -15,11 +15,12 @@ exports.uploadImagesForFeatured = upload.single("image");
 
 exports.resizePhotoFimg = (req, res, next) => {
   if (req.file) {
-    let newfile = `public/other/featured/${
-      new Date() + req.file.originalname
-    }.jpeg`;
+    let newfile = `public/other/featured/${new Date() + req.file.originalname}`;
 
-    sharp(req.file.buffer).jpeg({ quality: 100 }).toFile(newfile);
+    sharp(req.file.buffer)
+      .resize(164, 115)
+      .jpeg({ quality: 100 })
+      .toFile(newfile);
     req.sendfile = newfile.replace("public/", "");
     next();
   } else {
@@ -306,8 +307,8 @@ exports.getPRList = catchAsyncError(async (req, res) => {
         };
 
     getFullpost = await Post.aggregate([
-      {$match: query},
-      ...addCategoryName()
+      { $match: query },
+      ...addCategoryName(),
     ]);
     getFullpost = getFullpost[0];
   }
@@ -370,10 +371,7 @@ exports.globalSearch = catchAsyncError(async (req, res) => {
   searchedPosts = await Post.aggregate([
     {
       $facet: {
-        mainDoc: [
-          searchMatch,
-          ...PRFullSorting(pageOptions)
-        ],
+        mainDoc: [searchMatch, ...PRFullSorting(pageOptions)],
         totalCount: [searchMatch, { $count: "total" }],
       },
     },
@@ -411,10 +409,7 @@ exports.internalSearch = catchAsyncError(async (req, res) => {
   searchedPosts = await Post.aggregate([
     {
       $facet: {
-        mainDoc: [
-          searchMatch,
-          ...PRFullSorting(pageOptions)
-        ],
+        mainDoc: [searchMatch, ...PRFullSorting(pageOptions)],
         totalCount: [searchMatch, { $count: "total" }],
       },
     },
@@ -500,10 +495,7 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
   const categoryPosts = await Post.aggregate([
     {
       $facet: {
-        mainDoc: [
-          categoryMatch,
-          ...PRFullSorting(pageOptions)
-        ],
+        mainDoc: [categoryMatch, ...PRFullSorting(pageOptions)],
         totalCount: [categoryMatch, { $count: "total" }],
       },
     },
@@ -574,11 +566,10 @@ function PRFullSorting(pageOptions) {
   ];
 }
 
-function addCategoryName(){
+function addCategoryName() {
   return [
     {
       $addFields: {
-       
         categoryID: { $arrayElemAt: ["$category", 0] },
         subCategoryID: { $arrayElemAt: ["$subCategory", 0] },
       },
