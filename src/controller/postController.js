@@ -478,20 +478,25 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
 exports.categoryPrList = catchAsyncError(async (req, res) => {
   const { categoryID, page, limit } = req.body;
 
-  if (!mongoose.isValidObjectId(categoryID))
-    return sendResponse(res, 400, {
-      msg: errorMessages.category.inValidCategoryID,
-    });
+  // if (!mongoose.isValidObjectId(categoryID))
+  //   return sendResponse(res, 400, {
+  //     msg: errorMessages.category.inValidCategoryID,
+  //   });
+  console.log(categoryID);
 
   const pageOptions = {
     skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
     limitVal: parseInt(limit) || 30,
   };
 
+  const postMatch = await Category.findOne({ title: categoryID });
   const categoryMatch = {
     $match: {
       ...aggreFilters.homePage.filters,
-      category: ObjectId(categoryID),
+      $or: [
+        { category: ObjectId(postMatch._id) },
+        { subCategory: ObjectId(postMatch._id) },
+      ],
     },
   };
 
