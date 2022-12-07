@@ -181,7 +181,12 @@ export default function PostUploading() {
     setContent(data);
   };
   const editUrl = (v) => {
-    setUrl(v.split(" ").join("-"));
+    setUrl(
+      v
+        .replace(/[.,\s]/g, "")
+        .split(" ")
+        .join("-")
+    );
   };
 
   const alreadyfound = (ary1, ary2) => {
@@ -343,9 +348,7 @@ export default function PostUploading() {
                   onChange={(e) => {
                     setMainTitle(e.target.value);
                     editUrl(e.target.value);
-                    setSeoTitle(
-                      e.target.value.replace(/,/g, "").split(" ").join("-")
-                    );
+                    setSeoTitle(e.target.value.split(" ").join("-"));
                   }}
                   type="text"
                   placeholder="Enter title here"
@@ -544,8 +547,10 @@ export default function PostUploading() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url.replace(/,/g, "")}
-                  onChange={(e) => setUrl(e.target.value.replace(/,/g, ""))}
+                  value={url.replace(/[.,\s]/g, "")}
+                  onChange={(e) =>
+                    setUrl(e.target.value.replace(/[.,\s]/g, ""))
+                  }
                 />
               </div>
 
