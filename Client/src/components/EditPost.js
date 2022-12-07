@@ -208,7 +208,12 @@ export default function EditPost() {
     setContent(data);
   };
   const editUrl = (v) => {
-    setUrl(v.split(" ").join("-"));
+    setUrl(
+      v
+        .replace(/[.,\s]/g, "")
+        .split(" ")
+        .join("-")
+    );
   };
   const alreadyfound = (ary1, ary2) => {
     let output = 0;
@@ -586,8 +591,10 @@ export default function EditPost() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  value={url.replace(/[.,\s]/g, "")}
+                  onChange={(e) =>
+                    setUrl(e.target.value.replace(/[.,\s]/g, ""))
+                  }
                 />
               </div>
 
