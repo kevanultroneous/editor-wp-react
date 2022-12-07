@@ -385,9 +385,7 @@ export default function EditPost() {
                         <>
                           <Image src={dummyImg} width={100} />
                           <div>
-                            <Badge bg="info">
-                              Current Featured Image {dummyImg}
-                            </Badge>
+                            <Badge bg="info">Current Featured Image </Badge>
                           </div>
                         </>
                       )}
