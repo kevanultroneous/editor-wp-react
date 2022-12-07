@@ -24,8 +24,9 @@ postRouter.post(
 //delete post
 postRouter.post("/delete-post", postController.deletePost);
 
-//get all post
+//admin get all post
 postRouter.post("/get-all-post", postController.getAllpost);
+postRouter.post("/search-admin-posts", postController.searchAdminPosts);
 
 // front end pr list/ pr detail
 postRouter.post("/get-pr-list", postController.getPRList);

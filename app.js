@@ -9,6 +9,7 @@ const postRouter = require("./src/router/postRouter");
 const categoryRouter = require("./src/router/categoryRouter");
 const planRouter = require("./src/router/planRouter");
 const contactRouter = require("./src/router/contactUsRouter");
+const userRouter = require("./src/router/userRouter");
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use("/api/post/", postRouter);
 app.use("/api/category/", categoryRouter);
 app.use("/api/plan", planRouter);
 app.use("/api/contact", contactRouter);
+app.use("/api/user", userRouter);
 
 module.exports = app;

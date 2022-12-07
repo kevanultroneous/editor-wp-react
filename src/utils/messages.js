@@ -6,6 +6,8 @@ const errorMessages = {
     exists: "User already exists with this contact number or email.",
     notExists: "No user exist with this email.",
     blocked: "Your account is has been suspended. Kindly contact admin.",
+    loggedIn: `User logged in!`,
+    created: `News user created !`
   },
   name: {
     empty: `${empty} name.`,
@@ -35,6 +37,11 @@ const errorMessages = {
     newAndConfirmSame: "Password and Confirm password must be same.",
     empty: `${empty} password.`,
     wrongPwd: "Email or password is incorrect. Please try again.",
+    changed: `Password has changed`
+  },
+  otp : {
+    expired: "Otp has expired. Please resend the otp and verify again.",
+    invalid: `${provide} OTP`,
   },
   post: {
     uploadError: "Post was not uploaded",

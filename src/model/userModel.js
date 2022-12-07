@@ -1,18 +1,24 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const { errorMessages } = require("../utils/messages");
 
 const schema = new mongoose.Schema(
   {
-    customerName: {
+    name: {
       type: String,
       required: [true, errorMessages.name.empty],
     },
-    customerTitle: {
+    title: {
       type: String,
     },
-    customerEmail: {
+    email: {
       type: String,
       required: [true, errorMessages.email.empty],
+      unique: true,
+    },
+    contact: {
+      type: String,
+      required: [true, errorMessages.contact.empty],
       unique: true,
     },
     companyName: {
@@ -26,8 +32,8 @@ const schema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "serviceProvider",
-      enum: ["admin", "serviceProvider"],
+      default: "PRUser",
+      enum: ["admin", "PRUser"],
     },
     otp: {
       type: Number,
@@ -41,24 +47,43 @@ const schema = new mongoose.Schema(
     },
     isActive: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     password: {
       type: String,
       required: [true, errorMessages.password.empty],
       select: false,
     },
-    customerPRs: [
-        {
-        type: mongoose.Types.ObjectId,
-        ref: "Post",
-        }
-    ],
+    // posts: [
+    //   {
+    //     type: mongoose.Types.ObjectId,
+    //     ref: "Post",
+    //   },
+    // ],
   },
   {
     timestamps: true,
   }
 );
+
+schema.pre("save", async function (next) {
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+schema.methods.checkPassword = async function (loginPassword) {
+  return await bcrypt.compare(loginPassword, this.password).then((res) => res);
+};
+
+schema.methods.checkPasswordOnReset = async function (
+  loginPassword,
+  oldHashedPassword
+) {
+  return await bcrypt
+    .compare(loginPassword, oldHashedPassword)
+    .then((res) => res);
+};
+
 
 const User = mongoose.model("User", schema);
 module.exports = User;

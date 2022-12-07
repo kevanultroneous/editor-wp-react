@@ -36,3 +36,37 @@ exports.allEnquiry = catchAsyncError(async (req, res) => {
 
     return sendResponse(res, 200, {data: allEnquiries})
 })
+
+exports.searchEnquiry = catchAsyncError(async (req, res) => {
+  let searchedContacts;
+  const {searchTerm, page, limit } = req.body;
+
+  const pageOptions = {
+    skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+    limitVal: parseInt(limit) || 30,
+  };
+
+  searchedContacts = {$match: {$or: [
+    {email: new RegExp(searchTerm, "i")},
+    {contact: new RegExp(searchTerm, "i")},
+    {name: new RegExp(searchTerm, "i")}
+  ]}}
+
+  searchedContacts = await Contact.aggregate([
+    {
+      $facet: {
+        mainDoc: [searchedContacts],
+        totalCount: [searchedContacts, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ]);
+
+  if(searchedContacts) return sendResponse(res, 200, {data: searchedContacts});
+})

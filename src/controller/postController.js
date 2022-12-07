@@ -256,6 +256,51 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
     return sendResponse(res, 200, { success: true, data: getFullpost });
 });
 
+exports.searchAdminPosts = catchAsyncError(async (req, res) => {
+  const { searchTerm, page, limit } = req.body;
+
+  let getFullpost;
+
+  const pageOptions = {
+    skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+    limitVal: parseInt(limit) || 30,
+  };
+
+  const searchMatch = {
+    isActive: true,
+    $or: [
+      { title: new RegExp(searchTerm, "i") },
+      { summary: new RegExp(searchTerm, "i") },
+    ],
+  };
+
+  getFullpost = await Post.aggregate([
+    {
+      $facet: {
+        mainDoc: [
+          {
+            $match: searchMatch,
+          },
+          { $sort: { createdAt: -1 } },
+          { $skip: pageOptions.skipVal },
+          { $limit: pageOptions.limitVal },
+        ],
+        totalCount: [{$match: searchMatch}, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ]);
+
+  if (getFullpost)
+    return sendResponse(res, 200, { success: true, data: getFullpost });
+});
+
 exports.getPRList = catchAsyncError(async (req, res) => {
   const { postid, url, page, limit } = req.body;
 
@@ -470,18 +515,19 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
 exports.categoryPrList = catchAsyncError(async (req, res) => {
   const { categoryID, page, limit } = req.body;
 
-  // if (!mongoose.isValidObjectId(categoryID))
-  //   return sendResponse(res, 400, {
-  //     msg: errorMessages.category.inValidCategoryID,
-  //   });
-  console.log(categoryID);
+
 
   const pageOptions = {
     skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
     limitVal: parseInt(limit) || 30,
   };
 
-  const postMatch = await Category.findOne({ title: categoryID });
+  let postMatch = await Category.find({
+    title: new RegExp(categoryID, "i"),
+  });
+  postMatch = postMatch[0];
+  
+  console.log(postMatch);
   const categoryMatch = {
     $match: {
       ...aggreFilters.homePage.filters,
