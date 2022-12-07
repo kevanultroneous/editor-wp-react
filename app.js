@@ -8,6 +8,7 @@ const dotenv = require("dotenv");
 const postRouter = require("./src/router/postRouter");
 const categoryRouter = require("./src/router/categoryRouter");
 const planRouter = require("./src/router/planRouter");
+const contactRouter = require("./src/router/contactUsRouter");
 
 const app = express();
 
@@ -28,5 +29,6 @@ app.get("/test", async (req, res) => {
 app.use("/api/post/", postRouter);
 app.use("/api/category/", categoryRouter);
 app.use("/api/plan", planRouter);
+app.use("/api/contact", contactRouter);
 
 module.exports = app;

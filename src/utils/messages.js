@@ -11,13 +11,22 @@ const errorMessages = {
     empty: `${empty} name.`,
   },
   email: {
-    invalid: "${empty}valid email",
+    invalid: `${empty} valid email`,
     empty: `${empty} email.`,
   },
   contact: {
     invalid: "Contact number length must be between 7 and 15 characters",
     notContact: "Only numbers are allowed",
     empty: `${empty} contact number.`,
+  },
+  topic: {
+    empty: `${empty} topic.`,
+  },
+  contactMessage: {
+    empty: `${empty} message`
+  },
+  enquiry: {
+    created: "Enquiry created !",
   },
   password: {
     invalid:
@@ -49,6 +58,7 @@ const errorMessages = {
     inComplete: `${provide} details`,
     inValidParentID: `${provide} parent category id !`,
     doesntExist: `Category does not exist`,
+    postTypeExist: `${empty} post type`,
     invalidPostType: `${provide} postType`,
     categoryExists: "Category already exists !"
   },
