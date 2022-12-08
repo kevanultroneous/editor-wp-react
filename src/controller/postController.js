@@ -285,7 +285,7 @@ exports.searchAdminPosts = catchAsyncError(async (req, res) => {
           { $skip: pageOptions.skipVal },
           { $limit: pageOptions.limitVal },
         ],
-        totalCount: [{$match: searchMatch}, { $count: "total" }],
+        totalCount: [{ $match: searchMatch }, { $count: "total" }],
       },
     },
     {
@@ -401,6 +401,7 @@ exports.globalSearch = catchAsyncError(async (req, res) => {
   const searchMatch = {
     $match: {
       ...aggreFilters.homePage.filters,
+      releaseDate: { $lte: new Date() },
       title: new RegExp(searchTerm, "i"),
     },
   };
@@ -443,6 +444,7 @@ exports.internalSearch = catchAsyncError(async (req, res) => {
   const searchMatch = {
     $match: {
       ...aggreFilters.homePage.filters,
+      releaseDate: { $lte: new Date() },
       $or: [
         { title: new RegExp(searchTerm, "i") },
         { summary: new RegExp(searchTerm, "i") },
@@ -515,8 +517,6 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
 exports.categoryPrList = catchAsyncError(async (req, res) => {
   const { categoryID, page, limit } = req.body;
 
-
-
   const pageOptions = {
     skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
     limitVal: parseInt(limit) || 30,
@@ -526,7 +526,7 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
     title: new RegExp(categoryID, "i"),
   });
   postMatch = postMatch[0];
-  
+
   console.log(postMatch);
   const categoryMatch = {
     $match: {
