@@ -78,6 +78,12 @@ export default function PostUploading() {
     searchCategories(searchText);
   }, [searchText]);
 
+  useEffect(() => {
+    if (url.length > 0) {
+      editUrl(url);
+    }
+  }, [url]);
+
   const pauseCalender = () => {
     return (
       new Date().getFullYear() +
@@ -135,6 +141,8 @@ export default function PostUploading() {
       toast.error("Title is required !");
     } else if (mainTitle.length >= 200) {
       toast.error("Title should be less than 200 characters !");
+    } else if (url.length > 60) {
+      toast.error("slug url should be less than 46 characters !");
     } else if (selectedCategory.length <= 0) {
       toast.error("Please select one or more category !");
     } else if (content.length < 100) {
@@ -184,14 +192,30 @@ export default function PostUploading() {
     setContent(data);
   };
   // ] { } | \ ” % ~ # < > . , " " “” /
+
+  function replaceChar(origString, replaceChar, index) {
+    let firstPart = origString.substr(0, index);
+    let lastPart = origString.substr(index + 1);
+
+    let newString = firstPart + replaceChar + lastPart;
+    return newString;
+  }
   const editUrl = (v) => {
-    setUrl(
-      v
-        .split(" ")
-        .join("-")
-        .replace(/[.,#<>~“”{}|%"\s]/g, "")
-        .toLowerCase()
-    );
+    let updatedurl = v
+      .split(" ")
+      .join("-")
+      .replace(/[.,#<>~“”{}|%"\s]/g, "")
+      .substring(0, 60)
+      .toLowerCase();
+
+    let finddash = updatedurl.charAt(updatedurl.length - 1);
+    let removelastdash = replaceChar(updatedurl, "", updatedurl.length - 1);
+
+    if (finddash === "-") {
+      setUrl(removelastdash);
+    } else {
+      setUrl(updatedurl);
+    }
   };
 
   const alreadyfound = (ary1, ary2) => {
@@ -552,20 +576,8 @@ export default function PostUploading() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url
-                    .split(" ")
-                    .join("-")
-                    .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                    .toLowerCase()}
-                  onChange={(e) =>
-                    setUrl(
-                      e.target.value
-                        .split(" ")
-                        .join("-")
-                        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                        .toLowerCase()
-                    )
-                  }
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
                 />
               </div>
 

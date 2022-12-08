@@ -1,4 +1,4 @@
-const Contact = require("../model/contactUsModel");
+const Enquiry = require("../model/contactUsModel");
 
 const catchAsyncError = require("../utils/catchAsyncError");
 const { sendResponse } = require("../utils/commonFunctions");
@@ -18,7 +18,7 @@ exports.createEnquiry = catchAsyncError(async (req, res) => {
     message,
   };
 
-  enquiry = await Contact.create(enquiry);
+  enquiry = await Enquiry.create(enquiry);
 
   if (enquiry)
     return sendResponse(res, 200, {
@@ -32,7 +32,7 @@ exports.createEnquiry = catchAsyncError(async (req, res) => {
 exports.allEnquiry = catchAsyncError(async (req, res) => {
   let allEnquiries;
 
-  allEnquiries = await Contact.aggregate([
+  allEnquiries = await Enquiry.aggregate([
     {
       $facet: {
         mainDoc: [{ $match: {} }],
@@ -70,10 +70,14 @@ exports.searchEnquiry = catchAsyncError(async (req, res) => {
     },
   };
 
-  searchedContacts = await Contact.aggregate([
+  searchedContacts = await Enquiry.aggregate([
     {
       $facet: {
-        mainDoc: [searchedContacts],
+        mainDoc: [
+          searchedContacts,
+          { $skip: pageOptions.skipVal },
+          { $limit: pageOptions.limitVal },
+        ],
         totalCount: [searchedContacts, { $count: "total" }],
       },
     },

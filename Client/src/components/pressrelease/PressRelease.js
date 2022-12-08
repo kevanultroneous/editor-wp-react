@@ -27,6 +27,7 @@ function useQuery() {
 const PressRelease = () => {
   const navigate = useNavigate();
   let query = useQuery();
+  const [currentNumber, setCurrentNumber] = useState(null);
   const [postData, setPostData] = useState([]);
   const [deleteShow, setDeleteShow] = useState(false);
   const [currentPost, setCurrentPost] = useState("");
@@ -76,7 +77,7 @@ const PressRelease = () => {
     axios
       .post(`${defaultUrl}api/post/get-all-post`, {
         page: query.get("page"),
-        limit: 30,
+        limit: 10,
       })
       .then((r) => {
         if (r.data.success) {
@@ -141,7 +142,7 @@ const PressRelease = () => {
                 {postData != null ? (
                   postData[0]?.mainDoc.map((v, i) => (
                     <tr key={i}>
-                      <td>{i + 1}</td>
+                      <td>{currentNumber + i}</td>
                       <td>
                         {v.featuredImage ? (
                           <Image
@@ -236,12 +237,15 @@ const PressRelease = () => {
                 });
               }}
               current={parseInt(query.get("page")) || 1}
-              pageSize={30}
+              pageSize={10}
               total={postData[0]?.totalCount}
               className="pagination-data"
-              showTotal={(total, range) =>
-                `Showing ${range[0]}-${range[1]} of ${postData[0]?.totalCount}`
-              }
+              showTotal={(total, range) => (
+                <>
+                  {setCurrentNumber(range[0])}
+                  Showing {range[0]}-{range[1]} of {postData[0]?.totalCount}
+                </>
+              )}
               itemRender={PrevNextArrow}
             />
           </Col>

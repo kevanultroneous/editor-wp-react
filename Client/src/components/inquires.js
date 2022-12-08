@@ -3,10 +3,32 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 import Header from "./common/Header";
 import { defaultUrl } from "../utils/default";
-import { AiFillEye } from "react-icons/ai";
+import Pagination from "rc-pagination";
+import { FcLeft, FcRight } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
 const Inquires = () => {
+  const navigate = useNavigate();
   const [inquires, setInquires] = useState([]);
   const [search, setSearch] = useState("");
+  const [currentNumber, setCurrentNumber] = useState(null);
+  const PrevNextArrow = (current, type, originalElement) => {
+    if (type === "prev") {
+      return (
+        <button>
+          <FcLeft size={20} />
+        </button>
+      );
+    }
+    if (type === "next") {
+      return (
+        <button>
+          <FcRight size={20} />
+        </button>
+      );
+    }
+    return originalElement;
+  };
+
   useEffect(() => {
     fetchInquires();
   }, []);
@@ -16,13 +38,13 @@ const Inquires = () => {
       .post(defaultUrl + "api/contact/search-enquiry", {
         searchTerm: search,
       })
-      .then((r) => setInquires(r.data?.data[0]?.mainDoc))
+      .then((r) => setInquires(r.data?.data))
       .catch((e) => console.log(e));
   };
   const fetchInquires = () => {
     axios
       .get(defaultUrl + "api/contact/all-enquiry")
-      .then((r) => setInquires(r.data?.data[0]?.mainDoc))
+      .then((r) => setInquires(r.data?.data))
       .catch((e) => console.log(e));
   };
   return (
@@ -57,7 +79,7 @@ const Inquires = () => {
           </tr>
         </thead>
         <tbody>
-          {inquires.map((items, index) => (
+          {inquires[0]?.mainDoc.map((items, index) => (
             <tr>
               <td>{index + 1}</td>
               <td>{items.name}</td>
@@ -70,7 +92,30 @@ const Inquires = () => {
           ))}
         </tbody>
       </Table>
-      <div></div>
+      {inquires[0]?.totalCount > 10 && (
+        <div className={"pagination-fix"}>
+          <Pagination
+            showTitle={false}
+            // onChange={(v) => {
+            //   navigate({
+            //     pathname: "/press-release",
+            //     search: `?page=${v}`,
+            //   });
+            // }}
+            // current={parseInt(query.get("page")) || 1}
+            pageSize={10}
+            total={inquires[0]?.totalCount}
+            className="pagination-data"
+            showTotal={(total, range) => (
+              <>
+                {setCurrentNumber(range[0])}
+                Showing {range[0]}-{range[1]} of {200}
+              </>
+            )}
+            itemRender={PrevNextArrow}
+          />
+        </div>
+      )}
     </>
   );
 };
