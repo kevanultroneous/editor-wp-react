@@ -2,7 +2,11 @@ const sharp = require("sharp");
 let ObjectId = require("mongoose").Types.ObjectId;
 const { default: mongoose } = require("mongoose");
 
-const { sendResponse, upload } = require("../utils/commonFunctions");
+const {
+  sendResponse,
+  upload,
+  generateOtp,
+} = require("../utils/commonFunctions");
 const catchAsyncError = require("../utils/catchAsyncError");
 const { errorMessages } = require("../utils/messages");
 const { aggreFilters } = require("../utils/filterJson");
@@ -15,7 +19,7 @@ exports.uploadImagesForFeatured = upload.single("image");
 
 exports.resizePhotoFimg = (req, res, next) => {
   if (req.file) {
-    let newfile = `public/other/featured/${new Date() + req.file.originalname}`;
+    let newfile = `public/other/featured/${Date.now()}-${generateOtp()}`;
 
     sharp(req.file.buffer)
       .resize(164, 115)
