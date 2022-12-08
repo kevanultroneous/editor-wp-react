@@ -3,6 +3,7 @@ import {
   Button,
   Col,
   Container,
+  Form,
   Image,
   Row,
   Table,
@@ -26,6 +27,7 @@ export function useQuery() {
 
 const PressRelease = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
   let query = useQuery();
   const [currentNumber, setCurrentNumber] = useState(null);
   const [postData, setPostData] = useState([]);
@@ -75,7 +77,8 @@ const PressRelease = () => {
 
   const fetchPosts = () => {
     axios
-      .post(`${defaultUrl}api/post/get-all-post`, {
+      .post(`${defaultUrl}api/post/search-admin-posts`, {
+        searchTerm: search,
         page: query.get("page"),
         limit: 10,
       })
@@ -104,6 +107,7 @@ const PressRelease = () => {
     <>
       <Toaster position="top-right" reverseOrder={false} />
       <Header />
+      <div className="p-2 w-25"></div>
       <DeleteModel
         title={"Delete Press Release"}
         mentionText={`Are you sure to delete this ${currentPost} Press Release ?`}
@@ -114,7 +118,7 @@ const PressRelease = () => {
       />
       <Container fluid>
         <Row className="AddActionSpace">
-          <Col xl={12}>
+          <Col xl={6}>
             <Button
               variant="success"
               onClick={() => navigate("/upload-post/press-release")}
@@ -122,15 +126,32 @@ const PressRelease = () => {
               Add new PressRelease
             </Button>
           </Col>
+          <Col xl={6} className="d-flex justify-content-end">
+            <Form.Control
+              onKeyDown={(e) => {
+                if (e.key == "Enter") {
+                  navigate("/press-release");
+                  fetchPosts();
+                }
+              }}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search post by title or summary"
+              className="p-0 ps-3 pe-3 w-50"
+              size="lg"
+              aria-label="Small"
+              aria-describedby="inputGroup-sizing-sm"
+            />
+          </Col>
         </Row>
         <Row className="TableSpace">
-          <Col xl={12}>
+          <Col xl={12} className="p-0">
             <Table striped bordered hover variant="dark">
               <thead style={{ position: "sticky", top: "0" }}>
                 <tr>
                   <th>#</th>
                   <th>Cover/Featured</th>
-                  <th>Title</th>
+                  <th>Title </th>
                   <th>URL</th>
                   <th>Status</th>
                   <th>Released Date</th>
@@ -138,6 +159,7 @@ const PressRelease = () => {
                   <th colSpan={3}>Action</th>
                 </tr>
               </thead>
+
               <tbody>
                 {postData != null ? (
                   postData[0]?.mainDoc.map((v, i) => (
@@ -227,28 +249,30 @@ const PressRelease = () => {
               </tbody>
             </Table>
           </Col>
-          <Col xl={12} className={"pagination-fix"}>
-            <Pagination
-              showTitle={false}
-              onChange={(v) => {
-                navigate({
-                  pathname: "/press-release",
-                  search: `?page=${v}`,
-                });
-              }}
-              current={parseInt(query.get("page")) || 1}
-              pageSize={10}
-              total={postData[0]?.totalCount}
-              className="pagination-data"
-              showTotal={(total, range) => (
-                <>
-                  {setCurrentNumber(range[0])}
-                  Showing {range[0]}-{range[1]} of {postData[0]?.totalCount}
-                </>
-              )}
-              itemRender={PrevNextArrow}
-            />
-          </Col>
+          {postData[0]?.totalCount > 10 && (
+            <Col xl={12} className={"pagination-fix"}>
+              <Pagination
+                showTitle={false}
+                onChange={(v) => {
+                  navigate({
+                    pathname: "/press-release",
+                    search: `?page=${v}`,
+                  });
+                }}
+                current={parseInt(query.get("page")) || 1}
+                pageSize={10}
+                total={postData[0]?.totalCount}
+                className="pagination-data"
+                showTotal={(total, range) => (
+                  <>
+                    {setCurrentNumber(range[0])}
+                    Showing {range[0]}-{range[1]} of {postData[0]?.totalCount}
+                  </>
+                )}
+                itemRender={PrevNextArrow}
+              />
+            </Col>
+          )}
         </Row>
         {console.log()}
       </Container>
