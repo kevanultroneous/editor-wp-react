@@ -483,7 +483,7 @@ export default function PostUploading() {
                   onChange={(e) => setReleaseDate(e.target.value)}
                   type="datetime-local"
                   placeholder="Release Date"
-                  min={pauseCalender()}
+                  // min={pauseCalender()}
                   // max={new Date().toLocaleDateString("en-ca")}
                 />
               </div>

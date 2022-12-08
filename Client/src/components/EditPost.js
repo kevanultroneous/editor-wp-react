@@ -283,9 +283,9 @@ export default function EditPost() {
                   <Button
                     onClick={() => postUpload()}
                     className="ms-4"
-                    variant={publish ? "success" : "secondary"}
+                    variant={publish == "published" ? "success" : "secondary"}
                   >
-                    Save as {publish ? "Publish" : "Draft"}
+                    Save
                   </Button>
                 </h3>
               </div>
@@ -507,7 +507,7 @@ export default function EditPost() {
                   onChange={(e) => setReleaseDate(e.target.value)}
                   type="datetime-local"
                   placeholder="Release Date"
-                  min={timestampToDate(releaseDate)}
+                  // min={timestampToDate(releaseDate)}
                 />
               </div>
 

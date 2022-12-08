@@ -37,6 +37,8 @@ const Inquires = () => {
     axios
       .post(defaultUrl + "api/contact/search-enquiry", {
         searchTerm: search,
+        limit: 10,
+        page: 1,
       })
       .then((r) => setInquires(r.data?.data))
       .catch((e) => console.log(e));
