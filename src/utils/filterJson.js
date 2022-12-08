@@ -19,6 +19,9 @@ const aggreFilters = {
       parentCategory: 1,
       postType: 1,
       isActive: 1,
+      seoTitle: 1,
+      seoDescription: 1,
+      slugUrl: 1,
     },
     subCategories: {
       from: "categories",

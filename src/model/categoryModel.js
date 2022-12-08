@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const {aggreFilters} = require("../utils/filterJson");
+const { aggreFilters } = require("../utils/filterJson");
 
 const schema = new mongoose.Schema(
   {
@@ -16,6 +16,18 @@ const schema = new mongoose.Schema(
       type: String,
       default: "press",
       enum: aggreFilters.category.postTypes,
+    },
+    slugUrl: {
+      type: String,
+      unique: true,
+    },
+    seoTitle: {
+      type: String,
+      unique: true,
+    },
+    seoDescription: {
+      type: String,
+      unique: true,
     },
     isActive: {
       type: Boolean,
