@@ -18,7 +18,7 @@ import { defaultUrl, frontendurl } from "../../utils/default";
 import { MdClose, MdDone } from "react-icons/md";
 import Pagination from "rc-pagination";
 import { FcLeft, FcRight } from "react-icons/fc";
-function useQuery() {
+export function useQuery() {
   const { search } = useLocation();
 
   return React.useMemo(() => new URLSearchParams(search), [search]);

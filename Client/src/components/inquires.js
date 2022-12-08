@@ -6,8 +6,11 @@ import { defaultUrl } from "../utils/default";
 import Pagination from "rc-pagination";
 import { FcLeft, FcRight } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "./pressrelease/PressRelease";
+
 const Inquires = () => {
   const navigate = useNavigate();
+  let query = useQuery();
   const [inquires, setInquires] = useState([]);
   const [search, setSearch] = useState("");
   const [currentNumber, setCurrentNumber] = useState(null);
@@ -30,25 +33,24 @@ const Inquires = () => {
   };
 
   useEffect(() => {
-    fetchInquires();
+    searchInquires();
   }, []);
+
+  useEffect(() => {
+    searchInquires();
+  }, [query.get("page")]);
 
   const searchInquires = () => {
     axios
       .post(defaultUrl + "api/contact/search-enquiry", {
         searchTerm: search,
         limit: 10,
-        page: 1,
+        page: query.get("page") ? query.get("page") : 1,
       })
       .then((r) => setInquires(r.data?.data))
       .catch((e) => console.log(e));
   };
-  const fetchInquires = () => {
-    axios
-      .get(defaultUrl + "api/contact/all-enquiry")
-      .then((r) => setInquires(r.data?.data))
-      .catch((e) => console.log(e));
-  };
+
   return (
     <>
       <Header />
@@ -56,6 +58,7 @@ const Inquires = () => {
         <Form.Control
           onKeyDown={(e) => {
             if (e.key == "Enter") {
+              navigate("/inquires");
               searchInquires();
             }
           }}
@@ -83,7 +86,7 @@ const Inquires = () => {
         <tbody>
           {inquires[0]?.mainDoc.map((items, index) => (
             <tr>
-              <td>{index + 1}</td>
+              <td>{currentNumber + index}</td>
               <td>{items.name}</td>
               <td>{items.email}</td>
               <td>{items.contact}</td>
@@ -98,13 +101,13 @@ const Inquires = () => {
         <div className={"pagination-fix"}>
           <Pagination
             showTitle={false}
-            // onChange={(v) => {
-            //   navigate({
-            //     pathname: "/press-release",
-            //     search: `?page=${v}`,
-            //   });
-            // }}
-            // current={parseInt(query.get("page")) || 1}
+            onChange={(v) => {
+              navigate({
+                pathname: "/inquires",
+                search: `?page=${v}`,
+              });
+            }}
+            current={parseInt(query.get("page")) || 1}
             pageSize={10}
             total={inquires[0]?.totalCount}
             className="pagination-data"
