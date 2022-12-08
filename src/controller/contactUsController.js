@@ -30,27 +30,45 @@ exports.createEnquiry = catchAsyncError(async (req, res) => {
 });
 
 exports.allEnquiry = catchAsyncError(async (req, res) => {
-    let allEnquiries;
+  let allEnquiries;
 
-    allEnquiries = await Contact.find({}).sort({createdAt: -1})
+  allEnquiries = await Contact.aggregate([
+    {
+      $facet: {
+        mainDoc: [{ $match: {} }],
+        totalCount: [{ $match: {} }, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ]);
 
-    return sendResponse(res, 200, {data: allEnquiries})
-})
+  return sendResponse(res, 200, { data: allEnquiries });
+});
 
 exports.searchEnquiry = catchAsyncError(async (req, res) => {
   let searchedContacts;
-  const {searchTerm, page, limit } = req.body;
+  const { searchTerm, page, limit } = req.body;
 
   const pageOptions = {
     skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
     limitVal: parseInt(limit) || 30,
   };
 
-  searchedContacts = {$match: {$or: [
-    {email: new RegExp(searchTerm, "i")},
-    {contact: new RegExp(searchTerm, "i")},
-    {name: new RegExp(searchTerm, "i")}
-  ]}}
+  searchedContacts = {
+    $match: {
+      $or: [
+        { email: new RegExp(searchTerm, "i") },
+        { contact: new RegExp(searchTerm, "i") },
+        { name: new RegExp(searchTerm, "i") },
+      ],
+    },
+  };
 
   searchedContacts = await Contact.aggregate([
     {
@@ -68,5 +86,6 @@ exports.searchEnquiry = catchAsyncError(async (req, res) => {
     },
   ]);
 
-  if(searchedContacts) return sendResponse(res, 200, {data: searchedContacts});
-})
+  if (searchedContacts)
+    return sendResponse(res, 200, { data: searchedContacts });
+});
