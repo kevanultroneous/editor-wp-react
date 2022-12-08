@@ -19,7 +19,7 @@ exports.uploadImagesForFeatured = upload.single("image");
 
 exports.resizePhotoFimg = (req, res, next) => {
   if (req.file) {
-    let newfile = `public/other/featured/${Date.now()}-${generateOtp()}`;
+    let newfile = `public/other/featured/${Date.now()}-${generateOtp()}.jpeg`;
 
     sharp(req.file.buffer)
       .resize(164, 115)
