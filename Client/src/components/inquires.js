@@ -114,7 +114,7 @@ const Inquires = () => {
             showTotal={(total, range) => (
               <>
                 {setCurrentNumber(range[0])}
-                Showing {range[0]}-{range[1]} of {200}
+                Showing {range[0]}-{range[1]} of {inquires[0]?.totalCount}
               </>
             )}
             itemRender={PrevNextArrow}
