@@ -178,9 +178,9 @@ export default function EditPost() {
         .then((r) => {
           if (r.data.success) {
             toast.success(r.data.msg);
-            // navigate(
-            //   type === "press-release" ? "/press-release" : "/guest-post"
-            // );
+            navigate(
+              type === "press-release" ? "/press-release" : "/guest-post"
+            );
           } else {
             toast.error(r.data.msg);
           }
