@@ -201,7 +201,7 @@ export default function PostUploading() {
     let updatedurl = v
       .split(" ")
       .join("-")
-      .replace(/[.,#<>~“”''{}|%"\s]/g, "")
+      .replace(/[.,#<>~“”'':{}|%"\s]/g, "")
       .substring(0, 60)
       .toLowerCase();
 
