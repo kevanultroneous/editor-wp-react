@@ -102,7 +102,7 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     content,
     author,
     companyName,
-
+    // slugUrl,
     seoDescription,
     seoKeywords,
     backlinkUrl,
@@ -131,7 +131,7 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     content,
     author,
     companyName,
-
+    // slugUrl,
     seoDescription,
     seoKeywords,
 

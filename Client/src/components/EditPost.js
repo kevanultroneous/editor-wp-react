@@ -110,6 +110,13 @@ export default function EditPost() {
       });
   };
 
+  // * for emergency url edit
+  // useEffect(() => {
+  //   if (url.length > 0) {
+  //     editUrl(url);
+  //   }
+  // }, [url]);
+
   // category upload
   const [show, setShow] = useState(false);
   const [catname, setCatname] = useState("");
@@ -146,7 +153,7 @@ export default function EditPost() {
   formdata.append("seoTitle", seotitle);
   formdata.append("seoDescription", seodescription);
   formdata.append("backlinkUrl", weburl);
-  formdata.append("slugUrl", url);
+  // formdata.append("slugUrl", url);
   formdata.append("draftStatus", publish);
   formdata.append("postType", "press");
   formdata.append("releaseDate", new Date(releaseDate));
@@ -171,9 +178,9 @@ export default function EditPost() {
         .then((r) => {
           if (r.data.success) {
             toast.success(r.data.msg);
-            navigate(
-              type === "press-release" ? "/press-release" : "/guest-post"
-            );
+            // navigate(
+            //   type === "press-release" ? "/press-release" : "/guest-post"
+            // );
           } else {
             toast.error(r.data.msg);
           }
@@ -211,15 +218,31 @@ export default function EditPost() {
     const data = editor.getData();
     setContent(data);
   };
-  const editUrl = (v) => {
-    setUrl(
-      v
-        .split(" ")
-        .join("-")
-        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-        .toLowerCase()
-    );
-  };
+  // *for emergency edit url
+  // function replaceChar(origString, replaceChar, index) {
+  //   let firstPart = origString.substr(0, index);
+  //   let lastPart = origString.substr(index + 1);
+
+  //   let newString = firstPart + replaceChar + lastPart;
+  //   return newString;
+  // }
+  // const editUrl = (v) => {
+  //   let updatedurl = v
+  //     .split(" ")
+  //     .join("-")
+  //     .replace(/[.,#<>~“”''{}|%"\s]/g, "")
+  //     .substring(0, 60)
+  //     .toLowerCase();
+
+  //   let finddash = updatedurl.charAt(updatedurl.length - 1);
+  //   let removelastdash = replaceChar(updatedurl, "", updatedurl.length - 1);
+
+  //   if (finddash === "-") {
+  //     setUrl(removelastdash);
+  //   } else {
+  //     setUrl(updatedurl);
+  //   }
+  // };
   const alreadyfound = (ary1, ary2) => {
     let output = 0;
     for (let t = 0; t < ary1.length; t++) {
@@ -403,8 +426,8 @@ export default function EditPost() {
                   value={mainTitle}
                   onChange={(e) => {
                     setMainTitle(e.target.value);
-                    editUrl(e.target.value);
-                    setSeoDescription(e.target.value);
+                    // editUrl(e.target.value);
+                    // setSeoDescription(e.target.value);
                   }}
                   type="text"
                   placeholder="Enter title here"
@@ -600,20 +623,8 @@ export default function EditPost() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url
-                    .split(" ")
-                    .join("-")
-                    .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                    .toLowerCase()}
-                  onChange={(e) =>
-                    setUrl(
-                      e.target.value
-                        .split(" ")
-                        .join("-")
-                        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                        .toLowerCase()
-                    )
-                  }
+                  value={url}
+                  // onChange={(e) => setUrl(e.target.value)}
                 />
               </div>
 
