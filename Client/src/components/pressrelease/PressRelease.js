@@ -19,6 +19,7 @@ import { defaultUrl, frontendurl } from "../../utils/default";
 import { MdClose, MdDone } from "react-icons/md";
 import Pagination from "rc-pagination";
 import { FcLeft, FcRight } from "react-icons/fc";
+import Loaders from "../common/Loader";
 export function useQuery() {
   const { search } = useLocation();
 
@@ -36,7 +37,7 @@ const PressRelease = () => {
   const [currentPostId, setCurrentPostId] = useState("");
   const handleDeleteShow = () => setDeleteShow(true);
   const handleDeleteHide = () => setDeleteShow(false);
-
+  const [loader, setLoader] = useState(false);
   const handleDelete = (id, title) => {
     handleDeleteShow();
     setCurrentPostId(id);
@@ -76,6 +77,7 @@ const PressRelease = () => {
   }, [query]);
 
   const fetchPosts = () => {
+    setLoader(true);
     axios
       .post(`${defaultUrl}api/post/search-admin-posts`, {
         searchTerm: search,
@@ -83,11 +85,15 @@ const PressRelease = () => {
         limit: 10,
       })
       .then((r) => {
+        setLoader(false);
         if (r.data.success) {
           setPostData(r.data.data);
         }
       })
-      .catch((e) => toast.error(e.response.data.msg));
+      .catch((e) => {
+        toast.error(e.response.data.msg);
+        setLoader(false);
+      });
   };
   const deletePosts = () => {
     axios
@@ -106,6 +112,7 @@ const PressRelease = () => {
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
+      <Loaders show={loader} key={"loader-1"} />
       <Header />
       <div className="p-2 w-25"></div>
       <DeleteModel

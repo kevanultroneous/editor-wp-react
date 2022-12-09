@@ -154,9 +154,6 @@ export default function PostUploading() {
         .then((r) => {
           if (r.data.success) {
             toast.success(r.data.msg);
-            navigate(
-              type === "press-release" ? "/press-release" : "/guest-post"
-            );
           } else {
             toast.error(r.data.msg);
           }
@@ -164,7 +161,7 @@ export default function PostUploading() {
         .catch((e) => {
           toast.error(e.response.data.msg);
         });
-      setFFile(null);
+      // setFFile(null);
     }
   };
 
@@ -283,7 +280,7 @@ export default function PostUploading() {
                     className="ms-4"
                     variant={publish === 1 ? "success" : "secondary"}
                   >
-                    Save as {publish === 1 ? "Publish" : "Draft"}
+                    Save
                   </Button>
                 </h3>
               </div>
