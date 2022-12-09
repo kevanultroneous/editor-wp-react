@@ -199,9 +199,9 @@ export default function PostUploading() {
   }
   const editUrl = (v) => {
     let updatedurl = v
+      .replace(/[^\w\s]/gi, " ")
       .split(" ")
       .join("-")
-      .replace(/[.,#<>~“”'':{}|%"\s]/g, "")
       .substring(0, 60)
       .toLowerCase();
 
