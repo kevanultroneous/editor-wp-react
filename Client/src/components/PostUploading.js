@@ -136,7 +136,6 @@ export default function PostUploading() {
   if (!(ffile == null)) {
     formdata.append("image", prImg);
   }
-  console.log("watch pr img" + prImg);
   formdata.append("author", author);
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
@@ -250,7 +249,6 @@ export default function PostUploading() {
     100,
     [completedCrop]
   );
-  console.log(prImg);
   const alreadyfound = (ary1, ary2) => {
     let output = 0;
     for (let t = 0; t < ary1.length; t++) {
@@ -318,7 +316,6 @@ export default function PostUploading() {
                   onChange={(_, percentCrop) => setCrop(percentCrop)}
                   onComplete={(c) => setCompletedCrop(c)}
                   aspect={aspect}
-                  maxWidth={815}
                 >
                   <Image
                     ref={imgRef}
@@ -329,7 +326,6 @@ export default function PostUploading() {
               )}
             </Col>
             <Col xl={12}>
-              {console.log(completedCrop)}
               {!!completedCrop && (
                 <canvas
                   ref={previewCanvasRef}
@@ -350,6 +346,7 @@ export default function PostUploading() {
             onClick={() => {
               setImageEditing(false);
               setFFile(null);
+              setPrImg(null);
             }}
           >
             Cancel
@@ -446,37 +443,25 @@ export default function PostUploading() {
                   }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
-                {/* <center className="mt-3">
-                  {ffile != null && (
+                <center className="mt-3">
+                  {prImg != null && (
                     <>
-                      <ReactCrop
-                        locked={true}
-                        crop={crop}
-                        onChange={(_, percentCrop) => setCrop(percentCrop)}
-                        onComplete={(c) => setCompletedCrop(c)}
-                        aspect={aspect}
-                      >
-                        <Image ref={imgRef} src={URL.createObjectURL(ffile)} />
-                      </ReactCrop>
-                      {!!completedCrop && (
-                        <canvas
-                          ref={previewCanvasRef}
-                          style={{
-                            border: "1px solid black",
-                            objectFit: "cover",
-                            width: completedCrop.width,
-                            height: completedCrop.height,
-                          }}
-                        />
-                      )}
+                      <Image src={URL.createObjectURL(prImg)} width={100} />
+
                       <div>
-                        <Badge bg="danger" onClick={() => setFFile(null)}>
+                        <Badge
+                          bg="danger"
+                          onClick={() => {
+                            setFFile(null);
+                            setPrImg(null);
+                          }}
+                        >
                           Remove
                         </Badge>
                       </div>
                     </>
                   )}
-                </center> */}
+                </center>
               </div>
 
               <div className="mt-4">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "./common/Header";
 import {
   Container,
@@ -10,6 +10,7 @@ import {
   Spinner,
   Badge,
   Image,
+  Modal,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -23,9 +24,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdAddCircle } from "react-icons/io";
 import { defaultUrl } from "../utils/default";
+import { useDebounceEffect } from "./cropimage/useDebounceEffect";
+import { canvasPreview } from "./cropimage/canvasPreview";
+import { imgPreview } from "./cropimage/imagePreview";
+import ReactCrop from "react-image-crop";
 
 export default function EditPost() {
   const { type, postid } = useParams();
+
+  const [crop, setCrop] = useState({
+    unit: "px", // Can be 'px' or '%'
+    x: 25,
+    y: 25,
+    width: 815,
+    height: 570,
+  });
+  const previewCanvasRef = useRef(null);
+  const [aspect, setAspect] = useState(16 / 9);
+  const [completedCrop, setCompletedCrop] = useState();
+  const [imageEditing, setImageEditing] = useState(false);
+  const imgRef = useRef(null);
+  const [prImg, setPrImg] = useState(null);
 
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState([]);
@@ -147,7 +166,7 @@ export default function EditPost() {
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
   selectedSubCategory.map((v, i) => formdata.append(`subCategory[${i}]`, v));
   formdata.append("content", content);
-  formdata.append("image", ffile);
+  formdata.append("image", prImg);
   formdata.append("author", author);
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
@@ -191,6 +210,24 @@ export default function EditPost() {
       setFFile(null);
     }
   };
+
+  useDebounceEffect(
+    async () => {
+      if (
+        completedCrop?.width &&
+        completedCrop?.height &&
+        imgRef.current &&
+        previewCanvasRef.current
+      ) {
+        // We use canvasPreview as it's much faster than imgPreview.
+        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop);
+
+        imgPreview(imgRef.current, completedCrop).then((r) => setPrImg(r));
+      }
+    },
+    100,
+    [completedCrop]
+  );
 
   useEffect(() => {
     searchCategories(searchText);
@@ -294,6 +331,60 @@ export default function EditPost() {
         handleClose={handleClose}
         handleSave={handleSave}
       />
+      <Modal show={imageEditing} size="xl">
+        <Modal.Header>
+          <Modal.Title>Image editor</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col xl={12}>
+              {ffile != null && (
+                <ReactCrop
+                  locked={true}
+                  crop={crop}
+                  onChange={(_, percentCrop) => setCrop(percentCrop)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  aspect={aspect}
+                >
+                  <Image
+                    ref={imgRef}
+                    src={URL.createObjectURL(ffile)}
+                    width="100%"
+                  />
+                </ReactCrop>
+              )}
+            </Col>
+            <Col xl={12}>
+              {!!completedCrop && (
+                <canvas
+                  ref={previewCanvasRef}
+                  style={{
+                    border: "1px solid black",
+                    objectFit: "cover",
+                    width: completedCrop.width,
+                    height: completedCrop.height,
+                  }}
+                />
+              )}
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setImageEditing(false);
+              setFFile(null);
+              setPrImg(null);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={() => setImageEditing(false)}>
+            Use Image
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Header />
 
       <Container fluid>
@@ -389,15 +480,18 @@ export default function EditPost() {
                     userSelect: "none",
                   }}
                   type="file"
-                  onChange={(e) => setFFile(e.target.files[0])}
+                  onChange={(e) => {
+                    setFFile(e.target.files[0]);
+                    setImageEditing(true);
+                  }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
                 <center className="mt-3">
-                  {ffile != null ? (
+                  {prImg != null ? (
                     <>
-                      <Image src={URL.createObjectURL(ffile)} width={100} />
+                      <Image src={URL.createObjectURL(prImg)} width={100} />
                       <div>
-                        <Badge bg="danger" onClick={() => setFFile(null)}>
+                        <Badge bg="danger" onClick={() => setPrImg(null)}>
                           Remove
                         </Badge>
                       </div>
