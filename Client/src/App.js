@@ -8,6 +8,7 @@ import EditPost from "./components/EditPost";
 import PostUploading from "./components/PostUploading";
 import "./app.css";
 import "./rc-paginate.css";
+import "react-image-crop/dist/ReactCrop.css";
 import ViewPost from "./components/Viewpost";
 import Premium from "./components/Premium";
 import Inquires from "./components/inquires";

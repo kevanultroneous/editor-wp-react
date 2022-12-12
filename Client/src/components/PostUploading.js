@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "./common/Header";
 import {
   Container,
@@ -10,6 +10,7 @@ import {
   Spinner,
   Badge,
   Image,
+  Modal,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -23,9 +24,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdAddCircle } from "react-icons/io";
 import { defaultUrl } from "../utils/default";
+import ReactCrop from "react-image-crop";
+import { useDebounceEffect } from "./cropimage/useDebounceEffect";
+import { canvasPreview } from "./cropimage/canvasPreview";
+import { imgPreview } from "./cropimage/imagePreview";
 
 export default function PostUploading() {
   const { type } = useParams();
+  const [crop, setCrop] = useState({
+    unit: "px", // Can be 'px' or '%'
+    x: 25,
+    y: 25,
+    width: 815,
+    height: 570,
+  });
+  const previewCanvasRef = useRef(null);
+  const [aspect, setAspect] = useState(16 / 9);
+  const [completedCrop, setCompletedCrop] = useState();
+  const [imageEditing, setImageEditing] = useState(false);
+  const imgRef = useRef(null);
+  const [prImg, setPrImg] = useState(null);
+  //
 
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState([]);
@@ -115,9 +134,9 @@ export default function PostUploading() {
 
   formdata.append("content", content);
   if (!(ffile == null)) {
-    formdata.append("image", ffile);
+    formdata.append("image", prImg);
   }
-
+  console.log("watch pr img" + prImg);
   formdata.append("author", author);
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
@@ -214,7 +233,24 @@ export default function PostUploading() {
       setUrl(updatedurl);
     }
   };
+  useDebounceEffect(
+    async () => {
+      if (
+        completedCrop?.width &&
+        completedCrop?.height &&
+        imgRef.current &&
+        previewCanvasRef.current
+      ) {
+        // We use canvasPreview as it's much faster than imgPreview.
+        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop);
 
+        imgPreview(imgRef.current, completedCrop).then((r) => setPrImg(r));
+      }
+    },
+    100,
+    [completedCrop]
+  );
+  console.log(prImg);
   const alreadyfound = (ary1, ary2) => {
     let output = 0;
     for (let t = 0; t < ary1.length; t++) {
@@ -268,6 +304,61 @@ export default function PostUploading() {
       />
       <Header />
 
+      <Modal show={imageEditing} size="xl">
+        <Modal.Header>
+          <Modal.Title>Image editor</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col xl={12}>
+              {ffile != null && (
+                <ReactCrop
+                  locked={true}
+                  crop={crop}
+                  onChange={(_, percentCrop) => setCrop(percentCrop)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  aspect={aspect}
+                  maxWidth={815}
+                >
+                  <Image
+                    ref={imgRef}
+                    src={URL.createObjectURL(ffile)}
+                    width="100%"
+                  />
+                </ReactCrop>
+              )}
+            </Col>
+            <Col xl={12}>
+              {console.log(completedCrop)}
+              {!!completedCrop && (
+                <canvas
+                  ref={previewCanvasRef}
+                  style={{
+                    border: "1px solid black",
+                    objectFit: "cover",
+                    width: completedCrop.width,
+                    height: completedCrop.height,
+                  }}
+                />
+              )}
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setImageEditing(false);
+              setFFile(null);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={() => setImageEditing(false)}>
+            Use Image
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Container fluid>
         <Row className="MainSectionRow">
           <Col xl={8} lg={6} md={12} xs={12}>
@@ -348,13 +439,36 @@ export default function PostUploading() {
                     userSelect: "none",
                   }}
                   type="file"
-                  onChange={(e) => setFFile(e.target.files[0])}
+                  onChange={(e) => {
+                    console.log(e.target.files[0]);
+                    setFFile(e.target.files[0]);
+                    setImageEditing(true);
+                  }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
-                <center className="mt-3">
+                {/* <center className="mt-3">
                   {ffile != null && (
                     <>
-                      <Image src={URL.createObjectURL(ffile)} width={100} />
+                      <ReactCrop
+                        locked={true}
+                        crop={crop}
+                        onChange={(_, percentCrop) => setCrop(percentCrop)}
+                        onComplete={(c) => setCompletedCrop(c)}
+                        aspect={aspect}
+                      >
+                        <Image ref={imgRef} src={URL.createObjectURL(ffile)} />
+                      </ReactCrop>
+                      {!!completedCrop && (
+                        <canvas
+                          ref={previewCanvasRef}
+                          style={{
+                            border: "1px solid black",
+                            objectFit: "cover",
+                            width: completedCrop.width,
+                            height: completedCrop.height,
+                          }}
+                        />
+                      )}
                       <div>
                         <Badge bg="danger" onClick={() => setFFile(null)}>
                           Remove
@@ -362,7 +476,7 @@ export default function PostUploading() {
                       </div>
                     </>
                   )}
-                </center>
+                </center> */}
               </div>
 
               <div className="mt-4">

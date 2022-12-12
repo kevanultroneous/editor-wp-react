@@ -21,7 +21,11 @@ exports.resizePhotoFimg = (req, res, next) => {
   if (req.file) {
     let newfile = `public/other/featured/${Date.now()}-${generateOtp()}.jpeg`;
 
-    sharp(req.file.buffer).jpeg({ quality: 100 }).toFile(newfile);
+    sharp(req.file.buffer)
+      .flatten({ background: "#fff" })
+      .resize({ width: 815, height: 569 })
+      .jpeg({ quality: 100 })
+      .toFile(newfile);
     req.sendfile = newfile.replace("public/", "");
     next();
   } else {
