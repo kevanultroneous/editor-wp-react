@@ -481,8 +481,12 @@ export default function EditPost() {
                   }}
                   type="file"
                   onChange={(e) => {
-                    setFFile(e.target.files[0]);
-                    setImageEditing(true);
+                    if (Math.round(e.target.files[0].size / 1024 > 1096)) {
+                      alert("File size must under 1mb!");
+                    } else {
+                      setFFile(e.target.files[0]);
+                      setImageEditing(true);
+                    }
                   }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
