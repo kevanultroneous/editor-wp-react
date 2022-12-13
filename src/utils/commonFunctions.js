@@ -33,11 +33,16 @@ const multerStorage = multer.memoryStorage();
 // });
 
 const multerFilter = (req, file, cb) => {
-  const whitelist = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg"];
+  const whitelist = [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "image/webp",
+    "image/svg",
+  ];
   if (whitelist.includes(file.mimetype)) {
     cb(null, true);
   } else {
-   
     cb(new AppError(401, "Only jpeg, png, jpg and webp files are allowed"));
   }
 };
@@ -48,5 +53,7 @@ const upload = multer({
 });
 
 module.exports = {
-  sendResponse, generateOtp, upload
+  sendResponse,
+  generateOtp,
+  upload,
 };

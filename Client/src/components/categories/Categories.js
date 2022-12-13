@@ -96,7 +96,7 @@ export default function Categories() {
       .get(`${defaultUrl}api/category/all-category`)
       .then((r) => {
         if (r.data.status === 200) {
-          console.log(r.data);
+          // console.log(r.data);
           setCategoryData(r.data.data);
         }
       })

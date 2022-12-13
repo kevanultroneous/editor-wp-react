@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const {aggreFilters} = require("../utils/filterJson");
-const {errorMessages} = require("../utils/messages");
+const { aggreFilters } = require("../utils/filterJson");
+const { errorMessages } = require("../utils/messages");
 
 const schema = new mongoose.Schema(
   {
@@ -9,29 +9,29 @@ const schema = new mongoose.Schema(
       required: true,
     },
     contact: {
-        type: String,
+      type: String,
     },
     email: {
-        type: String,
-        required: [true, errorMessages.email.empty],
-      },
+      type: String,
+      required: [true, errorMessages.email.empty],
+    },
     postType: {
       type: String,
       default: "press",
       enum: aggreFilters.category.postTypes,
-      required: [true, errorMessages.category.postTypeExist]
+      required: [true, errorMessages.category.postTypeExist],
     },
     topic: {
-        type: String,
-        required: [true, errorMessages.topic.empty]
+      type: String,
+      required: [true, errorMessages.topic.empty],
     },
     message: {
-        type: String,
-        required: [true, errorMessages.contactMessage.empty]
-    }
+      type: String,
+      required: [true, errorMessages.contactMessage.empty],
+    },
   },
   { timestamps: true }
 );
 
-const Contact = mongoose.model("Contact", schema);
-module.exports = Contact;
+const Enquiry = mongoose.model("Enquiry", schema);
+module.exports = Enquiry;

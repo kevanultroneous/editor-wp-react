@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "./common/Header";
 import {
   Container,
@@ -10,6 +10,7 @@ import {
   Spinner,
   Badge,
   Image,
+  Modal,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -19,13 +20,31 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import { Markup } from "interweave";
-import { useNavigate, useParams } from "react-router-dom";
 import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdAddCircle } from "react-icons/io";
 import { defaultUrl } from "../utils/default";
+import ReactCrop from "react-image-crop";
+import { useDebounceEffect } from "./cropimage/useDebounceEffect";
+import { canvasPreview } from "./cropimage/canvasPreview";
+import { imgPreview } from "./cropimage/imagePreview";
 
 export default function PostUploading() {
-  const { type } = useParams();
+  // const { type } = useParams();
+
+  const [crop, setCrop] = useState({
+    unit: "px", // Can be 'px' or '%'
+    x: 25,
+    y: 25,
+    width: 815,
+    height: 570,
+  });
+  const previewCanvasRef = useRef(null);
+  const [aspect, setAspect] = useState(16 / 9);
+  const [completedCrop, setCompletedCrop] = useState();
+  const [imageEditing, setImageEditing] = useState(false);
+  const imgRef = useRef(null);
+  const [prImg, setPrImg] = useState(null);
+  //
 
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState([]);
@@ -72,33 +91,37 @@ export default function PostUploading() {
       .catch((e) => toast.error(e.response.data.msg));
   };
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     searchCategories(searchText);
   }, [searchText]);
 
-  const pauseCalender = () => {
-    return (
-      new Date().getFullYear() +
-      "-" +
-      (new Date().getMonth() + 1 < 10
-        ? "0" + new Date().getMonth() + 1
-        : new Date().getMonth() + 1) +
-      "-" +
-      (new Date().getDate() < 10
-        ? "0" + new Date().getDate()
-        : new Date().getDate()) +
-      "T" +
-      (new Date().getHours() < 10
-        ? "0" + new Date().getHours()
-        : new Date().getHours()) +
-      ":" +
-      (new Date().getMinutes() < 10
-        ? "0" + new Date().getMinutes()
-        : new Date().getMinutes())
-    );
-  };
+  useEffect(() => {
+    if (url.length > 0) {
+      editUrl(url);
+    }
+  }, [url]);
+
+  // const pauseCalender = () => {
+  //   return (
+  //     new Date().getFullYear() +
+  //     "-" +
+  //     (new Date().getMonth() + 1 < 10
+  //       ? "0" + new Date().getMonth() + 1
+  //       : new Date().getMonth() + 1) +
+  //     "-" +
+  //     (new Date().getDate() < 10
+  //       ? "0" + new Date().getDate()
+  //       : new Date().getDate()) +
+  //     "T" +
+  //     (new Date().getHours() < 10
+  //       ? "0" + new Date().getHours()
+  //       : new Date().getHours()) +
+  //     ":" +
+  //     (new Date().getMinutes() < 10
+  //       ? "0" + new Date().getMinutes()
+  //       : new Date().getMinutes())
+  //   );
+  // };
 
   const formdata = new FormData();
 
@@ -109,9 +132,8 @@ export default function PostUploading() {
 
   formdata.append("content", content);
   if (!(ffile == null)) {
-    formdata.append("image", ffile);
+    formdata.append("image", prImg);
   }
-
   formdata.append("author", author);
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
@@ -131,24 +153,30 @@ export default function PostUploading() {
   const postUpload = () => {
     if (releaseDate === "") {
       toast.error("Date is required !");
+      setAspect(16 / 9);
     } else if (mainTitle === "") {
       toast.error("Title is required !");
+      setAspect(16 / 9);
     } else if (mainTitle.length >= 200) {
       toast.error("Title should be less than 200 characters !");
+      setAspect(16 / 9);
+    } else if (url.length > 60) {
+      toast.error("slug url should be less than 46 characters !");
+      setAspect(16 / 9);
     } else if (selectedCategory.length <= 0) {
       toast.error("Please select one or more category !");
+      setAspect(16 / 9);
     } else if (content.length < 100) {
       toast.error("Content required 100 words !");
+      setAspect(16 / 9);
     } else {
-      console.log(selectedSubCategory);
+      // console.log(selectedSubCategory);
+      setAspect(16 / 9);
       axios
         .post(`${defaultUrl}api/post/create-post`, formdata)
         .then((r) => {
           if (r.data.success) {
             toast.success(r.data.msg);
-            navigate(
-              type === "press-release" ? "/press-release" : "/guest-post"
-            );
           } else {
             toast.error(r.data.msg);
           }
@@ -156,7 +184,7 @@ export default function PostUploading() {
         .catch((e) => {
           toast.error(e.response.data.msg);
         });
-      setFFile(null);
+      // setFFile(null);
     }
   };
 
@@ -184,16 +212,48 @@ export default function PostUploading() {
     setContent(data);
   };
   // ] { } | \ ” % ~ # < > . , " " “” /
-  const editUrl = (v) => {
-    setUrl(
-      v
-        .split(" ")
-        .join("-")
-        .replace(/[.,#<>~“”{}|%"\s]/g, "")
-        .toLowerCase()
-    );
-  };
 
+  function replaceChar(origString, replaceChar, index) {
+    let firstPart = origString.substr(0, index);
+    let lastPart = origString.substr(index + 1);
+
+    let newString = firstPart + replaceChar + lastPart;
+    return newString;
+  }
+  const editUrl = (v) => {
+    let updatedurl = v
+      .replace(/[^\w\s]/gi, " ")
+      .split(" ")
+      .join("-")
+      .substring(0, 60)
+      .toLowerCase();
+
+    let finddash = updatedurl.charAt(updatedurl.length - 1);
+    let removelastdash = replaceChar(updatedurl, "", updatedurl.length - 1);
+
+    if (finddash === "-") {
+      setUrl(removelastdash);
+    } else {
+      setUrl(updatedurl);
+    }
+  };
+  useDebounceEffect(
+    async () => {
+      if (
+        completedCrop?.width &&
+        completedCrop?.height &&
+        imgRef.current &&
+        previewCanvasRef.current
+      ) {
+        // We use canvasPreview as it's much faster than imgPreview.
+        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop);
+
+        imgPreview(imgRef.current, completedCrop).then((r) => setPrImg(r));
+      }
+    },
+    100,
+    [completedCrop]
+  );
   const alreadyfound = (ary1, ary2) => {
     let output = 0;
     for (let t = 0; t < ary1.length; t++) {
@@ -247,6 +307,71 @@ export default function PostUploading() {
       />
       <Header />
 
+      <Modal show={imageEditing} size="xl">
+        <Modal.Header>
+          <Modal.Title>Image editor</Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ height: "40rem", overflow: "hidden", overflowY: "scroll" }}
+        >
+          <Row>
+            <Col xl={12}>
+              {ffile != null && (
+                <ReactCrop
+                  crop={crop}
+                  onChange={(_, percentCrop) => setCrop(percentCrop)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  aspect={aspect}
+                >
+                  <Image
+                    ref={imgRef}
+                    src={URL.createObjectURL(ffile)}
+                    width="100%"
+                  />
+                </ReactCrop>
+              )}
+            </Col>
+            <Col xl={12}>
+              {!!completedCrop && (
+                <canvas
+                  ref={previewCanvasRef}
+                  style={{
+                    border: "1px dashed #000",
+                    objectFit: "cover",
+                    width: completedCrop.width,
+                    height: completedCrop.height,
+                  }}
+                />
+              )}
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setImageEditing(false);
+              setFFile(null);
+              setPrImg(null);
+              setAspect(16 / 9);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (prImg == null) {
+                alert("crop your image !");
+              } else {
+                setImageEditing(false);
+              }
+            }}
+          >
+            Use Image
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Container fluid>
         <Row className="MainSectionRow">
           <Col xl={8} lg={6} md={12} xs={12}>
@@ -259,7 +384,7 @@ export default function PostUploading() {
                     className="ms-4"
                     variant={publish === 1 ? "success" : "secondary"}
                   >
-                    Save as {publish === 1 ? "Publish" : "Draft"}
+                    Save
                   </Button>
                 </h3>
               </div>
@@ -327,15 +452,30 @@ export default function PostUploading() {
                     userSelect: "none",
                   }}
                   type="file"
-                  onChange={(e) => setFFile(e.target.files[0])}
+                  onChange={(e) => {
+                    if (Math.round(e.target.files[0].size / 1024 > 1096)) {
+                      alert("File size must under 1mb!");
+                    } else {
+                      setFFile(e.target.files[0]);
+                      setImageEditing(true);
+                    }
+                  }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
+
                 <center className="mt-3">
-                  {ffile != null && (
+                  {prImg != null && (
                     <>
-                      <Image src={URL.createObjectURL(ffile)} width={100} />
+                      <Image src={URL.createObjectURL(prImg)} width={100} />
+
                       <div>
-                        <Badge bg="danger" onClick={() => setFFile(null)}>
+                        <Badge
+                          bg="danger"
+                          onClick={() => {
+                            setFFile(null);
+                            setPrImg(null);
+                          }}
+                        >
                           Remove
                         </Badge>
                       </div>
@@ -459,7 +599,7 @@ export default function PostUploading() {
                   onChange={(e) => setReleaseDate(e.target.value)}
                   type="datetime-local"
                   placeholder="Release Date"
-                  min={pauseCalender()}
+                  // min={pauseCalender()}
                   // max={new Date().toLocaleDateString("en-ca")}
                 />
               </div>
@@ -552,20 +692,8 @@ export default function PostUploading() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url
-                    .split(" ")
-                    .join("-")
-                    .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                    .toLowerCase()}
-                  onChange={(e) =>
-                    setUrl(
-                      e.target.value
-                        .split(" ")
-                        .join("-")
-                        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                        .toLowerCase()
-                    )
-                  }
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
                 />
               </div>
 

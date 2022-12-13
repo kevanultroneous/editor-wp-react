@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "./common/Header";
 import {
   Container,
@@ -10,6 +10,7 @@ import {
   Spinner,
   Badge,
   Image,
+  Modal,
 } from "react-bootstrap";
 import "./postUploading.css";
 import axios from "axios";
@@ -23,9 +24,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdAddCircle } from "react-icons/io";
 import { defaultUrl } from "../utils/default";
+import { useDebounceEffect } from "./cropimage/useDebounceEffect";
+import { canvasPreview } from "./cropimage/canvasPreview";
+import { imgPreview } from "./cropimage/imagePreview";
+import ReactCrop from "react-image-crop";
 
 export default function EditPost() {
   const { type, postid } = useParams();
+
+  const [crop, setCrop] = useState({
+    unit: "px", // Can be 'px' or '%'
+    x: 25,
+    y: 25,
+    width: 815,
+    height: 570,
+  });
+  const previewCanvasRef = useRef(null);
+  const [aspect, setAspect] = useState(16 / 9);
+  const [completedCrop, setCompletedCrop] = useState();
+  const [imageEditing, setImageEditing] = useState(false);
+  const imgRef = useRef(null);
+  const [prImg, setPrImg] = useState(null);
 
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState([]);
@@ -110,6 +129,13 @@ export default function EditPost() {
       });
   };
 
+  // * for emergency url edit
+  // useEffect(() => {
+  //   if (url.length > 0) {
+  //     editUrl(url);
+  //   }
+  // }, [url]);
+
   // category upload
   const [show, setShow] = useState(false);
   const [catname, setCatname] = useState("");
@@ -140,13 +166,13 @@ export default function EditPost() {
   selectedCategory.map((v, i) => formdata.append(`category[${i}]`, v));
   selectedSubCategory.map((v, i) => formdata.append(`subCategory[${i}]`, v));
   formdata.append("content", content);
-  formdata.append("image", ffile);
+  formdata.append("image", prImg);
   formdata.append("author", author);
   formdata.append("companyName", company);
   formdata.append("seoTitle", seotitle);
   formdata.append("seoDescription", seodescription);
   formdata.append("backlinkUrl", weburl);
-  formdata.append("slugUrl", url);
+  // formdata.append("slugUrl", url);
   formdata.append("draftStatus", publish);
   formdata.append("postType", "press");
   formdata.append("releaseDate", new Date(releaseDate));
@@ -185,6 +211,24 @@ export default function EditPost() {
     }
   };
 
+  useDebounceEffect(
+    async () => {
+      if (
+        completedCrop?.width &&
+        completedCrop?.height &&
+        imgRef.current &&
+        previewCanvasRef.current
+      ) {
+        // We use canvasPreview as it's much faster than imgPreview.
+        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop);
+
+        imgPreview(imgRef.current, completedCrop).then((r) => setPrImg(r));
+      }
+    },
+    100,
+    [completedCrop]
+  );
+
   useEffect(() => {
     searchCategories(searchText);
     fetchParamPost();
@@ -211,15 +255,31 @@ export default function EditPost() {
     const data = editor.getData();
     setContent(data);
   };
-  const editUrl = (v) => {
-    setUrl(
-      v
-        .split(" ")
-        .join("-")
-        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-        .toLowerCase()
-    );
-  };
+  // *for emergency edit url
+  // function replaceChar(origString, replaceChar, index) {
+  //   let firstPart = origString.substr(0, index);
+  //   let lastPart = origString.substr(index + 1);
+
+  //   let newString = firstPart + replaceChar + lastPart;
+  //   return newString;
+  // }
+  // const editUrl = (v) => {
+  //   let updatedurl = v
+  //     .split(" ")
+  //     .join("-")
+  //     .replace(/[.,#<>~“”''{}|%"\s]/g, "")
+  //     .substring(0, 60)
+  //     .toLowerCase();
+
+  //   let finddash = updatedurl.charAt(updatedurl.length - 1);
+  //   let removelastdash = replaceChar(updatedurl, "", updatedurl.length - 1);
+
+  //   if (finddash === "-") {
+  //     setUrl(removelastdash);
+  //   } else {
+  //     setUrl(updatedurl);
+  //   }
+  // };
   const alreadyfound = (ary1, ary2) => {
     let output = 0;
     for (let t = 0; t < ary1.length; t++) {
@@ -271,6 +331,70 @@ export default function EditPost() {
         handleClose={handleClose}
         handleSave={handleSave}
       />
+      <Modal show={imageEditing} size="xl">
+        <Modal.Header>
+          <Modal.Title>Image editor</Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ height: "40rem", overflow: "hidden", overflowY: "scroll" }}
+        >
+          <Row>
+            <Col xl={12}>
+              {ffile != null && (
+                <ReactCrop
+                  crop={crop}
+                  onChange={(_, percentCrop) => setCrop(percentCrop)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  aspect={aspect}
+                >
+                  <Image
+                    ref={imgRef}
+                    src={URL.createObjectURL(ffile)}
+                    width="100%"
+                  />
+                </ReactCrop>
+              )}
+            </Col>
+            <Col xl={12}>
+              {!!completedCrop && (
+                <canvas
+                  ref={previewCanvasRef}
+                  style={{
+                    border: "1px dashed #000",
+                    objectFit: "cover",
+                    width: completedCrop.width,
+                    height: completedCrop.height,
+                  }}
+                />
+              )}
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setImageEditing(false);
+              setFFile(null);
+              setPrImg(null);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (prImg == null) {
+                alert("crop your image !");
+              } else {
+                setImageEditing(false);
+              }
+            }}
+          >
+            Use Image
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Header />
 
       <Container fluid>
@@ -283,9 +407,9 @@ export default function EditPost() {
                   <Button
                     onClick={() => postUpload()}
                     className="ms-4"
-                    variant={publish ? "success" : "secondary"}
+                    variant={publish === "published" ? "success" : "secondary"}
                   >
-                    Save as {publish ? "Publish" : "Draft"}
+                    Save
                   </Button>
                 </h3>
               </div>
@@ -366,15 +490,22 @@ export default function EditPost() {
                     userSelect: "none",
                   }}
                   type="file"
-                  onChange={(e) => setFFile(e.target.files[0])}
+                  onChange={(e) => {
+                    if (Math.round(e.target.files[0].size / 1024 > 1096)) {
+                      alert("File size must under 1mb!");
+                    } else {
+                      setFFile(e.target.files[0]);
+                      setImageEditing(true);
+                    }
+                  }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
                 <center className="mt-3">
-                  {ffile != null ? (
+                  {prImg != null ? (
                     <>
-                      <Image src={URL.createObjectURL(ffile)} width={100} />
+                      <Image src={URL.createObjectURL(prImg)} width={100} />
                       <div>
-                        <Badge bg="danger" onClick={() => setFFile(null)}>
+                        <Badge bg="danger" onClick={() => setPrImg(null)}>
                           Remove
                         </Badge>
                       </div>
@@ -403,8 +534,8 @@ export default function EditPost() {
                   value={mainTitle}
                   onChange={(e) => {
                     setMainTitle(e.target.value);
-                    editUrl(e.target.value);
-                    setSeoDescription(e.target.value);
+                    // editUrl(e.target.value);
+                    // setSeoDescription(e.target.value);
                   }}
                   type="text"
                   placeholder="Enter title here"
@@ -507,7 +638,7 @@ export default function EditPost() {
                   onChange={(e) => setReleaseDate(e.target.value)}
                   type="datetime-local"
                   placeholder="Release Date"
-                  min={timestampToDate(releaseDate)}
+                  // min={timestampToDate(releaseDate)}
                 />
               </div>
 
@@ -600,20 +731,8 @@ export default function EditPost() {
                   placeholder="My-New-post"
                   id="basic-url"
                   aria-describedby="basic-addon3"
-                  value={url
-                    .split(" ")
-                    .join("-")
-                    .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                    .toLowerCase()}
-                  onChange={(e) =>
-                    setUrl(
-                      e.target.value
-                        .split(" ")
-                        .join("-")
-                        .replace(/[.,#<>~/“”{}|%"\s]/g, "")
-                        .toLowerCase()
-                    )
-                  }
+                  value={url}
+                  // onChange={(e) => setUrl(e.target.value)}
                 />
               </div>
 

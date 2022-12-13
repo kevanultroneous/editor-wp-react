@@ -3,15 +3,15 @@
 }
 
 .TableSpace {
-  padding: 1rem 1rem;
   margin-bottom: 4rem;
 }
 
 .pagination-fix {
-  background-color: #323232;
+  background-color: #212529;
   padding: 1rem;
   position: fixed;
   bottom: 0;
   left: -5px;
+  width: 100%;
   color: #fff;
 }

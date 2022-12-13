@@ -1,37 +1,64 @@
 import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Form, Table } from "react-bootstrap";
 import Header from "./common/Header";
 import { defaultUrl } from "../utils/default";
-import { AiFillEye } from "react-icons/ai";
+import Pagination from "rc-pagination";
+import { FcLeft, FcRight } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "./pressrelease/PressRelease";
+
 const Inquires = () => {
+  const navigate = useNavigate();
+  let query = useQuery();
   const [inquires, setInquires] = useState([]);
   const [search, setSearch] = useState("");
+  const [currentNumber, setCurrentNumber] = useState(null);
+  const PrevNextArrow = (current, type, originalElement) => {
+    if (type === "prev") {
+      return (
+        <button>
+          <FcLeft size={20} />
+        </button>
+      );
+    }
+    if (type === "next") {
+      return (
+        <button>
+          <FcRight size={20} />
+        </button>
+      );
+    }
+    return originalElement;
+  };
+
   useEffect(() => {
-    fetchInquires();
+    searchInquires();
   }, []);
+
+  useEffect(() => {
+    searchInquires();
+  }, [query.get("page")]);
 
   const searchInquires = () => {
     axios
       .post(defaultUrl + "api/contact/search-enquiry", {
         searchTerm: search,
+        limit: 10,
+        page: query.get("page") ? query.get("page") : 1,
       })
-      .then((r) => setInquires(r.data?.data[0]?.mainDoc))
+      .then((r) => setInquires(r.data?.data))
       .catch((e) => console.log(e));
   };
-  const fetchInquires = () => {
-    axios
-      .get(defaultUrl + "api/contact/all-enquiry")
-      .then((r) => setInquires(r.data?.data[0]?.mainDoc))
-      .catch((e) => console.log(e));
-  };
+
   return (
     <>
       <Header />
       <div className="p-4 w-25">
         <Form.Control
           onKeyDown={(e) => {
-            if (e.key == "Enter") {
+            if (e.key === "Enter") {
+              navigate("/inquires");
               searchInquires();
             }
           }}
@@ -57,9 +84,9 @@ const Inquires = () => {
           </tr>
         </thead>
         <tbody>
-          {inquires.map((items, index) => (
+          {inquires[0]?.mainDoc.map((items, index) => (
             <tr>
-              <td>{index + 1}</td>
+              <td>{currentNumber + index}</td>
               <td>{items.name}</td>
               <td>{items.email}</td>
               <td>{items.contact}</td>
@@ -70,7 +97,30 @@ const Inquires = () => {
           ))}
         </tbody>
       </Table>
-      <div></div>
+      {inquires[0]?.totalCount > 10 && (
+        <div className={"pagination-fix"}>
+          <Pagination
+            showTitle={false}
+            onChange={(v) => {
+              navigate({
+                pathname: "/inquires",
+                search: `?page=${v}`,
+              });
+            }}
+            current={parseInt(query.get("page")) || 1}
+            pageSize={10}
+            total={inquires[0]?.totalCount}
+            className="pagination-data"
+            showTotal={(total, range) => (
+              <>
+                {setCurrentNumber(range[0])}
+                Showing {range[0]}-{range[1]} of {inquires[0]?.totalCount}
+              </>
+            )}
+            itemRender={PrevNextArrow}
+          />
+        </div>
+      )}
     </>
   );
 };
