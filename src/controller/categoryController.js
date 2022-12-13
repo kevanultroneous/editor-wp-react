@@ -40,7 +40,7 @@ exports.createCategory = catchAsyncError(async (req, res) => {
       });
 
     let checkExistingCategory = await Category.exists({ _id: parentCategory });
-    console.log(checkExistingCategory);
+    // console.log(checkExistingCategory);
     if (!checkExistingCategory)
       return sendResponse(res, 400, {
         msg: errorMessages.category.inValidParentID,

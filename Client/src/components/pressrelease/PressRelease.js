@@ -281,7 +281,7 @@ const PressRelease = () => {
             </Col>
           )}
         </Row>
-        {console.log()}
+        {/* {console.log()} */}
       </Container>
     </>
   );

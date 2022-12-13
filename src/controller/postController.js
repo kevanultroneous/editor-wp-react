@@ -503,7 +503,7 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
   }
 
   if (interestedPostList.length < 2 || interestedPostCategory.length < 1) {
-    console.log("recent");
+    // console.log("recent");
     interestedPostList = await Post.aggregate([
       {
         $match: {
@@ -532,7 +532,7 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
   });
   postMatch = postMatch[0];
 
-  console.log(postMatch);
+  // console.log(postMatch);
   const categoryMatch = {
     $match: {
       ...aggreFilters.homePage.filters,

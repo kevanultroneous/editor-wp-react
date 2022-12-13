@@ -29,6 +29,6 @@ export async function imgPreview(image, crop, scale = 1, rotate = 0) {
   }
 
   previewUrl = URL.createObjectURL(blob);
-  console.log(file);
+  // console.log(file);
   return file;
 }

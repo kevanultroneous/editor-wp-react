@@ -166,7 +166,7 @@ export default function PostUploading() {
     } else if (content.length < 100) {
       toast.error("Content required 100 words !");
     } else {
-      console.log(selectedSubCategory);
+      // console.log(selectedSubCategory);
       axios
         .post(`${defaultUrl}api/post/create-post`, formdata)
         .then((r) => {
@@ -437,7 +437,7 @@ export default function PostUploading() {
                   }}
                   type="file"
                   onChange={(e) => {
-                    console.log(e.target.files[0]);
+                    // console.log(e.target.files[0]);
                     setFFile(e.target.files[0]);
                     setImageEditing(true);
                   }}

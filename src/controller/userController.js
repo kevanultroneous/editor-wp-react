@@ -18,13 +18,13 @@ exports.protect = catchAsyncError(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
   } else {
-    sendResponse(res, 401, {msg: "User not logged in"}) // token is invalid or token is not present
+    sendResponse(res, 401, { msg: "User not logged in" }); // token is invalid or token is not present
   }
 
   const { id } = jwt.verify(token, process.env.JWT_SECRET_KEY); // decode and get id
 
   const userDetails = await User.findById(id);
-  console.log(userDetails);
+  // console.log(userDetails);
   //   .select("+otp +otpCreatedAt"); // change model name to the data required from
 
   req.user = userDetails; // save user details in variable
@@ -46,7 +46,7 @@ exports.userSignUp = catchAsyncError(async (req, res) => {
     contact,
   } = req.body;
 
-  user = await User.findOne({ $or: [{email: email}, {contact: contact}] });
+  user = await User.findOne({ $or: [{ email: email }, { contact: contact }] });
 
   if (user) {
     return sendResponse(res, 409, { msg: errorMessages.user.exists });
@@ -62,13 +62,18 @@ exports.userSignUp = catchAsyncError(async (req, res) => {
     companyEmail,
     companyWebsite,
     role,
-  }
+  };
 
- userDetails = await User.create(userDetails);
+  userDetails = await User.create(userDetails);
 
   delete userDetails._doc.password;
 
-  sendResponse(res, 200, { data: userDetails, msg: errorMessages.user.created }, true);
+  sendResponse(
+    res,
+    200,
+    { data: userDetails, msg: errorMessages.user.created },
+    true
+  );
 });
 
 exports.userSignIn = catchAsyncError(async (req, res) => {
@@ -89,7 +94,12 @@ exports.userSignIn = catchAsyncError(async (req, res) => {
   delete user._doc.otp;
   delete user._doc.otpCreatedAt;
 
-  sendResponse(res, 200, { data: user, msg: errorMessages.user.loggedIn }, true);
+  sendResponse(
+    res,
+    200,
+    { data: user, msg: errorMessages.user.loggedIn },
+    true
+  );
 });
 
 exports.changePassword = catchAsyncError(async (req, res, next) => {
@@ -97,7 +107,9 @@ exports.changePassword = catchAsyncError(async (req, res, next) => {
   const { newPassword } = req.body;
 
   if (await user.checkPasswordOnReset(newPassword, user.password)) {
-    return sendResponse(res, 200, {msg: errorMessages.password.oldAndNewSame});
+    return sendResponse(res, 200, {
+      msg: errorMessages.password.oldAndNewSame,
+    });
   }
 
   // send email for password change
@@ -105,7 +117,7 @@ exports.changePassword = catchAsyncError(async (req, res, next) => {
   user.password = newPassword;
   await user.save();
 
-  sendResponse(res,200, {data: user, msg: errorMessages.password.changed});
+  sendResponse(res, 200, { data: user, msg: errorMessages.password.changed });
 });
 
 // exports.resetPassword = catchAsyncError(async (req, res, next) => {
