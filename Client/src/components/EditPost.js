@@ -335,7 +335,9 @@ export default function EditPost() {
         <Modal.Header>
           <Modal.Title>Image editor</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body
+          style={{ height: "40rem", overflow: "hidden", overflowY: "scroll" }}
+        >
           <Row>
             <Col xl={12}>
               {ffile != null && (
