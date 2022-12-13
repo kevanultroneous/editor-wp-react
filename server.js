@@ -21,8 +21,8 @@ mongoose
 
 const port = process.env.PORT || 8000;
 
-const server = app.listen(port, e => {
-  if(!e) console.log(`server running of port ${port}`);
+const server = app.listen(port, () => {
+  console.log(`server running of port ${port}`);
 });
 
 // catch rejection error

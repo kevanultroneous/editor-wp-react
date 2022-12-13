@@ -29,6 +29,7 @@ exports.resizePhotoFimg = (req, res, next) => {
   }
 };
 
+// admin
 exports.addPost = catchAsyncError(async (req, res) => {
   const {
     title,
@@ -52,7 +53,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
   } = req.body;
 
   let newPost = {
-    title: title,
+    title,
     featuredImage: req.sendfile,
     summary,
     category,
@@ -183,19 +184,18 @@ exports.deletePost = catchAsyncError(async (req, res) => {
 
   // make it same as add post
   if (softDeletePost) {
-    sendResponse(res, 200, {
+    return sendResponse(res, 200, {
       msg: errorMessages.post.Deleted,
       success: true,
       data: softDeletePost,
     });
   }
-  sendResponse(res, 500, {
+  return sendResponse(res, 500, {
     msg: errorMessages.post.DeleteError,
     success: false,
   });
 });
 
-// admin
 exports.getAllpost = catchAsyncError(async (req, res) => {
   const { postid, url, page, limit } = req.body;
 
@@ -302,6 +302,7 @@ exports.searchAdminPosts = catchAsyncError(async (req, res) => {
     return sendResponse(res, 200, { success: true, data: getFullpost });
 });
 
+// front end
 exports.getPRList = catchAsyncError(async (req, res) => {
   const { postid, url, page, limit } = req.body;
 

@@ -14,7 +14,6 @@ const sendResponse = (res, statusCode, jsondata, sendToken) => {
   if (sendToken === true) {
     token = jwtToken(jsondata.data._id);
   }
-  console.log(jsondata);
   return res.status(statusCode).json({token ,...jsondata});
 };
 
