@@ -12,11 +12,12 @@ import "react-image-crop/dist/ReactCrop.css";
 import ViewPost from "./components/Viewpost";
 import Premium from "./components/Premium";
 import Inquires from "./components/inquires";
+import Login from "./components/login/Login";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Login />} />
       <Route path="/home" element={<Home />} />
       <Route path="/press-release" element={<PressRelease />} />
       <Route path="/premium" element={<Premium />} />

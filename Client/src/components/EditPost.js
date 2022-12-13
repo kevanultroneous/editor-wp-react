@@ -31,7 +31,12 @@ import ReactCrop from "react-image-crop";
 
 export default function EditPost() {
   const { type, postid } = useParams();
-
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    }
+  });
   const [crop, setCrop] = useState({
     unit: "px", // Can be 'px' or '%'
     x: 25,
@@ -96,7 +101,15 @@ export default function EditPost() {
 
   const fetchParamPost = () => {
     axios
-      .post(`${defaultUrl}api/post/get-all-post`, { postid: postid })
+      .post(
+        `${defaultUrl}api/post/get-all-post`,
+        { postid: postid },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
       .then((r) => {
         if (r.data?.success) {
           setAuthor(r.data?.data?.author);
@@ -142,9 +155,17 @@ export default function EditPost() {
   const handleClose = () => setShow(false);
   const handleSave = (catname) => {
     axios
-      .post(`${defaultUrl}api/category/upload-category`, {
-        title: catname,
-      })
+      .post(
+        `${defaultUrl}api/category/upload-category`,
+        {
+          title: catname,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
       .then((r) => {
         if (r.data.success) {
           toast.success(r.data.msg);
@@ -156,8 +177,6 @@ export default function EditPost() {
       })
       .catch((e) => toast.error(e.response.data.msg));
   };
-
-  const navigate = useNavigate();
 
   const formdata = new FormData();
 
@@ -193,7 +212,11 @@ export default function EditPost() {
       toast.error("Content required 100 words !");
     } else {
       axios
-        .post(`${defaultUrl}api/post/update-post`, formdata)
+        .post(`${defaultUrl}api/post/update-post`, formdata, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        })
         .then((r) => {
           if (r.data.success) {
             toast.success(r.data.msg);
@@ -238,7 +261,15 @@ export default function EditPost() {
     setLoader(true);
     setTimeout(() => {
       axios
-        .post(`${defaultUrl}api/category/search-category`, { search })
+        .post(
+          `${defaultUrl}api/category/search-category`,
+          { search },
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        )
         .then((r) => {
           setLoader(false);
           setSearchCateg(r.data?.data);

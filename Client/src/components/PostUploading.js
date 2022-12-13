@@ -27,10 +27,16 @@ import ReactCrop from "react-image-crop";
 import { useDebounceEffect } from "./cropimage/useDebounceEffect";
 import { canvasPreview } from "./cropimage/canvasPreview";
 import { imgPreview } from "./cropimage/imagePreview";
+import { useNavigate } from "react-router-dom";
 
 export default function PostUploading() {
   // const { type } = useParams();
-
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    }
+  });
   const [crop, setCrop] = useState({
     unit: "px", // Can be 'px' or '%'
     x: 25,

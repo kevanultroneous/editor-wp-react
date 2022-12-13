@@ -43,7 +43,11 @@ const PressRelease = () => {
     setCurrentPostId(id);
     setCurrentPost(title);
   };
-
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    }
+  });
   const PrevNextArrow = (current, type, originalElement) => {
     if (type === "prev") {
       return (
@@ -81,11 +85,19 @@ const PressRelease = () => {
   const fetchPosts = () => {
     setLoader(true);
     axios
-      .post(`${defaultUrl}api/post/search-admin-posts`, {
-        searchTerm: search,
-        page: query.get("page"),
-        limit: 10,
-      })
+      .post(
+        `${defaultUrl}api/post/search-admin-posts`,
+        {
+          searchTerm: search,
+          page: query.get("page"),
+          limit: 10,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
       .then((r) => {
         setLoader(false);
         if (r.data.success) {
@@ -99,7 +111,15 @@ const PressRelease = () => {
   };
   const deletePosts = () => {
     axios
-      .post(`${defaultUrl}api/post/delete-post`, { postid: currentPostId })
+      .post(
+        `${defaultUrl}api/post/delete-post`,
+        { postid: currentPostId },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
       .then((r) => {
         if (r.data.success) {
           handleDeleteHide();

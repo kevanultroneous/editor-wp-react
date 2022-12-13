@@ -11,7 +11,11 @@ export default function ViewPost() {
   const { postid } = useParams();
   const [postData, setPostData] = useState([]);
   const navigate = useNavigate();
-
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    }
+  });
   const fetchParamPost = () => {
     axios
       .post(`${defaultUrl}api/post/get-all-post`, { postid: postid })

@@ -10,6 +10,11 @@ import { useQuery } from "./pressrelease/PressRelease";
 
 const Inquires = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    }
+  });
   let query = useQuery();
   const [inquires, setInquires] = useState([]);
   const [search, setSearch] = useState("");

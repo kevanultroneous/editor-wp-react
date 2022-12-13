@@ -9,12 +9,18 @@ import { defaultUrl } from "../../utils/default";
 import DeleteModel from "../common/DeleteModel";
 import ModelUpdate from "../common/UpdateModel";
 import ModelUpload from "../common/UploadCategoryModel";
+import { useNavigate } from "react-router-dom";
 
 export default function Categories() {
+  const navigate = useNavigate();
   useEffect(() => {
     fetchCategory();
   }, []);
-
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    }
+  });
   const [switches, setSwitches] = useState(false);
   const [switches2, setSwitches2] = useState(false);
   const [show, setShow] = useState(false);
@@ -48,11 +54,19 @@ export default function Categories() {
         alert("select the category !");
       } else {
         axios
-          .post(`${defaultUrl}api/category/create-category`, {
-            parentCategory: parentid,
-            title: catname,
-            postType: switches === true ? "press" : "blog",
-          })
+          .post(
+            `${defaultUrl}api/category/create-category`,
+            {
+              parentCategory: parentid,
+              title: catname,
+              postType: switches === true ? "press" : "blog",
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+              },
+            }
+          )
           .then((r) => {
             if (r.data.success) {
               toast.success(r.data.msg);
@@ -71,10 +85,18 @@ export default function Categories() {
         alert("category name is required !");
       } else {
         axios
-          .post(`${defaultUrl}api/category/create-category`, {
-            title: catname,
-            postType: switches ? "press" : "blog",
-          })
+          .post(
+            `${defaultUrl}api/category/create-category`,
+            {
+              title: catname,
+              postType: switches ? "press" : "blog",
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+              },
+            }
+          )
           .then((r) => {
             if (r.status === 200) {
               toast.success(r.data.msg);
@@ -105,7 +127,15 @@ export default function Categories() {
 
   const deleteCategory = (catid) => {
     axios
-      .post(`${defaultUrl}api/category/delete-category`, { categoryId: catid })
+      .post(
+        `${defaultUrl}api/category/delete-category`,
+        { categoryId: catid },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
       .then((r) => {
         if (r.data.status === 200) {
           toast.success(r.data.msg);
@@ -120,11 +150,19 @@ export default function Categories() {
 
   const handleUpdate = () => {
     axios
-      .post(`${defaultUrl}api/category/update-category`, {
-        categoryId: currentCatId,
-        title: newcatname,
-        postType: switches ? "press" : "blog",
-      })
+      .post(
+        `${defaultUrl}api/category/update-category`,
+        {
+          categoryId: currentCatId,
+          title: newcatname,
+          postType: switches ? "press" : "blog",
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
       .then((r) => {
         toast.success("Category updated !");
         fetchCategory();
