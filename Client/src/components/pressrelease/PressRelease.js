@@ -62,6 +62,7 @@ const PressRelease = () => {
     return originalElement;
   };
 
+  // converting timestamp to date
   const timestampToDate = (ts) => {
     return (
       new Date(ts).getDate() +
@@ -76,6 +77,7 @@ const PressRelease = () => {
     fetchPosts();
   }, [query]);
 
+  // fetching posts
   const fetchPosts = () => {
     setLoader(true);
     axios
