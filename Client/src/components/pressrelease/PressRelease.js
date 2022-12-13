@@ -136,7 +136,7 @@ const PressRelease = () => {
           <Col xl={6} className="d-flex justify-content-end">
             <Form.Control
               onKeyDown={(e) => {
-                if (e.key == "Enter") {
+                if (e.key === "Enter") {
                   navigate("/press-release");
                   fetchPosts();
                 }
@@ -196,7 +196,7 @@ const PressRelease = () => {
                         <a
                           href={`${frontendurl}press-release/${v.slugUrl}`}
                           target={"_blank"}
-                          rel="visit"
+                          rel="noopener noreferrer"
                         >
                           visit
                         </a>

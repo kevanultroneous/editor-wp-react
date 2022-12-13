@@ -20,7 +20,6 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import { Markup } from "interweave";
-import { useNavigate, useParams } from "react-router-dom";
 import ModelUpload from "./common/UploadCategoryModel";
 import { IoMdAddCircle } from "react-icons/io";
 import { defaultUrl } from "../utils/default";
@@ -28,12 +27,10 @@ import ReactCrop from "react-image-crop";
 import { useDebounceEffect } from "./cropimage/useDebounceEffect";
 import { canvasPreview } from "./cropimage/canvasPreview";
 import { imgPreview } from "./cropimage/imagePreview";
-import { set } from "mongoose";
 
 export default function PostUploading() {
-  const { type } = useParams();
-  const [cwidth, setCwidth] = useState(815);
-  const [cheight, setCheight] = useState(570);
+  // const { type } = useParams();
+
   const [crop, setCrop] = useState({
     unit: "px", // Can be 'px' or '%'
     x: 25,
@@ -94,8 +91,6 @@ export default function PostUploading() {
       .catch((e) => toast.error(e.response.data.msg));
   };
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     searchCategories(searchText);
   }, [searchText]);
@@ -106,27 +101,27 @@ export default function PostUploading() {
     }
   }, [url]);
 
-  const pauseCalender = () => {
-    return (
-      new Date().getFullYear() +
-      "-" +
-      (new Date().getMonth() + 1 < 10
-        ? "0" + new Date().getMonth() + 1
-        : new Date().getMonth() + 1) +
-      "-" +
-      (new Date().getDate() < 10
-        ? "0" + new Date().getDate()
-        : new Date().getDate()) +
-      "T" +
-      (new Date().getHours() < 10
-        ? "0" + new Date().getHours()
-        : new Date().getHours()) +
-      ":" +
-      (new Date().getMinutes() < 10
-        ? "0" + new Date().getMinutes()
-        : new Date().getMinutes())
-    );
-  };
+  // const pauseCalender = () => {
+  //   return (
+  //     new Date().getFullYear() +
+  //     "-" +
+  //     (new Date().getMonth() + 1 < 10
+  //       ? "0" + new Date().getMonth() + 1
+  //       : new Date().getMonth() + 1) +
+  //     "-" +
+  //     (new Date().getDate() < 10
+  //       ? "0" + new Date().getDate()
+  //       : new Date().getDate()) +
+  //     "T" +
+  //     (new Date().getHours() < 10
+  //       ? "0" + new Date().getHours()
+  //       : new Date().getHours()) +
+  //     ":" +
+  //     (new Date().getMinutes() < 10
+  //       ? "0" + new Date().getMinutes()
+  //       : new Date().getMinutes())
+  //   );
+  // };
 
   const formdata = new FormData();
 

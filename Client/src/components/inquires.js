@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Form, Table } from "react-bootstrap";
 import Header from "./common/Header";
 import { defaultUrl } from "../utils/default";
 import Pagination from "rc-pagination";
@@ -57,7 +57,7 @@ const Inquires = () => {
       <div className="p-4 w-25">
         <Form.Control
           onKeyDown={(e) => {
-            if (e.key == "Enter") {
+            if (e.key === "Enter") {
               navigate("/inquires");
               searchInquires();
             }

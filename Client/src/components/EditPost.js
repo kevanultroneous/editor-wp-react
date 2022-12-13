@@ -405,7 +405,7 @@ export default function EditPost() {
                   <Button
                     onClick={() => postUpload()}
                     className="ms-4"
-                    variant={publish == "published" ? "success" : "secondary"}
+                    variant={publish === "published" ? "success" : "secondary"}
                   >
                     Save
                   </Button>
