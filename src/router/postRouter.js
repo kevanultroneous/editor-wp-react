@@ -16,8 +16,16 @@ postRouter.post(
 );
 
 //all posts
-postRouter.post("/get-all-post",userController.protect, postController.getAllpost);
-postRouter.post("/search-admin-posts",userController.protect, postController.searchAdminPosts);
+postRouter.post(
+  "/get-all-post",
+  userController.protect,
+  postController.getAllpost
+);
+postRouter.post(
+  "/search-admin-posts",
+  userController.protect,
+  postController.searchAdminPosts
+);
 
 //update post
 postRouter.post(
@@ -29,8 +37,11 @@ postRouter.post(
 );
 
 //delete post
-postRouter.post("/delete-post",userController.protect, postController.deletePost);
-
+postRouter.post(
+  "/delete-post",
+  userController.protect,
+  postController.deletePost
+);
 
 // front end pr list/ pr detail
 postRouter.post("/get-pr-list", postController.getPRList);
@@ -44,6 +55,5 @@ postRouter.post("/internal-search", postController.internalSearch);
 postRouter.post("/category-page", postController.categoryPrList);
 
 postRouter.post("/interested-posts", postController.interestedPosts);
-
 
 module.exports = postRouter;
