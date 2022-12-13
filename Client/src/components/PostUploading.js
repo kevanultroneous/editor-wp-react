@@ -155,18 +155,25 @@ export default function PostUploading() {
   const postUpload = () => {
     if (releaseDate === "") {
       toast.error("Date is required !");
+      setAspect(16 / 9);
     } else if (mainTitle === "") {
       toast.error("Title is required !");
+      setAspect(16 / 9);
     } else if (mainTitle.length >= 200) {
       toast.error("Title should be less than 200 characters !");
+      setAspect(16 / 9);
     } else if (url.length > 60) {
       toast.error("slug url should be less than 46 characters !");
+      setAspect(16 / 9);
     } else if (selectedCategory.length <= 0) {
       toast.error("Please select one or more category !");
+      setAspect(16 / 9);
     } else if (content.length < 100) {
       toast.error("Content required 100 words !");
+      setAspect(16 / 9);
     } else {
       // console.log(selectedSubCategory);
+      setAspect(16 / 9);
       axios
         .post(`${defaultUrl}api/post/create-post`, formdata)
         .then((r) => {
@@ -347,6 +354,7 @@ export default function PostUploading() {
               setImageEditing(false);
               setFFile(null);
               setPrImg(null);
+              setAspect(16 / 9);
             }}
           >
             Cancel
@@ -437,9 +445,12 @@ export default function PostUploading() {
                   }}
                   type="file"
                   onChange={(e) => {
-                    // console.log(e.target.files[0]);
-                    setFFile(e.target.files[0]);
-                    setImageEditing(true);
+                    if (Math.round(e.target.files[0].size / 1024 > 1096)) {
+                      alert("File size must under 1mb!");
+                    } else {
+                      setFFile(e.target.files[0]);
+                      setImageEditing(true);
+                    }
                   }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
