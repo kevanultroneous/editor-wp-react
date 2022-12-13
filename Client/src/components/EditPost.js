@@ -340,7 +340,6 @@ export default function EditPost() {
             <Col xl={12}>
               {ffile != null && (
                 <ReactCrop
-                  locked={true}
                   crop={crop}
                   onChange={(_, percentCrop) => setCrop(percentCrop)}
                   onComplete={(c) => setCompletedCrop(c)}
@@ -359,7 +358,7 @@ export default function EditPost() {
                 <canvas
                   ref={previewCanvasRef}
                   style={{
-                    border: "1px solid black",
+                    border: "1px dashed #000",
                     objectFit: "cover",
                     width: completedCrop.width,
                     height: completedCrop.height,
@@ -380,7 +379,16 @@ export default function EditPost() {
           >
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => setImageEditing(false)}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (prImg == null) {
+                alert("crop your image !");
+              } else {
+                setImageEditing(false);
+              }
+            }}
+          >
             Use Image
           </Button>
         </Modal.Footer>

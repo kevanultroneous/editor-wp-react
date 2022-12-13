@@ -28,9 +28,12 @@ import ReactCrop from "react-image-crop";
 import { useDebounceEffect } from "./cropimage/useDebounceEffect";
 import { canvasPreview } from "./cropimage/canvasPreview";
 import { imgPreview } from "./cropimage/imagePreview";
+import { set } from "mongoose";
 
 export default function PostUploading() {
   const { type } = useParams();
+  const [cwidth, setCwidth] = useState(815);
+  const [cheight, setCheight] = useState(570);
   const [crop, setCrop] = useState({
     unit: "px", // Can be 'px' or '%'
     x: 25,
@@ -313,12 +316,13 @@ export default function PostUploading() {
         <Modal.Header>
           <Modal.Title>Image editor</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body
+          style={{ height: "40rem", overflow: "hidden", overflowY: "scroll" }}
+        >
           <Row>
             <Col xl={12}>
               {ffile != null && (
                 <ReactCrop
-                  locked={true}
                   crop={crop}
                   onChange={(_, percentCrop) => setCrop(percentCrop)}
                   onComplete={(c) => setCompletedCrop(c)}
@@ -337,7 +341,7 @@ export default function PostUploading() {
                 <canvas
                   ref={previewCanvasRef}
                   style={{
-                    border: "1px solid black",
+                    border: "1px dashed #000",
                     objectFit: "cover",
                     width: completedCrop.width,
                     height: completedCrop.height,
@@ -359,7 +363,16 @@ export default function PostUploading() {
           >
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => setImageEditing(false)}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (prImg == null) {
+                alert("crop your image !");
+              } else {
+                setImageEditing(false);
+              }
+            }}
+          >
             Use Image
           </Button>
         </Modal.Footer>
@@ -454,6 +467,7 @@ export default function PostUploading() {
                   }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />
+
                 <center className="mt-3">
                   {prImg != null && (
                     <>

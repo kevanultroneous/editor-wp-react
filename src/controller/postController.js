@@ -495,6 +495,7 @@ exports.interestedPosts = catchAsyncError(async (req, res) => {
       {
         $match: {
           ...aggreFilters.homePage.filters,
+          _id: { $ne: ObjectId(postId) },
           category: interestedPostCategory,
         },
       },
