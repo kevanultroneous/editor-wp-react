@@ -33,7 +33,7 @@ export default function EditPost() {
   const { type, postid } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/");
     }
   });
@@ -106,7 +106,8 @@ export default function EditPost() {
         { postid: postid },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
           },
         }
       )
@@ -165,7 +166,8 @@ export default function EditPost() {
         },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
           },
         }
       )
@@ -222,7 +224,8 @@ export default function EditPost() {
       axios
         .post(`${defaultUrl}api/post/update-post`, formdata, {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
           },
         })
         .then((r) => {
@@ -277,7 +280,8 @@ export default function EditPost() {
           { search },
           {
             headers: {
-              Authorization: "Bearer " + localStorage.getItem("token"),
+              Authorization:
+                "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
             },
           }
         )

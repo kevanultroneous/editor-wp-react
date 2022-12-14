@@ -44,7 +44,7 @@ const PressRelease = () => {
     setCurrentPost(title);
   };
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/");
     }
   });
@@ -94,7 +94,8 @@ const PressRelease = () => {
         },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
           },
         }
       )
@@ -118,7 +119,8 @@ const PressRelease = () => {
         { postid: currentPostId },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
           },
         }
       )

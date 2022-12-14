@@ -22,7 +22,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (localStorage.getItem("token")) {
+    if (localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/home");
     }
   });
@@ -39,7 +39,7 @@ const Login = () => {
           password: password,
         })
         .then((response) => {
-          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("admin_auth_unmb_token", response.data.token);
           toast.success(response.data.msg);
           navigate("/home");
         })

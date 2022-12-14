@@ -5,7 +5,7 @@ import Header from "./common/Header";
 const Premium = () => {
   const navigate = useNavigate();
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/");
     }
   });

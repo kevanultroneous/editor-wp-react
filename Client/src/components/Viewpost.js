@@ -12,7 +12,7 @@ export default function ViewPost() {
   const [postData, setPostData] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/");
     }
   });

@@ -17,7 +17,7 @@ export default function Categories() {
     fetchCategory();
   }, []);
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/");
     }
   });
@@ -63,7 +63,8 @@ export default function Categories() {
             },
             {
               headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
+                Authorization:
+                  "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
               },
             }
           )
@@ -98,7 +99,8 @@ export default function Categories() {
             },
             {
               headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
+                Authorization:
+                  "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
               },
             }
           )
@@ -142,7 +144,8 @@ export default function Categories() {
         { categoryId: catid },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
           },
         }
       )
@@ -174,7 +177,8 @@ export default function Categories() {
         },
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
           },
         }
       )

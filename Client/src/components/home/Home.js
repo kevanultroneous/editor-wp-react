@@ -8,7 +8,7 @@ import "./style.css";
 function Home() {
   const navigate = useNavigate();
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/");
     }
   });

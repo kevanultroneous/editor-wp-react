@@ -33,7 +33,7 @@ export default function PostUploading() {
   // const { type } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("admin_auth_unmb_token")) {
       navigate("/");
     }
   });
