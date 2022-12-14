@@ -39,9 +39,11 @@ const Login = () => {
           password: password,
         })
         .then((response) => {
-          localStorage.setItem("admin_auth_unmb_token", response.data.token);
-          toast.success(response.data.msg);
-          navigate("/home");
+          if (response.data.token) {
+            localStorage.setItem("admin_auth_unmb_token", response.data.token);
+            toast.success(response.data.msg);
+            navigate("/home");
+          }
         })
         .catch((e) => {
           if (e.response) {
