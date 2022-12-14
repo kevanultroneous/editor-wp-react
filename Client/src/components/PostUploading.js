@@ -179,7 +179,12 @@ export default function PostUploading() {
       // console.log(selectedSubCategory);
       setAspect(16 / 9);
       axios
-        .post(`${defaultUrl}api/post/create-post`, formdata)
+        .post(`${defaultUrl}api/post/create-post`, formdata, {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.getItem("admin_auth_unmb_token"),
+          },
+        })
         .then((r) => {
           if (r.data.success) {
             toast.success(r.data.msg);
