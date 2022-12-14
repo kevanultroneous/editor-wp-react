@@ -47,7 +47,7 @@ const Login = () => {
         })
         .catch((e) => {
           if (e.response) {
-            toast.error(e.response.data.message);
+            toast.error(e.response.data.msg);
           }
         });
     }
