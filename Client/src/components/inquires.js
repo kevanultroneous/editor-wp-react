@@ -91,7 +91,9 @@ const Inquires = () => {
         <tbody>
           {inquires[0]?.mainDoc.map((items, index) => (
             <tr>
-              <td>{currentNumber + index}</td>
+              <td>
+                {currentNumber == null ? index + 1 : currentNumber + index}
+              </td>
               <td>{items.name}</td>
               <td>{items.email}</td>
               <td>{items.contact}</td>

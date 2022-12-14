@@ -35,8 +35,8 @@ export default function Header() {
             </Nav.Link>
             <Nav.Link
               onClick={() => {
-                localStorage.removeItem("token");
-                navigation("/inquires");
+                localStorage.removeItem("admin_auth_unmb_token");
+                navigation("/");
               }}
             >
               Logout
