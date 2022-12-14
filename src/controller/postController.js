@@ -253,7 +253,7 @@ exports.getAllpost = catchAsyncError(async (req, res) => {
     if (!getFullpost)
       return sendResponse(res, 404, {
         success: true,
-        data: errorMessages.post.NotFound,
+        data: {},
       });
   }
 
@@ -369,7 +369,7 @@ exports.getPRList = catchAsyncError(async (req, res) => {
 
   return sendResponse(res, 500, {
     success: false,
-    data: errorMessages.other.InternServErr,
+    data: {},
   });
 });
 
