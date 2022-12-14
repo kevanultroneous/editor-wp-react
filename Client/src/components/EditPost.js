@@ -138,7 +138,10 @@ export default function EditPost() {
         }
       })
       .catch((e) => {
-        toast.error(e.response.data.msg);
+        if (e.response.status === 500) {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
       });
   };
 
@@ -175,7 +178,12 @@ export default function EditPost() {
           toast.error(r.data.msg);
         }
       })
-      .catch((e) => toast.error(e.response.data.msg));
+      .catch((e) => {
+        if (e.response.status === 500) {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+      });
   };
 
   const formdata = new FormData();
@@ -228,7 +236,10 @@ export default function EditPost() {
           }
         })
         .catch((e) => {
-          toast.error(e.response.data.msg);
+          if (e.response.status === 500) {
+            localStorage.removeItem("token");
+            navigate("/");
+          }
         });
       setFFile(null);
     }
@@ -276,8 +287,10 @@ export default function EditPost() {
           setSuggestion(r.data?.suggestion);
         })
         .catch((e) => {
-          setLoader(false);
-          toast.error(e.response.data.msg);
+          if (e.response.status === 500) {
+            localStorage.removeItem("token");
+            navigate("/");
+          }
         });
     }, 1000);
   };

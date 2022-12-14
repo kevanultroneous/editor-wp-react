@@ -105,8 +105,10 @@ const PressRelease = () => {
         }
       })
       .catch((e) => {
-        toast.error(e.response.data.msg);
-        setLoader(false);
+        if (e.response.status === 500) {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
       });
   };
   const deletePosts = () => {
@@ -128,7 +130,12 @@ const PressRelease = () => {
           fetchPosts();
         }
       })
-      .catch((e) => toast.error(e.response.data.msg));
+      .catch((e) => {
+        if (e.response.status === 500) {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+      });
   };
 
   return (

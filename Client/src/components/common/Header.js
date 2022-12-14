@@ -33,6 +33,14 @@ export default function Header() {
             <Nav.Link onClick={() => navigation("/inquires")}>
               Inquires
             </Nav.Link>
+            <Nav.Link
+              onClick={() => {
+                localStorage.removeItem("token");
+                navigation("/inquires");
+              }}
+            >
+              Logout
+            </Nav.Link>
             {/* <Nav.Link onClick={() => navigation("/premium")}>
               Premium Plans
             </Nav.Link> */}

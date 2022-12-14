@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from "../common/Header";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,11 @@ import "./style.css";
 
 function Home() {
   const navigate = useNavigate();
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    }
+  });
   return (
     <>
       <Header />

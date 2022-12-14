@@ -78,7 +78,12 @@ export default function Categories() {
               toast.error(r.data.msg);
             }
           })
-          .catch((e) => toast.error(e.response.data.msg));
+          .catch((e) => {
+            if (e.response.status === 500) {
+              localStorage.removeItem("token");
+              navigate("/");
+            }
+          });
       }
     } else {
       if (catname.length <= 3) {
@@ -108,7 +113,12 @@ export default function Categories() {
               toast.error(r.data.msg);
             }
           })
-          .catch((e) => toast.error(e.response.data.msg));
+          .catch((e) => {
+            if (e.response.status === 500) {
+              localStorage.removeItem("token");
+              navigate("/");
+            }
+          });
       }
     }
   };
@@ -145,7 +155,12 @@ export default function Categories() {
           fetchCategory();
         }
       })
-      .catch((e) => toast.error(e.response.data.msg));
+      .catch((e) => {
+        if (e.response.status === 500) {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+      });
   };
 
   const handleUpdate = () => {
@@ -170,7 +185,12 @@ export default function Categories() {
         setCurrentCatname("");
         handleCloseUpd();
       })
-      .catch((e) => toast.error(e.response.data.msg));
+      .catch((e) => {
+        if (e.response.status === 500) {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+      });
   };
 
   return (
