@@ -18,6 +18,8 @@ exports.createEnquiry = catchAsyncError(async (req, res) => {
     message,
   };
 
+  if(contact && (contact.length <= 7 || contact.length >= 15)) return sendResponse(res, 400, {msg: errorMessages.contact.invalid})
+
   enquiry = await Enquiry.create(enquiry);
 
   if (enquiry)
