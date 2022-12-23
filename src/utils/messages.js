@@ -54,6 +54,7 @@ const errorMessages = {
     DeleteError: "Post not deleted !",
     invalidID: "post id is not valid !",
     NotFound: "post not found !",
+    hardDelete: "post is hard deleted !",
   },
   category: {
     created: "Category created!",

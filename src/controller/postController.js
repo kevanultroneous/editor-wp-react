@@ -13,7 +13,10 @@ const { aggreFilters } = require("../utils/filterJson");
 
 const Post = require("../model/postModel");
 const Category = require("../model/categoryModel");
-const { reduceWithImageMin } = require("../utils/imageminReduce");
+const {
+  reduceWithImageMin,
+  reduceWithImageThumbnail,
+} = require("../utils/imageminReduce");
 const {
   uploadImageToS3,
   deleteImageFromS3,
@@ -28,6 +31,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
   let post;
   let updatedPost;
   let imageLink;
+  let thumbnailImageLink;
 
   const {
     title,
@@ -79,9 +83,16 @@ exports.addPost = catchAsyncError(async (req, res) => {
     post._id
   );
 
+  thumbnailImageLink = await uploadThumbnailImage(
+    req.file.buffer,
+    req.file.mimetype,
+    `${post._id}-thumbnail`
+  );
+
   if (post) {
     updatedPost = await Post.findByIdAndUpdate(post._id, {
       featuredImage: imageLink,
+      thumbnailImage: thumbnailImageLink,
     });
   }
 
@@ -162,6 +173,11 @@ exports.updatePost = catchAsyncError(async (req, res) => {
       req.file.buffer,
       req.file.mimetype,
       postid
+    );
+    changesTobeUpdated.thumbnailImage = await uploadThumbnailImage(
+      req.file.buffer,
+      req.file.mimetype,
+      `${postid}-thumbnail`
     );
   }
 
@@ -628,6 +644,35 @@ exports.getImage = catchAsyncError(async (req, res) => {
   });
 });
 
+exports.hardDelete = catchAsyncError(async (req, res) => {
+  let post;
+  let featuredImageDelete;
+  let thumbnailImageDelete;
+  let filename;
+
+  const { postid } = req.body;
+  console.log(req.body);
+
+  if (!mongoose.isValidObjectId(postid))
+    return sendResponse(res, 500, {
+      msg: errorMessages.post.invalidID,
+      success: false,
+    });
+
+  post = await Post.findByIdAndDelete(postid);
+
+  filename = postid.toString();
+  featuredImageDelete = await deleteImageFromS3(filename);
+
+  filename = `${filename}-thumbnail`;
+  thumbnailImageDelete = await deleteImageFromS3(filename);
+
+  return sendResponse(res, 200, {
+    msg: errorMessages.post.hardDelete,
+    data: post,
+  });
+});
+
 function PRFullSorting(pageOptions) {
   return [
     {
@@ -738,6 +783,30 @@ async function uploadFeaturedImage(buffer, mimetype, filename) {
     .catch((err) => err);
 
   const bufferImage = await reduceWithImageMin(updatedbuffer);
+
+  const body = {
+    Body: bufferImage,
+    Key: filename.toString(),
+    ContentType: mimetype,
+  };
+
+  const s3ImageUploaded = await uploadImageToS3(body);
+
+  if (s3ImageUploaded)
+    return `https://unmediabuzz-s3bucket.s3.us-west-1.amazonaws.com/${filename}`;
+  return undefined;
+}
+
+async function uploadThumbnailImage(buffer, mimetype, filename) {
+  const updatedbuffer = await sharp(buffer)
+    .flatten({ background: "#fff" })
+    .resize({ width: 125, height: 125 })
+    .jpeg({ quality: 100 })
+    .toBuffer()
+    .then((data) => data)
+    .catch((err) => err);
+
+  const bufferImage = await reduceWithImageThumbnail(updatedbuffer);
 
   const body = {
     Body: bufferImage,

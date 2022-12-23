@@ -36,6 +36,7 @@ postRouter.post(
 
 //delete post
 postRouter.post("/delete-post", postController.deletePost);
+postRouter.post("/hard-delete", postController.hardDelete);
 
 //get all post
 postRouter.post("/get-all-post", postController.getAllpost);

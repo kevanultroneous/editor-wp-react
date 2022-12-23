@@ -31,7 +31,7 @@ exports.uploadImageToS3 =  (imageObj) => {
 exports.deleteImageFromS3 =  (imageObj) => {
   const params = {
     Bucket: bucketName,
-    ...imageObj,
+    Key: imageObj,
   };
   const command = new DeleteObjectCommand(params);
   const awsStrore =  s3.send(command);

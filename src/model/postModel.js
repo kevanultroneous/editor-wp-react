@@ -14,6 +14,9 @@ const schema = new mongoose.Schema(
     featuredImage: {
       type: String,
     },
+    thumbnailImage: {
+      type: String,
+    },
     category: [
       {
         type: mongoose.Types.ObjectId,
