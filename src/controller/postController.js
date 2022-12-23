@@ -13,28 +13,22 @@ const { aggreFilters } = require("../utils/filterJson");
 
 const Post = require("../model/postModel");
 const Category = require("../model/categoryModel");
+const { reduceWithImageMin } = require("../utils/imageminReduce");
+const {
+  uploadImageToS3,
+  deleteImageFromS3,
+  getImageFromS3,
+} = require("../utils/s3_bucket");
 
 // add in common functions => check kyc
 exports.uploadImagesForFeatured = upload.single("image");
 
-exports.resizePhotoFimg = (req, res, next) => {
-  if (req.file) {
-    let newfile = `public/other/featured/${Date.now()}-${generateOtp()}.jpeg`;
-
-    sharp(req.file.buffer)
-      .flatten({ background: "#fff" })
-      .resize({ width: 815, height: 569 })
-      .jpeg({ quality: 100 })
-      .toFile(newfile);
-    req.sendfile = newfile.replace("public/", "");
-    next();
-  } else {
-    next();
-  }
-};
-
 // admin
 exports.addPost = catchAsyncError(async (req, res) => {
+  let post;
+  let updatedPost;
+  let imageLink;
+
   const {
     title,
     summary,
@@ -58,7 +52,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
 
   let newPost = {
     title,
-    featuredImage: req.sendfile,
+    // featuredImage: req.sendfile,
     summary,
     category,
     subCategory,
@@ -78,9 +72,20 @@ exports.addPost = catchAsyncError(async (req, res) => {
     isApproved,
   };
 
-  let post = await Post.create(newPost);
+  post = await Post.create(newPost);
+  imageLink = await uploadFeaturedImage(
+    req.file.buffer,
+    req.file.mimetype,
+    post._id
+  );
 
   if (post) {
+    updatedPost = await Post.findByIdAndUpdate(post._id, {
+      featuredImage: imageLink,
+    });
+  }
+
+  if (updatedPost) {
     return sendResponse(res, 200, {
       msg:
         draftStatus !== "draft"
@@ -152,7 +157,13 @@ exports.updatePost = catchAsyncError(async (req, res) => {
     isActive,
   };
 
-  if (req.sendfile) changesTobeUpdated.featuredImage = req.sendfile;
+  if (req.file) {
+    changesTobeUpdated.featuredImage = await uploadFeaturedImage(
+      req.file.buffer,
+      req.file.mimetype,
+      postid
+    );
+  }
 
   const updatedPost = await Post.findByIdAndUpdate(postid, changesTobeUpdated, {
     new: true,
@@ -564,6 +575,59 @@ exports.categoryPrList = catchAsyncError(async (req, res) => {
   return sendResponse(res, 200, { data: categoryPosts, status: 200 });
 });
 
+exports.uploadImage = catchAsyncError(async (req, res) => {
+  const bufferImage = await reduceWithImageMin(req.file.buffer);
+  const timestamp = Date.now();
+  const filename = `${timestamp}.JPEG`;
+
+  const body = {
+    Body: bufferImage,
+    Key: filename,
+    ContentType: req.file.mimetype,
+  };
+  const s3Store = await uploadImageToS3(body);
+
+  return sendResponse(res, 200, {
+    msg: "working",
+    data: s3Store,
+    file: filename,
+  });
+});
+
+exports.deleteImage = catchAsyncError(async (req, res) => {
+  const { filename } = req.body;
+
+  const body = {
+    Key: filename,
+  };
+  const s3Store = deleteImageFromS3(body);
+
+  return sendResponse(res, 200, {
+    msg: "working",
+    data: s3Store,
+    file: filename,
+  });
+});
+
+exports.getImage = catchAsyncError(async (req, res) => {
+  // const bufferImage = await reduceWithImageMin(req.file.buffer);
+  // const timestamp = new Date().toISOString();
+  // const filename = `${timestamp}.JPEG`;
+  const { filename } = req.body;
+
+  // console.log(req.body);
+  const body = {
+    Key: filename,
+  };
+  const s3Store = getImageFromS3(body);
+
+  return sendResponse(res, 200, {
+    msg: "working",
+    data: s3Store,
+    file: filename,
+  });
+});
+
 function PRFullSorting(pageOptions) {
   return [
     {
@@ -662,4 +726,28 @@ function addCategoryName() {
       },
     },
   ];
+}
+
+async function uploadFeaturedImage(buffer, mimetype, filename) {
+  const updatedbuffer = await sharp(buffer)
+    .flatten({ background: "#fff" })
+    .resize({ width: 815, height: 569 })
+    .jpeg({ quality: 100 })
+    .toBuffer()
+    .then((data) => data)
+    .catch((err) => err);
+
+  const bufferImage = await reduceWithImageMin(updatedbuffer);
+
+  const body = {
+    Body: bufferImage,
+    Key: filename.toString(),
+    ContentType: mimetype,
+  };
+
+  const s3ImageUploaded = await uploadImageToS3(body);
+
+  if (s3ImageUploaded)
+    return `https://unmediabuzz-s3bucket.s3.us-west-1.amazonaws.com/${filename}`;
+  return undefined;
 }
