@@ -44,6 +44,7 @@ const errorMessages = {
     invalid: `${provide} OTP`,
   },
   post: {
+    imageError: `${provide} image`,
     uploadError: "Post was not uploaded",
     Draft: "Post is in draft",
     Published: "Post is uploaded",

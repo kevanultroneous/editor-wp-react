@@ -11,7 +11,7 @@ postRouter.post(
   "/create-post",
   postController.uploadImagesForFeatured,
   userController.protect,
-  postController.addPost,
+  postController.addPost
 );
 
 // all posts
@@ -35,8 +35,21 @@ postRouter.post(
 );
 
 //delete post
-postRouter.post("/delete-post", postController.deletePost);
-postRouter.post("/hard-delete", postController.hardDelete);
+postRouter.post(
+  "/delete-post",
+  userController.protect,
+  postController.deletePost
+);
+postRouter.post(
+  "/hard-delete",
+  userController.protect,
+  postController.hardDelete
+);
+postRouter.post(
+  "/recently-deleted",
+  userController.protect,
+  postController.recentlyDeleted
+);
 
 //get all post
 postRouter.post("/get-all-post", postController.getAllpost);
@@ -52,6 +65,5 @@ postRouter.post("/search-pr-title", postController.globalSearch);
 postRouter.post("/internal-search", postController.internalSearch);
 
 postRouter.post("/interested-posts", postController.interestedPosts);
-
 
 module.exports = postRouter;

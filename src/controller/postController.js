@@ -33,6 +33,8 @@ exports.addPost = catchAsyncError(async (req, res) => {
   let imageLink;
   let thumbnailImageLink;
 
+  if(!req.file) return sendResponse(res, 400, {msg: errorMessages.post.imageError})
+
   const {
     title,
     summary,
@@ -211,7 +213,7 @@ exports.deletePost = catchAsyncError(async (req, res) => {
 
   const softDeletePost = await Post.findByIdAndUpdate(postid, {
     isActive: false,
-  });
+  }, {new: true});
 
   // make it same as add post
   if (softDeletePost) {
@@ -671,6 +673,40 @@ exports.hardDelete = catchAsyncError(async (req, res) => {
     msg: errorMessages.post.hardDelete,
     data: post,
   });
+});
+
+exports.recentlyDeleted = catchAsyncError(async (req, res) => {
+  const { page, limit } = req.body;
+
+  let getFullpost;
+
+  const pageOptions = {
+    skipVal: (parseInt(page) - 1 || 0) * (parseInt(limit) || 30),
+    limitVal: parseInt(limit) || 30,
+  };
+
+  getFullpost = await Post.aggregate([
+    {
+      $facet: {
+        mainDoc: [
+          { $match: { isActive: false } },
+          { $sort: { updatedAt: -1 } },
+          { $skip: pageOptions.skipVal },
+          { $limit: pageOptions.limitVal },
+        ],
+        totalCount: [{ $match: { isActive: true } }, { $count: "total" }],
+      },
+    },
+    {
+      $addFields: {
+        totalCount: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.total", 0] }, 0],
+        },
+      },
+    },
+  ]);
+
+  return sendResponse(res, 200, {data: getFullpost,});
 });
 
 function PRFullSorting(pageOptions) {
