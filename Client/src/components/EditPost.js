@@ -128,8 +128,8 @@ export default function EditPost() {
           setReleaseDate(r.data?.data?.releaseDate);
           setHomePin(r.data?.data?.homePageStatus);
           setDummyImg(
-            r.data?.data?.featuredImage
-              ? defaultUrl + r.data?.data?.featuredImage
+            r.data?.data?.thumbnailImage
+              ? r.data?.data?.thumbnailImage
               : null
           );
           setApproved(r.data?.data?.isApproved);
@@ -539,12 +539,12 @@ export default function EditPost() {
                   }}
                   type="file"
                   onChange={(e) => {
-                    if (Math.round(e.target.files[0].size / 1024 > 1096)) {
-                      alert("File size must under 1mb!");
-                    } else {
+                    // if (Math.round(e.target.files[0].size / 1024 > 1096)) {
+                    //   alert("File size must under 1mb!");
+                    // } else {
                       setFFile(e.target.files[0]);
                       setImageEditing(true);
-                    }
+                    // }
                   }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />

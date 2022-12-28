@@ -464,12 +464,12 @@ export default function PostUploading() {
                   }}
                   type="file"
                   onChange={(e) => {
-                    if (Math.round(e.target.files[0].size / 1024 > 1096)) {
-                      alert("File size must under 1mb!");
-                    } else {
+                    // if (Math.round(e.target.files[0].size / 1024 > 1096)) {
+                    //   alert("File size must under 1mb!");
+                    // } else {
                       setFFile(e.target.files[0]);
                       setImageEditing(true);
-                    }
+                    // }
                   }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
                 />

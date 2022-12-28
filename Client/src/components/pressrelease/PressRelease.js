@@ -206,7 +206,7 @@ const PressRelease = () => {
                       <td>
                         {v.featuredImage ? (
                           <Image
-                            src={`${defaultUrl + v.featuredImage}`}
+                            src={`${v.thumbnailImage}`}
                             height={80}
                             width={"100px"}
                           />
