@@ -95,7 +95,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
     updatedPost = await Post.findByIdAndUpdate(post._id, {
       featuredImage: imageLink,
       thumbnailImage: thumbnailImageLink,
-    });
+    }, {new: true});
   }
 
   if (updatedPost) {
@@ -105,7 +105,7 @@ exports.addPost = catchAsyncError(async (req, res) => {
           ? errorMessages.post.Published
           : errorMessages.post.Draft,
       success: true,
-      data: subCategory,
+      data: updatedPost,
     });
   }
 
@@ -829,7 +829,7 @@ async function uploadFeaturedImage(buffer, mimetype, filename) {
   const s3ImageUploaded = await uploadImageToS3(body);
 
   if (s3ImageUploaded)
-    return `https://unmediabuzz-s3bucket.s3.us-west-1.amazonaws.com/${filename}`;
+    return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_BUCKET_REGION}.amazonaws.com/${filename}`;
   return undefined;
 }
 
@@ -853,6 +853,6 @@ async function uploadThumbnailImage(buffer, mimetype, filename) {
   const s3ImageUploaded = await uploadImageToS3(body);
 
   if (s3ImageUploaded)
-    return `https://unmediabuzz-s3bucket.s3.us-west-1.amazonaws.com/${filename}`;
+    return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_BUCKET_REGION}.amazonaws.com/${filename}`;
   return undefined;
 }
