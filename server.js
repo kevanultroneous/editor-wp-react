@@ -2,6 +2,23 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const app = require("./app");
 
+// ======================== FOR STARTING NODE ON HTTPS ========================
+
+// const privateKey = fs.readFileSync(
+//   "/etc/letsencrypt/live/unmediabuzz.com/privkey.pem",
+//   "utf8"
+// );
+// const certificate = fs.readFileSync(
+//   "/etc/letsencrypt/live/unmediabuzz.com/cert.pem",
+//   "utf8"
+// );
+// const ca = fs.readFileSync(
+//   "/etc/letsencrypt/live/unmediabuzz.com/chain.pem",
+//   "utf8"
+// );
+
+// const credentials = { key: privateKey, cert: certificate, ca: ca };
+
 // ======================== EVERYTHING RELATED TO SERVER WILL BE HERE ========================
 
 // catch exception error
@@ -24,6 +41,9 @@ const port = process.env.PORT || 8000;
 const server = app.listen(port, () => {
   console.log(`server running of port ${port}`);
 });
+
+// const httpsServer = https.createServer(credentials, app);
+// httpsServer.listen(8000);
 
 // catch rejection error
 process.on("unhandledRejection", (err) => {
