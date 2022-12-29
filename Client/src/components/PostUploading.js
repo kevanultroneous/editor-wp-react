@@ -42,10 +42,10 @@ export default function PostUploading() {
     x: 25,
     y: 25,
     width: 815,
-    height: 570,
+    height: 569,
   });
   const previewCanvasRef = useRef(null);
-  const [aspect, setAspect] = useState(16 / 9);
+  const [aspect, setAspect] = useState(815 / 569);
   const [completedCrop, setCompletedCrop] = useState();
   const [imageEditing, setImageEditing] = useState(false);
   const imgRef = useRef(null);
@@ -159,25 +159,25 @@ export default function PostUploading() {
   const postUpload = () => {
     if (releaseDate === "") {
       toast.error("Date is required !");
-      setAspect(16 / 9);
+      setAspect(815 / 569);
     } else if (mainTitle === "") {
       toast.error("Title is required !");
-      setAspect(16 / 9);
+      setAspect(815 / 569);
     } else if (mainTitle.length >= 200) {
       toast.error("Title should be less than 200 characters !");
-      setAspect(16 / 9);
+      setAspect(815 / 569);
     } else if (url.length > 60) {
       toast.error("slug url should be less than 46 characters !");
-      setAspect(16 / 9);
+      setAspect(815 / 569);
     } else if (selectedCategory.length <= 0) {
       toast.error("Please select one or more category !");
-      setAspect(16 / 9);
+      setAspect(815 / 569);
     } else if (content.length < 100) {
       toast.error("Content required 100 words !");
-      setAspect(16 / 9);
+      setAspect(815 / 569);
     } else {
       // console.log(selectedSubCategory);
-      setAspect(16 / 9);
+      setAspect(815 / 569);
       axios
         .post(`${defaultUrl}api/post/create-post`, formdata, {
           headers: {
@@ -364,7 +364,7 @@ export default function PostUploading() {
               setImageEditing(false);
               setFFile(null);
               setPrImg(null);
-              setAspect(16 / 9);
+              setAspect(815 / 569);
             }}
           >
             Cancel

@@ -42,10 +42,10 @@ export default function EditPost() {
     x: 25,
     y: 25,
     width: 815,
-    height: 570,
+    height: 569,
   });
   const previewCanvasRef = useRef(null);
-  const [aspect, setAspect] = useState(16 / 9);
+  const [aspect, setAspect] = useState(815 / 569);
   const [completedCrop, setCompletedCrop] = useState();
   const [imageEditing, setImageEditing] = useState(false);
   const imgRef = useRef(null);
@@ -128,9 +128,7 @@ export default function EditPost() {
           setReleaseDate(r.data?.data?.releaseDate);
           setHomePin(r.data?.data?.homePageStatus);
           setDummyImg(
-            r.data?.data?.thumbnailImage
-              ? r.data?.data?.thumbnailImage
-              : null
+            r.data?.data?.thumbnailImage ? r.data?.data?.thumbnailImage : null
           );
           setApproved(r.data?.data?.isApproved);
           setSeokeywords(r.data?.data?.seoKeywords);
@@ -542,8 +540,8 @@ export default function EditPost() {
                     // if (Math.round(e.target.files[0].size / 1024 > 1096)) {
                     //   alert("File size must under 1mb!");
                     // } else {
-                      setFFile(e.target.files[0]);
-                      setImageEditing(true);
+                    setFFile(e.target.files[0]);
+                    setImageEditing(true);
                     // }
                   }}
                   accept="image/png,image/jpg,image/jpeg,image/svg"
