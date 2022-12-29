@@ -63,6 +63,7 @@ postRouter.get("/get-recent-pr", postController.getRecentPR);
 
 postRouter.post("/search-pr-title", postController.globalSearch);
 postRouter.post("/internal-search", postController.internalSearch);
+postRouter.post("/category-page", postController.categoryPrList);
 
 postRouter.post("/interested-posts", postController.interestedPosts);
 
